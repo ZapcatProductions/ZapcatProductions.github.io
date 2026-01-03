@@ -15,33 +15,36 @@
     font-family: sans-serif;
   }
 
+  /* GAME CONTAINER (THE BOX IS THE GAME) */
   #game-container {
     width: 360px;
     height: 360px;
     background: white;
     border: 2px solid black;
     position: relative;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    box-sizing: border-box;
+    padding: 12px;
   }
 
-  /* CROSSWORD GRID */
+  /* GRID SCALES TO FIT CONTAINER */
   #grid {
+    width: 100%;
+    height: 100%;
     display: grid;
     grid-template-columns: repeat(5, 1fr);
     grid-template-rows: repeat(5, 1fr);
     gap: 2px;
-    width: 300px;
-    height: 300px;
   }
 
   .cell {
-    border: 1px solid #000;
-    text-transform: uppercase;
-    font-size: 22px;
+    width: 100%;
+    height: 100%;
+    border: 1px solid black;
+    box-sizing: border-box;
     text-align: center;
-    line-height: 1;
+    font-size: 1.5em;
+    font-weight: bold;
+    text-transform: uppercase;
     outline: none;
   }
 
@@ -50,7 +53,7 @@
   }
 
   .block {
-    background: #000;
+    background: black;
   }
 
   /* AD OVERLAY */
@@ -72,28 +75,28 @@
 
 <div id="game-container">
 
-  <!-- GAME -->
   <div id="grid"></div>
 
-  <!-- AD OVERLAY -->
   <div id="ad-overlay">Loading…</div>
 
 </div>
 
 <script>
-  /* SIMPLE 5x5 MINI CROSSWORD */
+  /* MINI CROSSWORD LAYOUT
+     Empty string = black square
+  */
   const layout = [
     ["H","E","L","L","O"],
-    ["A","", "","", "R"],
+    ["A","","","", "R"],
     ["P","A","N","E","L"],
-    ["P","", "","", "O"],
+    ["P","","","", "O"],
     ["Y","E","A","R","S"]
   ];
 
   const grid = document.getElementById("grid");
 
-  layout.forEach((row, r) => {
-    row.forEach((letter, c) => {
+  layout.forEach((row) => {
+    row.forEach((letter) => {
       if (letter === "") {
         const block = document.createElement("div");
         block.className = "cell block";
@@ -103,15 +106,18 @@
         input.className = "cell";
         input.maxLength = 1;
         input.dataset.answer = letter;
+
         input.addEventListener("input", () => {
           input.value = input.value.toUpperCase();
           focusNext(input);
         });
-        input.addEventListener("keydown", e => {
+
+        input.addEventListener("keydown", (e) => {
           if (e.key === "Backspace" && !input.value) {
             focusPrev(input);
           }
         });
+
         grid.appendChild(input);
       }
     });
@@ -129,11 +135,11 @@
     if (cells[i - 1]) cells[i - 1].focus();
   }
 
-  /* SIMULATE AD LOAD */
+  /* SIMULATED AD */
   setTimeout(() => {
     document.getElementById("ad-overlay").style.display = "none";
-    const firstCell = document.querySelector(".cell:not(.block)");
-    if (firstCell) firstCell.focus();
+    const first = document.querySelector(".cell:not(.block)");
+    if (first) first.focus();
   }, 3000);
 </script>
 
