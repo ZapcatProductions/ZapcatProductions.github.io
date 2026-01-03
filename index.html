@@ -2,33 +2,76 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Mini Game</title>
+<title>Mini Crossword</title>
 
 <style>
+  /* PAGE SETUP */
   body {
     margin: 0;
     height: 100vh;
     display: flex;
     justify-content: center;
-    align-items: center;
-
+    align-items: center; /* IMPORTANT */
     background: #e0e0e0;
     font-family: sans-serif;
   }
 
+  /* GAME CONTAINER (THE SQUARE) */
   #game-container {
     width: 360px;
     height: 360px;
     background: white;
     border: 2px solid black;
     position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  /* PLACEHOLDER GAME CONTENT */
+  #game-content {
+    font-size: 18px;
+    color: #333;
+  }
+
+  /* AD / LOADING OVERLAY */
+  #ad-overlay {
+    position: absolute;
+    inset: 0;
+    background: black;
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 20px;
+    z-index: 10;
   }
 </style>
 </head>
 
 <body>
 
-<div id="game-container"></div>
+<div id="game-container">
+
+  <!-- GAME CONTENT (WILL BECOME CROSSWORD) -->
+  <div id="game-content">
+    Game will load here
+  </div>
+
+  <!-- AD OVERLAY -->
+  <div id="ad-overlay">
+    Loading…
+  </div>
+
+</div>
+
+<script>
+  /* SIMULATE AD LOADING */
+  setTimeout(() => {
+    const ad = document.getElementById("ad-overlay");
+    if (ad) ad.style.display = "none";
+  }, 3000);
+</script>
 
 </body>
 </html>
