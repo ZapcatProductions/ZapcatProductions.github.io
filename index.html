@@ -6,160 +6,117 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
-:root {
-  --tile-default: #e0e0e0;
-  --tile-active: #cfe3ff;
-  --tile-complete: #ffffff;
-  --tile-error: #ffb3b3;
+:root{
+  --grey:#e0e0e0;
+  --blue:#cfe3ff;
+  --white:#ffffff;
+  --red:#ffb3b3;
 }
 
-body {
-  margin: 0;
-  font-family: system-ui, sans-serif;
-  background: #f2f2f2;
-}
-
-/* ===== PRELOADERS ===== */
-#adScreen, #introScreen {
-  position: fixed;
-  inset: 0;
-  background: black;
-  color: white;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 100;
-}
-
-#introScreen {
-  background: white;
-  color: black;
-  flex-direction: column;
-  display: none;
-}
-
-#startBtn {
-  margin-top: 24px;
-  padding: 10px 20px;
-  background: #3a7bfd;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  font-size: 14px;
-  cursor: pointer;
-  align-self: flex-end;
-  margin-right: 24px;
+body{
+  margin:0;
+  font-family:system-ui,sans-serif;
+  background:#f2f2f2;
 }
 
 /* ===== TOP BAR ===== */
-#topbar {
-  height: 48px;
-  background: #9ac57a;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 14px;
-  font-weight: 600;
+#topbar{
+  height:48px;
+  background:#9ac57a;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:0 14px;
+  font-weight:600;
 }
 
 /* ===== SETTINGS ===== */
-#settingsBtn { cursor: pointer; }
-#settings {
-  display: none;
-  position: fixed;
-  top: 56px;
-  right: 16px;
-  background: white;
-  border: 1px solid #ccc;
-  padding: 12px;
-  z-index: 10;
+#settingsBtn{cursor:pointer}
+#settings{
+  display:none;
+  position:fixed;
+  top:56px;
+  right:16px;
+  background:white;
+  border:1px solid #ccc;
+  padding:12px;
+  z-index:10;
 }
 
 /* ===== ACTIVE CLUE ===== */
-#active-clue {
-  background: white;
-  padding: 10px;
-  border-bottom: 1px solid #ccc;
-  font-size: 14px;
+#active-clue{
+  background:white;
+  padding:10px;
+  border-bottom:1px solid #ccc;
+  font-size:14px;
 }
 
 /* ===== LAYOUT ===== */
-#game {
-  display: grid;
-  grid-template-columns: minmax(0,1fr) 320px;
-  gap: 16px;
-  padding: 16px;
-  max-width: 1200px;
-  margin: auto;
+#game{
+  display:grid;
+  grid-template-columns:auto 320px;
+  gap:16px;
+  padding:16px;
+  max-width:900px;
+  margin:auto;
 }
 
 /* ===== GRID ===== */
-#grid {
-  display: grid;
-  gap: 2px;
-  background: black;
+#grid{
+  display:grid;
+  grid-template-columns:repeat(5,48px);
+  gap:2px;
+  background:black;
 }
 
-.cell {
-  background: var(--tile-default);
-  position: relative;
+.cell{
+  width:48px;
+  height:48px;
+  background:var(--grey);
+  position:relative;
 }
 
-.cell.block { background: black; }
+.cell.block{background:black}
 
-.cell.active { background: var(--tile-active); }
-.cell.complete { background: var(--tile-complete); }
-.cell.error { background: var(--tile-error); }
+.cell.active{background:var(--blue)}
+.cell.complete{background:var(--white)}
+.cell.error{background:var(--red)}
 
-.cell input {
-  width: 100%;
-  height: 100%;
-  border: none;
-  background: transparent;
-  text-align: center;
-  font-size: 22px;
-  font-weight: bold;
-  text-transform: uppercase;
+.cell input{
+  width:100%;
+  height:100%;
+  border:none;
+  background:transparent;
+  text-align:center;
+  font-size:20px;
+  font-weight:bold;
+  text-transform:uppercase;
 }
 
-.cell input:focus { outline: none; }
+.cell input:focus{outline:none}
 
-.number {
-  position: absolute;
-  top: 3px;
-  left: 4px;
-  font-size: 9px;
-  font-weight: 600;
-  pointer-events: none;
+.number{
+  position:absolute;
+  top:3px;
+  left:4px;
+  font-size:9px;
+  font-weight:600;
+  pointer-events:none;
 }
 
 /* ===== CLUES ===== */
-#clues {
-  background: white;
-  border: 1px solid #ccc;
-  padding: 12px;
-  overflow-y: auto;
+#clues{
+  background:white;
+  border:1px solid #ccc;
+  padding:12px;
 }
 
-.clue { cursor: pointer; padding: 4px; }
-.clue.active { background: var(--tile-active); }
+.clue{cursor:pointer;padding:4px}
+.clue.active{background:var(--blue)}
 </style>
 </head>
 
 <body>
-
-<!-- BLACK AD -->
-<div id="adScreen">Ad loading…</div>
-
-<!-- INTRO -->
-<div id="introScreen">
-  <h2 id="dateText"></h2>
-  <div>by zapcatproductions</div>
-  <p>thank you for playing my mini game, I hope you have fun</p>
-  <p>looking for more fun crosswords? open the menu (top right) to find past minis. this is mini 1</p>
-  <small>copyright zapcatproductions 2026</small>
-  <button id="startBtn">Start</button>
-</div>
 
 <div id="topbar">
   <div id="timer">00:00</div>
@@ -176,48 +133,32 @@ body {
   <div id="grid"></div>
   <div id="clues">
     <h3>Across</h3>
-    <div class="clue" data-key="1_across">1. Learned</div>
-    <div class="clue" data-key="5_across">5. Reader pause</div>
+    <div class="clue" data-number="1">1. Learned</div>
+    <div class="clue" data-number="5">5. Reader pause</div>
     <h3>Down</h3>
-    <div class="clue" data-key="1_down">1. Puts down</div>
-    <div class="clue" data-key="2_down">2. Eat</div>
+    <div class="clue" data-number="1">1. Puts down</div>
+    <div class="clue" data-number="2">2. Eat</div>
   </div>
 </div>
 
 <script>
-/* ===== DATE ===== */
-document.getElementById("dateText").textContent =
-  new Date().toLocaleDateString(undefined,{weekday:"long",month:"long",day:"numeric",year:"numeric"});
-
-/* ===== PRELOADER FLOW ===== */
-setTimeout(()=>{
-  adScreen.style.display="none";
-  introScreen.style.display="flex";
-},1500);
-
 /* ===== TIMER ===== */
-let seconds=0, timerInt=null;
-function startTimer(){
-  timerInt=setInterval(()=>{
-    seconds++;
-    const m=String(Math.floor(seconds/60)).padStart(2,'0');
-    const s=String(seconds%60).padStart(2,'0');
-    timer.textContent=`${m}:${s}`;
-  },1000);
-}
-startBtn.onclick=()=>{
-  introScreen.style.display="none";
-  startTimer();
-};
+let t=0;
+setInterval(()=>{
+  t++;
+  timer.textContent=
+    String(Math.floor(t/60)).padStart(2,'0')+':' +
+    String(t%60).padStart(2,'0');
+},1000);
 
 /* ===== GRID DATA ===== */
 const gridData=[
  ['L','E','A','R','N'],
  ['A',null,'E',null,'A'],
- ['Y','O','U','R','E'],
+ ['Y','O','U','R','E']
 ];
 
-const cluesMap={
+const clues={
  '1_across':[[0,0],[0,1],[0,2],[0,3],[0,4]],
  '5_across':[[2,0],[2,1],[2,2],[2,3],[2,4]],
  '1_down':[[0,0],[1,0],[2,0]],
@@ -227,81 +168,131 @@ const cluesMap={
 const numbers={'0,0':1,'2,0':5,'0,2':2};
 
 const grid=document.getElementById('grid');
-grid.style.gridTemplateColumns=`repeat(5,1fr)`;
-
 const cells=[];
+
+/* ===== BUILD GRID ===== */
 for(let r=0;r<3;r++){
- cells[r]=[];
- for(let c=0;c<5;c++){
-  const cell=document.createElement('div');
-  cell.className='cell';
-  if(gridData[r][c]==null){cell.classList.add('block');}
-  else{
-   const input=document.createElement('input');
-   input.maxLength=1;
-   cell.appendChild(input);
-   const k=`${r},${c}`;
-   if(numbers[k]){
-     const n=document.createElement('div');
-     n.className='number';
-     n.textContent=numbers[k];
-     cell.appendChild(n);
-   }
-   input.onfocus=()=>selectTile(r,c);
-   input.oninput=()=>checkCell(r,c,input,cell);
+  cells[r]=[];
+  for(let c=0;c<5;c++){
+    const cell=document.createElement('div');
+    cell.className='cell';
+
+    if(gridData[r][c]==null){
+      cell.classList.add('block');
+    }else{
+      const input=document.createElement('input');
+      input.maxLength=1;
+      cell.appendChild(input);
+
+      const k=`${r},${c}`;
+      if(numbers[k]){
+        const n=document.createElement('div');
+        n.className='number';
+        n.textContent=numbers[k];
+        cell.appendChild(n);
+      }
+
+      input.onfocus=()=>selectTile(r,c);
+      input.oninput=()=>handleInput(r,c,input,cell);
+    }
+
+    grid.appendChild(cell);
+    cells[r][c]=cell;
   }
-  grid.appendChild(cell);
-  cells[r][c]=cell;
- }
 }
 
-let activeKey=null;
+/* ===== STATE ===== */
+let activeNumber=1;
+let activeDir='across';
 
+/* ===== HELPERS ===== */
+function keyFor(num,dir){return `${num}_${dir}`}
+
+function activate(num,dir){
+  activeNumber=num;
+  activeDir=dir;
+
+  document.querySelectorAll('.cell').forEach(c=>{
+    c.classList.remove('active','complete');
+  });
+  document.querySelectorAll('.clue').forEach(c=>c.classList.remove('active'));
+
+  const key=keyFor(num,dir);
+  clues[key].forEach(([r,c])=>cells[r][c].classList.add('active'));
+
+  document.querySelectorAll(`.clue[data-number="${num}"]`)
+    .forEach(c=>c.classList.add('active'));
+
+  activeClue.textContent=
+    (dir==='across'?'Across ':'Down ')+num;
+}
+
+/* ===== TILE CLICK ===== */
 function selectTile(r,c){
- const keys=Object.entries(cluesMap).filter(([k,v])=>v.some(p=>p[0]==r&&p[1]==c)).map(e=>e[0]);
- if(!keys.length)return;
- if(keys.includes(activeKey)){
-   const other=keys.find(k=>k!==activeKey);
-   if(other) activate(other);
- } else activate(keys[0]);
+  const matches=[];
+  for(const k in clues){
+    if(clues[k].some(p=>p[0]==r&&p[1]==c)) matches.push(k);
+  }
+  if(!matches.length)return;
+
+  const current=keyFor(activeNumber,activeDir);
+  if(matches.includes(current)){
+    const other=matches.find(k=>k!==current);
+    if(other){
+      const [n,d]=other.split('_');
+      activate(Number(n),d);
+    }
+  }else{
+    const [n,d]=matches[0].split('_');
+    activate(Number(n),d);
+  }
 }
 
-function activate(key){
- activeKey=key;
- document.querySelectorAll('.cell').forEach(c=>c.className='cell'+(c.classList.contains('block')?' block':''));
- document.querySelectorAll('.clue').forEach(c=>c.classList.remove('active'));
- cluesMap[key].forEach(([r,c])=>cells[r][c].classList.add('active'));
- document.querySelector(`[data-key="${key}"]`)?.classList.add('active');
- activeClue.textContent=document.querySelector(`[data-key="${key}"]`).textContent;
+/* ===== CLUE CLICK (TRUE TOGGLE) ===== */
+document.querySelectorAll('.clue').forEach(clue=>{
+  clue.onclick=()=>{
+    const num=Number(clue.dataset.number);
+    if(num===activeNumber){
+      activate(num,activeDir==='across'?'down':'across');
+    }else{
+      activate(num,'across');
+    }
+  };
+});
+
+/* ===== INPUT / ERROR CHECK ===== */
+function handleInput(r,c,input,cell){
+  cell.classList.remove('error');
+
+  if(!input.value)return;
+
+  if(errorCheck.checked){
+    if(input.value.toUpperCase()!==gridData[r][c]){
+      cell.classList.add('error');
+    }
+  }
+  checkComplete();
 }
 
-function checkCell(r,c,input,cell){
- cell.classList.remove('error');
- if(!input.value)return;
- if(document.getElementById('errorCheck').checked){
-   if(input.value.toUpperCase()!==gridData[r][c]){
-     cell.classList.add('error');
-   }
- }
- checkComplete();
-}
-
+/* ===== WORD COMPLETE ===== */
 function checkComplete(){
- if(!activeKey)return;
- const done=cluesMap[activeKey].every(([r,c])=>{
-   const i=cells[r][c].querySelector('input');
-   return i && i.value.toUpperCase()===gridData[r][c];
- });
- cluesMap[activeKey].forEach(([r,c])=>{
-   cells[r][c].classList.toggle('complete',done);
- });
+  const key=keyFor(activeNumber,activeDir);
+  const done=clues[key].every(([r,c])=>{
+    const i=cells[r][c].querySelector('input');
+    return i && i.value.toUpperCase()===gridData[r][c];
+  });
+  clues[key].forEach(([r,c])=>{
+    cells[r][c].classList.toggle('complete',done);
+  });
 }
-
-document.querySelectorAll('.clue').forEach(c=>c.onclick=()=>activate(c.dataset.key));
-activate('1_across');
 
 /* ===== SETTINGS ===== */
-settingsBtn.onclick=()=>settings.style.display=settings.style.display==='block'?'none':'block';
+settingsBtn.onclick=()=>{
+  settings.style.display=settings.style.display==='block'?'none':'block';
+};
+
+/* ===== START ===== */
+activate(1,'across');
 </script>
 
 </body>
