@@ -6,119 +6,167 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
-body { margin:0; font-family:system-ui,sans-serif; background:#f2f2f2; }
+:root {
+  --tile-default: #e0e0e0;
+  --tile-active: #cfe3ff;
+  --tile-complete: #ffffff;
+  --tile-error: #ffb3b3;
+}
 
-/* Top bar */
+body {
+  margin: 0;
+  font-family: system-ui, sans-serif;
+  background: #f2f2f2;
+}
+
+/* ===== PRELOADERS ===== */
+#adScreen, #introScreen {
+  position: fixed;
+  inset: 0;
+  background: black;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+}
+
+#introScreen {
+  background: white;
+  color: black;
+  flex-direction: column;
+  display: none;
+}
+
+#startBtn {
+  margin-top: 24px;
+  padding: 10px 20px;
+  background: #3a7bfd;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 14px;
+  cursor: pointer;
+  align-self: flex-end;
+  margin-right: 24px;
+}
+
+/* ===== TOP BAR ===== */
 #topbar {
-  background:#9ac57a;
-  height:48px;
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  padding:0 14px;
-  font-weight:600;
+  height: 48px;
+  background: #9ac57a;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 14px;
+  font-weight: 600;
 }
 
-/* Settings */
-#settingsBtn { cursor:pointer; }
+/* ===== SETTINGS ===== */
+#settingsBtn { cursor: pointer; }
 #settings {
-  display:none;
-  position:fixed;
-  top:56px;
-  right:16px;
-  background:white;
-  border:1px solid #ccc;
-  padding:12px;
-  width:220px;
-  z-index:10;
+  display: none;
+  position: fixed;
+  top: 56px;
+  right: 16px;
+  background: white;
+  border: 1px solid #ccc;
+  padding: 12px;
+  z-index: 10;
 }
 
-/* Active clue */
+/* ===== ACTIVE CLUE ===== */
 #active-clue {
-  background:white;
-  border-bottom:1px solid #ccc;
-  padding:10px;
-  font-size:14px;
+  background: white;
+  padding: 10px;
+  border-bottom: 1px solid #ccc;
+  font-size: 14px;
 }
 
-/* Layout */
+/* ===== LAYOUT ===== */
 #game {
-  display:grid;
-  grid-template-columns:auto 320px;
-  gap:16px;
-  padding:16px;
-  max-width:1100px;
-  margin:auto;
+  display: grid;
+  grid-template-columns: minmax(0,1fr) 320px;
+  gap: 16px;
+  padding: 16px;
+  max-width: 1200px;
+  margin: auto;
 }
 
-/* Grid */
+/* ===== GRID ===== */
 #grid {
-  display:grid;
-  gap:2px;
-  background:black;
+  display: grid;
+  gap: 2px;
+  background: black;
 }
 
 .cell {
-  width:48px;
-  height:48px;
-  background:white;
-  position:relative;
+  background: var(--tile-default);
+  position: relative;
 }
 
-.cell.block { background:black; }
+.cell.block { background: black; }
 
-.cell.highlight { background:#dbeaff; }
-.cell.error { background:#ffcccc; }
+.cell.active { background: var(--tile-active); }
+.cell.complete { background: var(--tile-complete); }
+.cell.error { background: var(--tile-error); }
 
 .cell input {
-  width:100%;
-  height:100%;
-  border:none;
-  text-align:center;
-  font-size:22px;
-  font-weight:bold;
-  text-transform:uppercase;
-  background:transparent;
-  position:relative;
-  z-index:1;
+  width: 100%;
+  height: 100%;
+  border: none;
+  background: transparent;
+  text-align: center;
+  font-size: 22px;
+  font-weight: bold;
+  text-transform: uppercase;
 }
 
-.cell input:focus { outline:none; }
+.cell input:focus { outline: none; }
 
 .number {
-  position:absolute;
-  top:3px;
-  left:4px;
-  font-size:9px;
-  font-weight:600;
-  z-index:2;
-  pointer-events:none;
+  position: absolute;
+  top: 3px;
+  left: 4px;
+  font-size: 9px;
+  font-weight: 600;
+  pointer-events: none;
 }
 
-/* Clues */
+/* ===== CLUES ===== */
 #clues {
-  background:white;
-  border:1px solid #ccc;
-  padding:12px;
-  overflow-y:auto;
-  max-height:80vh;
+  background: white;
+  border: 1px solid #ccc;
+  padding: 12px;
+  overflow-y: auto;
 }
 
-.clue { font-size:14px; padding:4px; cursor:pointer; }
-.clue.active { background:#dbeaff; }
+.clue { cursor: pointer; padding: 4px; }
+.clue.active { background: var(--tile-active); }
 </style>
 </head>
 
 <body>
 
+<!-- BLACK AD -->
+<div id="adScreen">Ad loading…</div>
+
+<!-- INTRO -->
+<div id="introScreen">
+  <h2 id="dateText"></h2>
+  <div>by zapcatproductions</div>
+  <p>thank you for playing my mini game, I hope you have fun</p>
+  <p>looking for more fun crosswords? open the menu (top right) to find past minis. this is mini 1</p>
+  <small>copyright zapcatproductions 2026</small>
+  <button id="startBtn">Start</button>
+</div>
+
 <div id="topbar">
-  ← Back
   <div id="timer">00:00</div>
   <div id="settingsBtn">⚙️</div>
 </div>
 
 <div id="settings">
-  <strong>Settings</strong><br><br>
   <label><input type="checkbox" id="errorCheck"> Error check mode</label>
 </div>
 
@@ -126,145 +174,134 @@ body { margin:0; font-family:system-ui,sans-serif; background:#f2f2f2; }
 
 <div id="game">
   <div id="grid"></div>
-
   <div id="clues">
     <h3>Across</h3>
     <div class="clue" data-key="1_across">1. Learned</div>
-    <div class="clue" data-key="5_across">5. Reader’s pause</div>
-    <div class="clue" data-key="8_across">8. Place</div>
-    <div class="clue" data-key="10_across">10. Tiny bit</div>
-    <div class="clue" data-key="12_across">12. Music piece</div>
-
+    <div class="clue" data-key="5_across">5. Reader pause</div>
     <h3>Down</h3>
     <div class="clue" data-key="1_down">1. Puts down</div>
-    <div class="clue" data-key="2_down">2. Charged</div>
-    <div class="clue" data-key="3_down">3. Exist</div>
-    <div class="clue" data-key="4_down">4. Not old</div>
-    <div class="clue" data-key="6_down">6. Consume</div>
+    <div class="clue" data-key="2_down">2. Eat</div>
   </div>
 </div>
 
 <script>
+/* ===== DATE ===== */
+document.getElementById("dateText").textContent =
+  new Date().toLocaleDateString(undefined,{weekday:"long",month:"long",day:"numeric",year:"numeric"});
+
+/* ===== PRELOADER FLOW ===== */
+setTimeout(()=>{
+  adScreen.style.display="none";
+  introScreen.style.display="flex";
+},1500);
+
+/* ===== TIMER ===== */
+let seconds=0, timerInt=null;
+function startTimer(){
+  timerInt=setInterval(()=>{
+    seconds++;
+    const m=String(Math.floor(seconds/60)).padStart(2,'0');
+    const s=String(seconds%60).padStart(2,'0');
+    timer.textContent=`${m}:${s}`;
+  },1000);
+}
+startBtn.onclick=()=>{
+  introScreen.style.display="none";
+  startTimer();
+};
+
 /* ===== GRID DATA ===== */
-/* null = block */
-const gridData = [
-  ['L','E','A','R','N',null,'P','A','U','S','E',null],
-  ['A',null,'M',null,'A',null,'L',null,'H',null,'E',null],
-  ['Y','O','U','R','E',null,'A','R','E','A',null,null],
-  ['S',null,'T',null,'R',null,'C',null,'E',null,'S',null],
-  ['E','A','T',null,'I','T',null,'S','O','N','G',null],
-  [null,null,null,null,null,null,null,null,null,null,null,null],
-  ['N','E','W',null,'B','I','T',null,'H','E','R','E'],
-  ['O',null,'E',null,'A',null,'A',null,'O',null,'E',null],
-  ['W','H','O','L','E',null,'R','E','A','D',null,null],
-  ['E',null,'S',null,'T',null,'S',null,'D',null,'R',null],
-  ['S','O','N','G',null,'E','A','T',null,'A','R','E'],
-  [null,null,null,null,null,null,null,null,null,null,null,null]
+const gridData=[
+ ['L','E','A','R','N'],
+ ['A',null,'E',null,'A'],
+ ['Y','O','U','R','E'],
 ];
 
-/* ===== CLUES MAP ===== */
-const cluesMap = {
-  '1_across': [[0,0],[0,1],[0,2],[0,3],[0,4]],
-  '5_across': [[0,6],[0,7],[0,8],[0,9],[0,10]],
-  '8_across': [[2,0],[2,1],[2,2],[2,3],[2,4]],
-  '10_across': [[6,4],[6,5],[6,6]],
-  '12_across': [[4,7],[4,8],[4,9],[4,10]],
-
-  '1_down': [[0,0],[1,0],[2,0],[3,0],[4,0]],
-  '2_down': [[0,2],[1,2],[2,2],[3,2],[4,2]],
-  '3_down': [[0,3],[2,3],[4,3],[6,3],[8,3]],
-  '4_down': [[0,4],[1,4],[2,4],[3,4],[4,4]],
-  '6_down': [[0,6],[1,6],[2,6],[3,6],[4,6]]
+const cluesMap={
+ '1_across':[[0,0],[0,1],[0,2],[0,3],[0,4]],
+ '5_across':[[2,0],[2,1],[2,2],[2,3],[2,4]],
+ '1_down':[[0,0],[1,0],[2,0]],
+ '2_down':[[0,2],[1,2],[2,2]]
 };
 
-/* ===== NUMBERS ===== */
-const numbers = {
-  '0,0':1,'0,6':5,'2,0':8,'6,4':10,'4,7':12,
-  '0,2':2,'0,3':3,'0,4':4,'0,6':6
-};
+const numbers={'0,0':1,'2,0':5,'0,2':2};
 
-/* ===== BUILD GRID ===== */
-const grid = document.getElementById('grid');
-grid.style.gridTemplateColumns = `repeat(12,48px)`;
+const grid=document.getElementById('grid');
+grid.style.gridTemplateColumns=`repeat(5,1fr)`;
 
 const cells=[];
-for(let r=0;r<12;r++){
-  cells[r]=[];
-  for(let c=0;c<12;c++){
-    const cell=document.createElement('div');
-    cell.className='cell';
-
-    if(gridData[r][c]===null){
-      cell.classList.add('block');
-    } else {
-      const input=document.createElement('input');
-      input.maxLength=1;
-      input.dataset.r=r;
-      input.dataset.c=c;
-      cell.appendChild(input);
-
-      const key=`${r},${c}`;
-      if(numbers[key]){
-        const n=document.createElement('div');
-        n.className='number';
-        n.textContent=numbers[key];
-        cell.appendChild(n);
-      }
-
-      input.addEventListener('focus',()=>selectTile(r,c));
-      input.addEventListener('input',()=>{
-        if(document.getElementById('errorCheck').checked){
-          cell.classList.toggle(
-            'error',
-            input.value.toUpperCase()!==gridData[r][c]
-          );
-        } else cell.classList.remove('error');
-      });
-    }
-
-    grid.appendChild(cell);
-    cells[r][c]=cell;
+for(let r=0;r<3;r++){
+ cells[r]=[];
+ for(let c=0;c<5;c++){
+  const cell=document.createElement('div');
+  cell.className='cell';
+  if(gridData[r][c]==null){cell.classList.add('block');}
+  else{
+   const input=document.createElement('input');
+   input.maxLength=1;
+   cell.appendChild(input);
+   const k=`${r},${c}`;
+   if(numbers[k]){
+     const n=document.createElement('div');
+     n.className='number';
+     n.textContent=numbers[k];
+     cell.appendChild(n);
+   }
+   input.onfocus=()=>selectTile(r,c);
+   input.oninput=()=>checkCell(r,c,input,cell);
   }
+  grid.appendChild(cell);
+  cells[r][c]=cell;
+ }
 }
 
-/* ===== ACTIVE WORD ===== */
 let activeKey=null;
 
-function highlight(key){
-  document.querySelectorAll('.cell').forEach(c=>c.classList.remove('highlight'));
-  document.querySelectorAll('.clue').forEach(c=>c.classList.remove('active'));
-
-  cluesMap[key].forEach(([r,c])=>cells[r][c].classList.add('highlight'));
-  document.querySelector(`[data-key="${key}"]`)?.classList.add('active');
-  activeKey=key;
-}
-
-/* ===== TILE CLICK ===== */
 function selectTile(r,c){
-  const matches=Object.entries(cluesMap)
-    .filter(([k,v])=>v.some(([rr,cc])=>rr===r&&cc===c))
-    .map(([k])=>k);
-
-  if(!matches.length) return;
-
-  if(matches.includes(activeKey)){
-    const next=matches.find(k=>k!==activeKey);
-    if(next) highlight(next);
-  } else highlight(matches[0]);
+ const keys=Object.entries(cluesMap).filter(([k,v])=>v.some(p=>p[0]==r&&p[1]==c)).map(e=>e[0]);
+ if(!keys.length)return;
+ if(keys.includes(activeKey)){
+   const other=keys.find(k=>k!==activeKey);
+   if(other) activate(other);
+ } else activate(keys[0]);
 }
 
-/* ===== CLUE CLICK ===== */
-document.querySelectorAll('.clue').forEach(clue=>{
-  clue.onclick=()=>highlight(clue.dataset.key);
-});
+function activate(key){
+ activeKey=key;
+ document.querySelectorAll('.cell').forEach(c=>c.className='cell'+(c.classList.contains('block')?' block':''));
+ document.querySelectorAll('.clue').forEach(c=>c.classList.remove('active'));
+ cluesMap[key].forEach(([r,c])=>cells[r][c].classList.add('active'));
+ document.querySelector(`[data-key="${key}"]`)?.classList.add('active');
+ activeClue.textContent=document.querySelector(`[data-key="${key}"]`).textContent;
+}
+
+function checkCell(r,c,input,cell){
+ cell.classList.remove('error');
+ if(!input.value)return;
+ if(document.getElementById('errorCheck').checked){
+   if(input.value.toUpperCase()!==gridData[r][c]){
+     cell.classList.add('error');
+   }
+ }
+ checkComplete();
+}
+
+function checkComplete(){
+ if(!activeKey)return;
+ const done=cluesMap[activeKey].every(([r,c])=>{
+   const i=cells[r][c].querySelector('input');
+   return i && i.value.toUpperCase()===gridData[r][c];
+ });
+ cluesMap[activeKey].forEach(([r,c])=>{
+   cells[r][c].classList.toggle('complete',done);
+ });
+}
+
+document.querySelectorAll('.clue').forEach(c=>c.onclick=()=>activate(c.dataset.key));
+activate('1_across');
 
 /* ===== SETTINGS ===== */
-document.getElementById('settingsBtn').onclick=()=>{
-  settings.style.display=settings.style.display==='block'?'none':'block';
-};
-
-/* ===== START ===== */
-highlight('1_across');
+settingsBtn.onclick=()=>settings.style.display=settings.style.display==='block'?'none':'block';
 </script>
 
 </body>
