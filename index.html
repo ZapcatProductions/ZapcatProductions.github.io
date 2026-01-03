@@ -9,6 +9,44 @@ body {
     margin: 0;
     font-family: system-ui, sans-serif;
     background: #f2f2f2;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+}
+
+/* START SCREEN */
+#startScreen {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: white;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 50;
+}
+
+#startScreen h1 {
+    font-size: 28px;
+    margin-bottom: 8px;
+}
+
+#startScreen p {
+    margin-bottom: 20px;
+    font-size: 16px;
+}
+
+#startBtn {
+    padding: 12px 24px;
+    font-size: 16px;
+    background: #3399ff;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
 }
 
 /* TOP BAR */
@@ -20,6 +58,8 @@ body {
     justify-content: space-between;
     padding: 0 14px;
     font-weight: 600;
+    width: 100%;
+    max-width: 900px;
 }
 
 /* SETTINGS */
@@ -80,15 +120,15 @@ body {
 }
 
 .cell {
-    width: 70px;
-    height: 70px;
+    width: 50px;
+    height: 50px;
     background: #808080;
     position: relative;
     font-weight: bold;
-    font-size: 28px;
+    font-size: 22px;
     text-transform: uppercase;
     text-align: center;
-    line-height: 70px;
+    line-height: 50px;
     cursor: pointer;
 }
 
@@ -102,7 +142,7 @@ body {
     height: 100%;
     border: none;
     text-align: center;
-    font-size: 28px;
+    font-size: 22px;
     text-transform: uppercase;
     background: transparent;
     font-weight: bold;
@@ -114,8 +154,8 @@ body {
 /* NUMBER */
 .number {
     position: absolute;
-    top: 3px;
-    left: 4px;
+    top: 2px;
+    left: 3px;
     font-size: 10px;
     font-weight: 600;
 }
@@ -158,6 +198,12 @@ body {
 </head>
 <body>
 
+<div id="startScreen">
+    <h1 id="currentDate"></h1>
+    <p>Thank you for playing my mini game</p>
+    <button id="startBtn">Start</button>
+</div>
+
 <div id="topbar">
     ← Back
     <div id="timer">00:00</div>
@@ -172,54 +218,71 @@ body {
 <div id="errorDisclaimer">Error Mode Enabled</div>
 
 <div id="active-clue">
-    <strong>Across 1.</strong> Having learned something
+    <strong>Across 1.</strong> Test clue
 </div>
 
 <div id="game">
     <div id="grid"></div>
     <div id="clues">
         <h3>Across</h3>
-        <div class="clue" data-number="1" data-direction="across">1. Having learned something</div>
-        <div class="clue" data-number="6" data-direction="across">6. What gives a reader pause?</div>
+        <div class="clue" data-number="1" data-direction="across">1. LEARNED</div>
+        <div class="clue" data-number="2" data-direction="across">2. PAUSE</div>
         <h3>Down</h3>
-        <div class="clue" data-number="1" data-direction="down">1. Lays</div>
-        <div class="clue" data-number="2" data-direction="down">2. Charged, in a way</div>
+        <div class="clue" data-number="1" data-direction="down">1. LAYS</div>
+        <div class="clue" data-number="3" data-direction="down">3. CHIP</div>
     </div>
 
     <div id="preloader">Loading...</div>
 </div>
 
 <script>
+// ========== Current Date for Start Screen ==========
+const dateEl = document.getElementById('currentDate');
+const now = new Date();
+const months = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+dateEl.textContent = `${now.getDate()} ${months[now.getMonth()]} ${now.getFullYear()}`;
+
+// ========== Grid Data (8x8) ==========
 const gridData = [
-    ['L','E','A','R','N'],
-    ['P','A','U','S','E'],
-    ['W','H','E','R','E'],
-    [null,'C','H','I','P'],
-    [null,'S','O','N','G']
+    ['L','E','A','R','N', null, null, null],
+    ['A',null,null,null,'A','P','A','U'],
+    ['Y',null,null,null,'U',null,'S','E'],
+    ['S',null,'C','H','I','P',null,null],
+    [' ',null,null,null,' ',null,null,null],
+    [null,null,null,null,null,null,null,null],
+    [null,null,null,null,null,null,null,null],
+    [null,null,null,null,null,null,null,null]
 ];
 
-const numbers = { '0,0':1, '1,0':6, '3,1':2 };
+// Map numbers to clues (row,col)
+const numbers = { '0,0':1, '1,4':2, '3,2':3 }; // add more as needed
+
+// Map clues to positions
 const cluesMap = {
-    '1_across': [[0,0],[0,1],[0,2],[0,3],[0,4]],
-    '6_across': [[1,0],[1,1],[1,2],[1,3],[1,4]],
-    '1_down': [[0,0],[1,0],[2,0]],
-    '2_down': [[3,1],[4,1]]
+    '1_across': [[0,0],[0,1],[0,2],[0,3],[0,4],[0,5],[0,6],[0,7]],
+    '2_across': [[1,4],[1,5],[1,6],[1,7]],
+    '1_down': [[0,0],[1,0],[2,0],[3,0]],
+    '3_down': [[3,2],[4,2],[5,2]]
 };
 
+// ===== Elements =====
 const grid = document.getElementById('grid');
 const errorCheckToggle = document.getElementById('errorCheck');
 const errorDisclaimer = document.getElementById('errorDisclaimer');
+const startBtn = document.getElementById('startBtn');
+const startScreen = document.getElementById('startScreen');
 
-grid.style.gridTemplateColumns = `repeat(${gridData[0].length},70px)`;
-grid.style.gridTemplateRows = `repeat(${gridData.length},70px)`;
+grid.style.gridTemplateColumns = `repeat(${gridData[0].length},50px)`;
+grid.style.gridTemplateRows = `repeat(${gridData.length},50px)`;
 
+// ===== Build grid =====
 const cells = [];
 for (let r=0;r<gridData.length;r++){
     cells[r] = [];
     for (let c=0;c<gridData[r].length;c++){
         const cell = document.createElement('div');
         cell.className = 'cell';
-        if(gridData[r][c]===null){
+        if(!gridData[r][c] || gridData[r][c]===' '){
             cell.classList.add('block');
         } else {
             const input = document.createElement('input');
@@ -236,11 +299,11 @@ for (let r=0;r<gridData.length;r++){
                 cell.appendChild(n);
             }
 
-            // Input event for error checking & auto advance
+            // Input event for error + auto advance/backspace
             input.addEventListener('input', () => {
                 const correct = gridData[r][c].toUpperCase();
                 if(errorCheckToggle.checked){
-                    if(input.value.toUpperCase() !== correct && input.value !== ''){
+                    if(input.value.toUpperCase() !== correct && input.value!==''){
                         cell.classList.add('error');
                         cell.classList.remove('correct');
                     } else if(input.value.toUpperCase() === correct){
@@ -266,40 +329,58 @@ for (let r=0;r<gridData.length;r++){
                 }
             });
 
-            // Click tile logic
-            cell.addEventListener('click', () => {
+            // Backspace
+            input.addEventListener('keydown', (e)=>{
+                if(e.key==='Backspace'){
+                    const positions = cluesMap[`${activeWord}_${activeDirection}`];
+                    const idx = positions.findIndex(([rr,cc])=>rr===r && cc===c);
+                    if(idx>0 && !input.value){
+                        const [prevR,prevC] = positions[idx-1];
+                        const prevInput = cells[prevR][prevC].querySelector('input');
+                        if(prevInput){
+                            prevInput.focus();
+                            prevInput.value='';
+                        }
+                        e.preventDefault();
+                    }
+                }
+            });
+
+            // Tile click logic toggle
+            cell.addEventListener('click', ()=>{
                 const matchingWords = [];
                 for(const key in cluesMap){
                     if(cluesMap[key].some(([rr,cc])=>rr===r && cc===c)) matchingWords.push(key);
                 }
-                // Prefer current activeDirection if available
-                const preferred = matchingWords.find(k=>k.endsWith(activeDirection)) || matchingWords[0];
-                if(preferred){
-                    const [num, dir] = preferred.split('_');
-                    highlightWord(num, dir);
-                }
+                if(matchingWords.length===0) return;
+                let preferred;
+                if(matchingWords.length===1) preferred = matchingWords[0];
+                else preferred = matchingWords.find(k=>!k.endsWith(activeDirection))||matchingWords[0];
+                const [num,dir] = preferred.split('_');
+                highlightWord(num,dir);
             });
-
         }
         grid.appendChild(cell);
         cells[r][c] = cell;
     }
 }
 
-document.getElementById('settingsBtn').onclick = () => {
+// ===== Settings toggle =====
+document.getElementById('settingsBtn').onclick = ()=>{
     const settings = document.getElementById('settings');
-    settings.style.display = settings.style.display==='block' ? 'none':'block';
-};
+    settings.style.display = settings.style.display==='block'?'none':'block';
+}
 
-// Error disclaimer
-errorCheckToggle.addEventListener('change', () => {
-    errorDisclaimer.textContent = errorCheckToggle.checked ? 'Error Mode Enabled' : 'Error Mode Disabled';
+// ===== Error disclaimer =====
+errorCheckToggle.addEventListener('change', ()=>{
+    errorDisclaimer.textContent = errorCheckToggle.checked?'Error Mode Enabled':'Error Mode Disabled';
     errorDisclaimer.style.opacity = 1;
-    setTimeout(() => { errorDisclaimer.style.opacity = 0; }, 1200);
+    setTimeout(()=>{errorDisclaimer.style.opacity=0},1200);
 });
 
-// Timer
-let seconds = 0;
+// ===== Timer =====
+let seconds=0;
+let timerInterval=null;
 function updateTimer(){
     seconds++;
     const mins = String(Math.floor(seconds/60)).padStart(2,'0');
@@ -307,38 +388,31 @@ function updateTimer(){
     document.getElementById('timer').textContent = `${mins}:${secs}`;
 }
 
-// Highlight word
+// ===== Highlight word =====
 let activeWord = null;
 let activeDirection = 'across';
-
 function highlightWord(number,direction){
     cells.flat().forEach(cell => cell.classList.remove('highlight'));
     document.querySelectorAll('.clue').forEach(clue=>clue.classList.remove('active'));
     const key = `${number}_${direction}`;
     const positions = cluesMap[key];
     if(!positions) return;
-
     positions.forEach(([r,c]) => cells[r][c].classList.add('highlight'));
-
     const clueEl = document.querySelector(`.clue[data-number='${number}'][data-direction='${direction}']`);
     if(clueEl) clueEl.classList.add('active');
-
     document.getElementById('active-clue').innerHTML = `<strong>${direction.charAt(0).toUpperCase()+direction.slice(1)} ${number}.</strong> ${clueEl.textContent.split('. ').slice(1).join('. ')}`;
-
     const firstCell = cells[positions[0][0]][positions[0][1]];
     const input = firstCell.querySelector('input');
     if(input) input.focus();
-
     activeWord = number;
     activeDirection = direction;
 }
 
-// Click clues with toggle
-document.querySelectorAll('.clue').forEach(clue => {
-    clue.addEventListener('click', () => {
+// ===== Click clues toggle =====
+document.querySelectorAll('.clue').forEach(clue=>{
+    clue.addEventListener('click',()=>{
         const number = clue.dataset.number;
         const direction = clue.dataset.direction;
-
         if(activeWord == number){
             const otherDirection = activeDirection==='across'?'down':'across';
             if(cluesMap[`${number}_${otherDirection}`]){
@@ -347,20 +421,24 @@ document.querySelectorAll('.clue').forEach(clue => {
             }
         }
         highlightWord(number,direction);
-    });
-});
+    })
+})
 
-// Initial highlight
+// ===== Initial highlight =====
 highlightWord(1,'across');
 
-// Preloader fade and timer start
-window.addEventListener('load', () => {
+// ===== Preloader & start button =====
+window.addEventListener('load', ()=>{
     const preloader = document.getElementById('preloader');
-    preloader.style.opacity = 0;
-    setTimeout(() => { preloader.style.display = 'none'; }, 800);
+    preloader.style.opacity=0;
+    setTimeout(()=>{preloader.style.display='none';},800);
+})
 
-    setInterval(updateTimer,1000);
+startBtn.addEventListener('click', ()=>{
+    startScreen.style.display='none';
+    if(!timerInterval) timerInterval = setInterval(updateTimer,1000);
 });
 </script>
+
 </body>
 </html>
