@@ -59,8 +59,6 @@ body {
 /* GRID */
 #grid {
   display: grid;
-  grid-template-columns: repeat(5, 70px);
-  grid-template-rows: repeat(5, 70px);
   gap: 2px;
   background: black;
 }
@@ -133,17 +131,16 @@ body {
 
   <div id="clues">
     <h3>Across</h3>
-    <div class="clue">1. Having learned something</div>
-    <div class="clue">6. What gives a reader pause?</div>
+    <div class="clue" data-number="1" data-direction="across">1. Having learned something</div>
+    <div class="clue" data-number="6" data-direction="across">6. What gives a reader pause?</div>
 
     <h3>Down</h3>
-    <div class="clue">1. Lays</div>
-    <div class="clue">2. Charged, in a way</div>
+    <div class="clue" data-number="1" data-direction="down">1. Lays</div>
+    <div class="clue" data-number="2" data-direction="down">2. Charged, in a way</div>
   </div>
 </div>
 
 <script>
-/* BASIC GRID DATA */
 const gridData = [
   ['L','E','A','R','N'],
   ['P','A','U','S','E'],
@@ -153,22 +150,29 @@ const gridData = [
 ];
 
 const numbers = {
-  '0,0':1,'1,0':6,'3,1':8
+  '0,0':1,  // Across 1, Down 1
+  '1,0':6,  // Across 6
+  '3,1':2   // Down 2
 };
 
 const grid = document.getElementById('grid');
 
-/* BUILD GRID */
-for (let r=0;r<5;r++){
-  for (let c=0;c<5;c++){
+// Set grid size dynamically
+grid.style.gridTemplateColumns = `repeat(${gridData[0].length},70px)`;
+grid.style.gridTemplateRows = `repeat(${gridData.length},70px)`;
+
+// Build grid
+for (let r=0; r<gridData.length; r++){
+  for (let c=0; c<gridData[r].length; c++){
     const cell = document.createElement('div');
     cell.className = 'cell';
-
+    
     if (gridData[r][c] === null){
       cell.classList.add('block');
     } else {
       const input = document.createElement('input');
       input.maxLength = 1;
+      input.value = '';
       cell.appendChild(input);
 
       const key = r+','+c;
@@ -179,17 +183,14 @@ for (let r=0;r<5;r++){
         cell.appendChild(n);
       }
     }
-
     grid.appendChild(cell);
   }
 }
 
-/* SETTINGS TOGGLE */
-const settingsBtn = document.getElementById('settingsBtn');
-const settings = document.getElementById('settings');
-settingsBtn.onclick = () => {
-  settings.style.display =
-    settings.style.display === 'block' ? 'none' : 'block';
+// Settings toggle
+document.getElementById('settingsBtn').onclick = () => {
+  const settings = document.getElementById('settings');
+  settings.style.display = settings.style.display === 'block' ? 'none' : 'block';
 };
 </script>
 
