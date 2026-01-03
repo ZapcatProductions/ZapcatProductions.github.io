@@ -44,6 +44,22 @@ body {
     font-size: 14px;
 }
 
+/* ERROR DISCLAIMER */
+#errorDisclaimer {
+    position: fixed;
+    top: 60px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #ffcccc;
+    padding: 8px 16px;
+    border-radius: 4px;
+    font-weight: bold;
+    opacity: 0;
+    transition: opacity 0.8s ease;
+    pointer-events: none;
+    z-index: 30;
+}
+
 /* LAYOUT */
 #game {
     display: grid;
@@ -73,6 +89,7 @@ body {
     text-transform: uppercase;
     text-align: center;
     line-height: 70px;
+    cursor: pointer;
 }
 
 .cell.block { background: black; }
@@ -89,6 +106,7 @@ body {
     text-transform: uppercase;
     background: transparent;
     font-weight: bold;
+    pointer-events: none; /* clicks handled by cell div */
 }
 
 .cell input:focus { outline: none; }
@@ -148,8 +166,10 @@ body {
 
 <div id="settings">
     <strong>Settings</strong><br><br>
-    <label><input type="checkbox" id="errorCheck"> Error Check Mode</label>
+    <label><input type="checkbox" id="errorCheck" checked> Error Check Mode</label>
 </div>
+
+<div id="errorDisclaimer">Error Mode Enabled</div>
 
 <div id="active-clue">
     <strong>Across 1.</strong> Having learned something
@@ -191,6 +211,7 @@ const cluesMap = {
 
 const grid = document.getElementById('grid');
 const errorCheckToggle = document.getElementById('errorCheck');
+const errorDisclaimer = document.getElementById('errorDisclaimer');
 
 // Correct grid layout
 grid.style.gridTemplateColumns = `repeat(${gridData[0].length},70px)`;
@@ -239,6 +260,37 @@ for (let r=0;r<gridData.length;r++){
                     cell.classList.remove('correct');
                 }
             });
+
+            // Click tile to select word
+            cell.addEventListener('click', () => {
+                // check across first
+                const number = Object.keys(numbers).find(k => k===`${r},${c}`);
+                let found = false;
+
+                // check if part of across
+                for(const key in cluesMap){
+                    const [num, dir] = key.split('_');
+                    if(dir === 'across'){
+                        if(cluesMap[key].some(([rr,cc])=>rr===r && cc===c)){
+                            highlightWord(num, 'across');
+                            found = true;
+                            break;
+                        }
+                    }
+                }
+                if(!found){ // check down
+                    for(const key in cluesMap){
+                        const [num, dir] = key.split('_');
+                        if(dir === 'down'){
+                            if(cluesMap[key].some(([rr,cc])=>rr===r && cc===c)){
+                                highlightWord(num, 'down');
+                                break;
+                            }
+                        }
+                    }
+                }
+            });
+
         }
         grid.appendChild(cell);
         cells[r][c] = cell;
@@ -250,6 +302,13 @@ document.getElementById('settingsBtn').onclick = () => {
     const settings = document.getElementById('settings');
     settings.style.display = settings.style.display==='block' ? 'none':'block';
 };
+
+// Error disclaimer fade
+errorCheckToggle.addEventListener('change', () => {
+    errorDisclaimer.textContent = errorCheckToggle.checked ? 'Error Mode Enabled' : 'Error Mode Disabled';
+    errorDisclaimer.style.opacity = 1;
+    setTimeout(() => { errorDisclaimer.style.opacity = 0; }, 1200);
+});
 
 // Timer
 let seconds = 0;
@@ -289,13 +348,12 @@ function highlightWord(number,direction){
     activeDirection = direction;
 }
 
-// Click clues with toggle across/down
+// Click clues with toggle
 document.querySelectorAll('.clue').forEach(clue => {
     clue.addEventListener('click', () => {
         const number = clue.dataset.number;
         const direction = clue.dataset.direction;
 
-        // toggle if same number clicked
         if(activeWord == number){
             const otherDirection = activeDirection==='across'?'down':'across';
             if(cluesMap[`${number}_${otherDirection}`]){
@@ -310,7 +368,7 @@ document.querySelectorAll('.clue').forEach(clue => {
 // Initial highlight
 highlightWord(1,'across');
 
-// Preloader fade
+// Preloader fade and timer start
 window.addEventListener('load', () => {
     const preloader = document.getElementById('preloader');
     preloader.style.opacity = 0;
