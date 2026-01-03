@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Mini Crossword</title>
+<title>Mini Crossword - Cake Recipe</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <style>
 body {
@@ -12,8 +12,6 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
-    height: 100vh;
 }
 
 /* START SCREEN */
@@ -37,6 +35,8 @@ body {
 #startScreen p {
     margin-bottom: 20px;
     font-size: 16px;
+    text-align: center;
+    max-width: 280px;
 }
 
 #startBtn {
@@ -80,8 +80,12 @@ body {
 #active-clue {
     background: white;
     border-bottom: 1px solid #ccc;
-    padding: 10px;
+    padding: 8px 12px;
     font-size: 14px;
+    width: 100%;
+    max-width: 900px;
+    margin-top: 8px;
+    box-sizing: border-box;
 }
 
 /* ERROR DISCLAIMER */
@@ -166,6 +170,7 @@ body {
     border: 1px solid #ccc;
     padding: 12px;
     overflow-y: auto;
+    max-height: 500px;
 }
 
 .clue {
@@ -216,7 +221,6 @@ body {
 </div>
 
 <div id="errorDisclaimer">Error Mode Enabled</div>
-
 <div id="active-clue">
     <strong>Across 1.</strong> Test clue
 </div>
@@ -225,44 +229,69 @@ body {
     <div id="grid"></div>
     <div id="clues">
         <h3>Across</h3>
-        <div class="clue" data-number="1" data-direction="across">1. LEARNED</div>
-        <div class="clue" data-number="2" data-direction="across">2. PAUSE</div>
-        <h3>Down</h3>
-        <div class="clue" data-number="1" data-direction="down">1. LAYS</div>
-        <div class="clue" data-number="3" data-direction="down">3. CHIP</div>
-    </div>
+        <div class="clue" data-number="1" data-direction="across">1. I make the cake rise (3)</div>
+        <div class="clue" data-number="2" data-direction="across">2. Sweet and white, I vanish in batter (5)</div>
+        <div class="clue" data-number="3" data-direction="across">3. I make the mix smooth (3)</div>
+        <div class="clue" data-number="4" data-direction="across">4. Fluffy and soft, folded in last (5)</div>
+        <div class="clue" data-number="5" data-direction="across">5. Brown and sweet, I crunch in your bite (4)</div>
+        <div class="clue" data-number="6" data-direction="across">6. Melt to bind, golden in color (6)</div>
+        <div class="clue" data-number="7" data-direction="across">7. Chocolate flavor, dark and rich (5)</div>
+        <div class="clue" data-number="8" data-direction="across">8. Sticky and thick, binds together (3)</div>
 
+        <h3>Down</h3>
+        <div class="clue" data-number="1" data-direction="down">1. I make cakes rise, but not in oven (5)</div>
+        <div class="clue" data-number="2" data-direction="down">2. Powdered and white, dust me on top (5)</div>
+        <div class="clue" data-number="3" data-direction="down">3. Sour tang to balance sweetness (4)</div>
+        <div class="clue" data-number="4" data-direction="down">4. Sticky and sweet, poured over cake (5)</div>
+        <div class="clue" data-number="5" data-direction="down">5. Used to mix, spin and whirl (3)</div>
+        <div class="clue" data-number="6" data-direction="down">6. Thin and delicate, wrap cakes in me (5)</div>
+        <div class="clue" data-number="7" data-direction="down">7. Brown and gooey, melted from sweet bean (5)</div>
+        <div class="clue" data-number="8" data-direction="down">8. Dusted lightly, powdered sugar delight (4)</div>
+    </div>
     <div id="preloader">Loading...</div>
 </div>
 
 <script>
-// ========== Current Date for Start Screen ==========
+// ===== Current Date =====
 const dateEl = document.getElementById('currentDate');
 const now = new Date();
 const months = ["January","February","March","April","May","June","July","August","September","October","November","December"];
 dateEl.textContent = `${now.getDate()} ${months[now.getMonth()]} ${now.getFullYear()}`;
 
-// ========== Grid Data (8x8) ==========
+// ===== Grid Data (8x8) =====
 const gridData = [
-    ['L','E','A','R','N', null, null, null],
-    ['A',null,null,null,'A','P','A','U'],
-    ['Y',null,null,null,'U',null,'S','E'],
-    ['S',null,'C','H','I','P',null,null],
-    [' ',null,null,null,' ',null,null,null],
-    [null,null,null,null,null,null,null,null],
-    [null,null,null,null,null,null,null,null],
-    [null,null,null,null,null,null,null,null]
+  ['E','G','G',null,null,null,'S','U'],
+  ['M',null,null,null,'S','U','G','A'],
+  ['I',null,null,null,'U',null,'E','R'],
+  ['L','Y','M','I','L','K',null,null],
+  ['K',null,null,null,'F',null,'F','R'],
+  [null,null,null,null,'R',null,'O','S'],
+  ['N','U','T','S',null,null,'T','T'],
+  ['B','U','T','T','E','R',null,'Y']
 ];
 
-// Map numbers to clues (row,col)
-const numbers = { '0,0':1, '1,4':2, '3,2':3 }; // add more as needed
+// Map numbers to clues
+const numbers = { '0,0':1,'0,6':2,'3,0':3,'4,4':4,'6,0':5,'7,0':6,'7,1':7,'7,2':8 };
 
 // Map clues to positions
 const cluesMap = {
-    '1_across': [[0,0],[0,1],[0,2],[0,3],[0,4],[0,5],[0,6],[0,7]],
-    '2_across': [[1,4],[1,5],[1,6],[1,7]],
-    '1_down': [[0,0],[1,0],[2,0],[3,0]],
-    '3_down': [[3,2],[4,2],[5,2]]
+  '1_across': [[0,0],[0,1],[0,2]],
+  '2_across': [[0,6],[0,7],[1,6],[1,7],[2,6],[2,7]],
+  '3_across': [[3,0],[3,1],[3,2],[3,3],[3,4],[3,5]],
+  '4_across': [[4,4],[4,5],[4,6],[4,7],[5,6]],
+  '5_across': [[6,0],[6,1],[6,2],[6,3]],
+  '6_across': [[7,0],[7,1],[7,2],[7,3],[7,4],[7,5]],
+  '7_across': [[7,0],[7,1],[7,2],[7,3],[7,4]],
+  '8_across': [[7,5],[7,6],[7,7]],
+
+  '1_down': [[0,0],[1,0],[2,0],[3,0],[4,0]],
+  '2_down': [[0,6],[1,6],[2,6],[3,6],[4,6]],
+  '3_down': [[2,4],[3,4],[4,4],[5,4]],
+  '4_down': [[4,4],[5,4],[6,4],[7,4],[7,5]],
+  '5_down': [[5,0],[6,0],[7,0]],
+  '6_down': [[7,1],[6,1],[5,1],[4,1],[3,1]],
+  '7_down': [[7,2],[6,2],[5,2],[4,2],[3,2]],
+  '8_down': [[7,7],[6,7],[5,7],[4,7]]
 };
 
 // ===== Elements =====
@@ -277,168 +306,150 @@ grid.style.gridTemplateRows = `repeat(${gridData.length},50px)`;
 
 // ===== Build grid =====
 const cells = [];
-for (let r=0;r<gridData.length;r++){
-    cells[r] = [];
-    for (let c=0;c<gridData[r].length;c++){
-        const cell = document.createElement('div');
-        cell.className = 'cell';
-        if(!gridData[r][c] || gridData[r][c]===' '){
-            cell.classList.add('block');
-        } else {
-            const input = document.createElement('input');
-            input.maxLength = 1;
-            input.dataset.row = r;
-            input.dataset.col = c;
-            cell.appendChild(input);
+for(let r=0;r<gridData.length;r++){
+  cells[r]=[];
+  for(let c=0;c<gridData[r].length;c++){
+    const cell=document.createElement('div');
+    cell.className='cell';
+    if(!gridData[r][c]||gridData[r][c]===' '){cell.classList.add('block');}
+    else{
+      const input=document.createElement('input');
+      input.maxLength=1;
+      input.dataset.row=r;
+      input.dataset.col=c;
+      cell.appendChild(input);
+      const key=`${r},${c}`;
+      if(numbers[key]){
+        const n=document.createElement('div');
+        n.className='number';
+        n.textContent=numbers[key];
+        cell.appendChild(n);
+      }
 
-            const key = `${r},${c}`;
-            if(numbers[key]){
-                const n = document.createElement('div');
-                n.className = 'number';
-                n.textContent = numbers[key];
-                cell.appendChild(n);
-            }
+      input.addEventListener('input',()=>{
+        const correct=gridData[r][c].toUpperCase();
+        if(errorCheckToggle.checked){
+          if(input.value.toUpperCase()!==correct && input.value!==''){cell.classList.add('error'); cell.classList.remove('correct');}
+          else if(input.value.toUpperCase()===correct){cell.classList.add('correct'); cell.classList.remove('error');}
+          else{cell.classList.remove('error'); cell.classList.remove('correct');}
+        } else{cell.classList.remove('error'); cell.classList.remove('correct');}
 
-            // Input event for error + auto advance/backspace
-            input.addEventListener('input', () => {
-                const correct = gridData[r][c].toUpperCase();
-                if(errorCheckToggle.checked){
-                    if(input.value.toUpperCase() !== correct && input.value!==''){
-                        cell.classList.add('error');
-                        cell.classList.remove('correct');
-                    } else if(input.value.toUpperCase() === correct){
-                        cell.classList.add('correct');
-                        cell.classList.remove('error');
-                    } else {
-                        cell.classList.remove('error');
-                        cell.classList.remove('correct');
-                    }
-                } else {
-                    cell.classList.remove('error');
-                    cell.classList.remove('correct');
-                }
-
-                // Auto-advance
-                const positions = cluesMap[`${activeWord}_${activeDirection}`];
-                if(!positions) return;
-                const idx = positions.findIndex(([rr,cc])=>rr===r && cc===c);
-                if(idx!==-1 && idx<positions.length-1){
-                    const [nextR,nextC] = positions[idx+1];
-                    const nextInput = cells[nextR][nextC].querySelector('input');
-                    if(nextInput) nextInput.focus();
-                }
-            });
-
-            // Backspace
-            input.addEventListener('keydown', (e)=>{
-                if(e.key==='Backspace'){
-                    const positions = cluesMap[`${activeWord}_${activeDirection}`];
-                    const idx = positions.findIndex(([rr,cc])=>rr===r && cc===c);
-                    if(idx>0 && !input.value){
-                        const [prevR,prevC] = positions[idx-1];
-                        const prevInput = cells[prevR][prevC].querySelector('input');
-                        if(prevInput){
-                            prevInput.focus();
-                            prevInput.value='';
-                        }
-                        e.preventDefault();
-                    }
-                }
-            });
-
-            // Tile click logic toggle
-            cell.addEventListener('click', ()=>{
-                const matchingWords = [];
-                for(const key in cluesMap){
-                    if(cluesMap[key].some(([rr,cc])=>rr===r && cc===c)) matchingWords.push(key);
-                }
-                if(matchingWords.length===0) return;
-                let preferred;
-                if(matchingWords.length===1) preferred = matchingWords[0];
-                else preferred = matchingWords.find(k=>!k.endsWith(activeDirection))||matchingWords[0];
-                const [num,dir] = preferred.split('_');
-                highlightWord(num,dir);
-            });
+        // auto-advance
+        const positions=cluesMap[`${activeWord}_${activeDirection}`];
+        if(!positions) return;
+        const idx=positions.findIndex(([rr,cc])=>rr===r && cc===c);
+        if(idx!==-1 && idx<positions.length-1){
+          const [nextR,nextC]=positions[idx+1];
+          const nextInput=cells[nextR][nextC].querySelector('input');
+          if(nextInput) nextInput.focus();
         }
-        grid.appendChild(cell);
-        cells[r][c] = cell;
+      });
+
+      input.addEventListener('keydown',(e)=>{
+        if(e.key==='Backspace'){
+          const positions=cluesMap[`${activeWord}_${activeDirection}`];
+          const idx=positions.findIndex(([rr,cc])=>rr===r && cc===c);
+          if(idx>0 && !input.value){
+            const [prevR,prevC]=positions[idx-1];
+            const prevInput=cells[prevR][prevC].querySelector('input');
+            if(prevInput){prevInput.focus(); prevInput.value='';}
+            e.preventDefault();
+          }
+        }
+      });
+
+      cell.addEventListener('click',()=>{
+        const matchingWords=[];
+        for(const key in cluesMap){
+          if(cluesMap[key].some(([rr,cc])=>rr===r && cc===c)) matchingWords.push(key);
+        }
+        if(matchingWords.length===0) return;
+        let preferred;
+        if(matchingWords.length===1) preferred=matchingWords[0];
+        else preferred=matchingWords.find(k=>!k.endsWith(activeDirection))||matchingWords[0];
+        const [num,dir]=preferred.split('_');
+        highlightWord(num,dir);
+      });
     }
+    grid.appendChild(cell);
+    cells[r][c]=cell;
+  }
 }
 
 // ===== Settings toggle =====
-document.getElementById('settingsBtn').onclick = ()=>{
-    const settings = document.getElementById('settings');
-    settings.style.display = settings.style.display==='block'?'none':'block';
+document.getElementById('settingsBtn').onclick=()=>{
+  const settings=document.getElementById('settings');
+  settings.style.display=settings.style.display==='block'?'none':'block';
 }
 
 // ===== Error disclaimer =====
-errorCheckToggle.addEventListener('change', ()=>{
-    errorDisclaimer.textContent = errorCheckToggle.checked?'Error Mode Enabled':'Error Mode Disabled';
-    errorDisclaimer.style.opacity = 1;
-    setTimeout(()=>{errorDisclaimer.style.opacity=0},1200);
+errorCheckToggle.addEventListener('change',()=>{
+  errorDisclaimer.textContent=errorCheckToggle.checked?'Error Mode Enabled':'Error Mode Disabled';
+  errorDisclaimer.style.opacity=1;
+  setTimeout(()=>{errorDisclaimer.style.opacity=0},1200);
 });
 
 // ===== Timer =====
 let seconds=0;
 let timerInterval=null;
 function updateTimer(){
-    seconds++;
-    const mins = String(Math.floor(seconds/60)).padStart(2,'0');
-    const secs = String(seconds%60).padStart(2,'0');
-    document.getElementById('timer').textContent = `${mins}:${secs}`;
+  seconds++;
+  const mins=String(Math.floor(seconds/60)).padStart(2,'0');
+  const secs=String(seconds%60).padStart(2,'0');
+  document.getElementById('timer').textContent=`${mins}:${secs}`;
 }
 
 // ===== Highlight word =====
-let activeWord = null;
-let activeDirection = 'across';
+let activeWord=null;
+let activeDirection='across';
 function highlightWord(number,direction){
-    cells.flat().forEach(cell => cell.classList.remove('highlight'));
-    document.querySelectorAll('.clue').forEach(clue=>clue.classList.remove('active'));
-    const key = `${number}_${direction}`;
-    const positions = cluesMap[key];
-    if(!positions) return;
-    positions.forEach(([r,c]) => cells[r][c].classList.add('highlight'));
-    const clueEl = document.querySelector(`.clue[data-number='${number}'][data-direction='${direction}']`);
-    if(clueEl) clueEl.classList.add('active');
-    document.getElementById('active-clue').innerHTML = `<strong>${direction.charAt(0).toUpperCase()+direction.slice(1)} ${number}.</strong> ${clueEl.textContent.split('. ').slice(1).join('. ')}`;
-    const firstCell = cells[positions[0][0]][positions[0][1]];
-    const input = firstCell.querySelector('input');
-    if(input) input.focus();
-    activeWord = number;
-    activeDirection = direction;
+  cells.flat().forEach(cell=>cell.classList.remove('highlight'));
+  document.querySelectorAll('.clue').forEach(clue=>clue.classList.remove('active'));
+  const key=`${number}_${direction}`;
+  const positions=cluesMap[key];
+  if(!positions) return;
+  positions.forEach(([r,c])=>cells[r][c].classList.add('highlight'));
+  const clueEl=document.querySelector(`.clue[data-number='${number}'][data-direction='${direction}']`);
+  if(clueEl) clueEl.classList.add('active');
+  document.getElementById('active-clue').innerHTML=`<strong>${direction.charAt(0).toUpperCase()+direction.slice(1)} ${number}.</strong> ${clueEl.textContent.split('. ').slice(1).join('. ')}`;
+  const firstCell=cells[positions[0][0]][positions[0][1]];
+  const input=firstCell.querySelector('input');
+  if(input) input.focus();
+  activeWord=number;
+  activeDirection=direction;
 }
 
 // ===== Click clues toggle =====
 document.querySelectorAll('.clue').forEach(clue=>{
-    clue.addEventListener('click',()=>{
-        const number = clue.dataset.number;
-        const direction = clue.dataset.direction;
-        if(activeWord == number){
-            const otherDirection = activeDirection==='across'?'down':'across';
-            if(cluesMap[`${number}_${otherDirection}`]){
-                highlightWord(number,otherDirection);
-                return;
-            }
-        }
-        highlightWord(number,direction);
-    })
+  clue.addEventListener('click',()=>{
+    const number=clue.dataset.number;
+    const direction=clue.dataset.direction;
+    if(activeWord==number){
+      const otherDirection=activeDirection==='across'?'down':'across';
+      if(cluesMap[`${number}_${otherDirection}`]){
+        highlightWord(number,otherDirection);
+        return;
+      }
+    }
+    highlightWord(number,direction);
+  })
 })
 
 // ===== Initial highlight =====
 highlightWord(1,'across');
 
-// ===== Preloader & start button =====
-window.addEventListener('load', ()=>{
-    const preloader = document.getElementById('preloader');
-    preloader.style.opacity=0;
-    setTimeout(()=>{preloader.style.display='none';},800);
+// ===== Preloader =====
+window.addEventListener('load',()=>{
+  const preloader=document.getElementById('preloader');
+  preloader.style.opacity=0;
+  setTimeout(()=>{preloader.style.display='none';},800);
 })
 
-startBtn.addEventListener('click', ()=>{
-    startScreen.style.display='none';
-    if(!timerInterval) timerInterval = setInterval(updateTimer,1000);
+// ===== Start button =====
+startBtn.addEventListener('click',()=>{
+  startScreen.style.display='none';
+  if(!timerInterval) timerInterval=setInterval(updateTimer,1000);
 });
 </script>
-
 </body>
 </html>
