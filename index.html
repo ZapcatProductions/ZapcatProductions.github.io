@@ -52,6 +52,7 @@ body {
     padding: 16px;
     max-width: 900px;
     margin: auto;
+    position: relative;
 }
 
 /* GRID */
@@ -116,13 +117,32 @@ body {
 }
 
 .clue.active { background: #dbeaff; }
+
+/* PRELOADER */
+#preloader {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: black;
+    z-index: 20;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 24px;
+    opacity: 1;
+    transition: opacity 0.8s ease;
+    pointer-events: none;
+}
 </style>
 </head>
 <body>
 
 <div id="topbar">
     ← Back
-    <div>00:00</div>
+    <div id="timer">00:00</div>
     <div id="settingsBtn">⚙️</div>
 </div>
 
@@ -145,6 +165,8 @@ body {
         <div class="clue" data-number="1" data-direction="down">1. Lays</div>
         <div class="clue" data-number="2" data-direction="down">2. Charged, in a way</div>
     </div>
+
+    <div id="preloader">Loading...</div>
 </div>
 
 <script>
@@ -229,6 +251,15 @@ document.getElementById('settingsBtn').onclick = () => {
     settings.style.display = settings.style.display==='block' ? 'none':'block';
 };
 
+// Timer
+let seconds = 0;
+function updateTimer(){
+    seconds++;
+    const mins = String(Math.floor(seconds/60)).padStart(2,'0');
+    const secs = String(seconds%60).padStart(2,'0');
+    document.getElementById('timer').textContent = `${mins}:${secs}`;
+}
+
 // Highlight word
 let activeWord = null;
 let activeDirection = 'across';
@@ -258,14 +289,15 @@ function highlightWord(number,direction){
     activeDirection = direction;
 }
 
-// Click clues
+// Click clues with toggle across/down
 document.querySelectorAll('.clue').forEach(clue => {
     clue.addEventListener('click', () => {
         const number = clue.dataset.number;
         const direction = clue.dataset.direction;
-        // Toggle direction if same clue
+
+        // toggle if same number clicked
         if(activeWord == number){
-            const otherDirection = direction==='across'?'down':'across';
+            const otherDirection = activeDirection==='across'?'down':'across';
             if(cluesMap[`${number}_${otherDirection}`]){
                 highlightWord(number,otherDirection);
                 return;
@@ -275,8 +307,18 @@ document.querySelectorAll('.clue').forEach(clue => {
     });
 });
 
-// Highlight first across clue initially
+// Initial highlight
 highlightWord(1,'across');
+
+// Preloader fade
+window.addEventListener('load', () => {
+    const preloader = document.getElementById('preloader');
+    preloader.style.opacity = 0;
+    setTimeout(() => { preloader.style.display = 'none'; }, 800);
+
+    // Start timer
+    setInterval(updateTimer,1000);
+});
 </script>
 </body>
 </html>
