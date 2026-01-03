@@ -6,206 +6,240 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
-body { margin: 0; font-family: system-ui, sans-serif; background: #f2f2f2; }
+body { margin:0; font-family:system-ui,sans-serif; background:#f2f2f2; }
 
-/* Top bar */
-#topbar { background: #9ac57a; height: 48px; display:flex; align-items:center; justify-content:space-between; padding:0 14px; font-weight:600; }
+/* PRELOADER */
+#preloader {
+  position:fixed; inset:0;
+  background:black;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  color:white;
+  z-index:9999;
+}
 
-/* Settings */
-#settingsBtn { cursor:pointer; }
-#settings { display:none; position:fixed; top:56px; right:16px; background:white; border:1px solid #ccc; padding:12px; width:220px; z-index:10; }
+/* INTRO MODAL */
+#intro {
+  position:fixed; inset:0;
+  background:rgba(0,0,0,.4);
+  display:none;
+  align-items:center;
+  justify-content:center;
+  z-index:9998;
+}
+#introBox {
+  background:white;
+  width:420px;
+  padding:24px;
+  text-align:center;
+  position:relative;
+}
+#introBox h1 { margin:0 0 8px; }
+#introBox p { margin:6px 0; }
+#startBtn {
+  position:absolute;
+  bottom:16px;
+  right:16px;
+  padding:8px 14px;
+  background:#3b82f6;
+  color:white;
+  border:none;
+  cursor:pointer;
+  font-size:13px;
+}
 
-/* Active clue display */
-#active-clue { background:white; border-bottom:1px solid #ccc; padding:10px; font-size:14px; }
+/* TOP BAR */
+#topbar {
+  background:#9ac57a;
+  height:48px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:0 14px;
+  font-weight:600;
+}
 
-/* Layout */
-#game { display:grid; grid-template-columns:auto 320px; gap:16px; padding:16px; max-width:900px; margin:auto; }
+/* LAYOUT */
+#game {
+  display:grid;
+  grid-template-columns:auto 320px;
+  gap:16px;
+  padding:16px;
+  max-width:1000px;
+  margin:auto;
+}
 
-/* Grid */
+/* GRID */
 #grid { display:grid; gap:2px; background:black; }
-.cell { width:70px; height:70px; background:#fff; position:relative; font-weight:bold; font-size:28px; text-transform:uppercase; text-align:center; line-height:70px; cursor:pointer; }
-.cell.block { background:black; cursor:default; }
-.cell.highlight { background:#dbeaff; }
-.cell.error { background:#ffcccc; }
+.cell {
+  width:60px; height:60px;
+  background:white;
+  position:relative;
+}
+.cell.block { background:black; }
+.cell.active { background:#dbeaff; }
 
-.cell input { width:100%; height:100%; border:none; text-align:center; font-size:28px; text-transform:uppercase; background:transparent; font-weight:bold; cursor:pointer; }
+.cell input {
+  width:100%; height:100%;
+  border:none;
+  text-align:center;
+  font-size:26px;
+  text-transform:uppercase;
+  background:transparent;
+}
 .cell input:focus { outline:none; }
 
-.number { position:absolute; top:3px; left:4px; font-size:10px; font-weight:600; }
+.number {
+  position:absolute;
+  top:3px; left:4px;
+  font-size:10px;
+}
 
-/* Clues */
-#clues { background:white; border:1px solid #ccc; padding:12px; overflow-y:auto; }
-.clue { font-size:14px; padding:4px; cursor:pointer; }
+/* CLUES */
+#clues { background:white; border:1px solid #ccc; padding:12px; }
+.clue { padding:4px; cursor:pointer; }
 .clue.active { background:#dbeaff; }
 </style>
 </head>
+
 <body>
 
+<div id="preloader">Advertisement</div>
+
+<div id="intro">
+  <div id="introBox">
+    <h1 id="dateTitle"></h1>
+    <p><strong>by zapcatproductions</strong></p>
+    <p>thank you for playing my mini game, I hope you have fun</p>
+    <p>looking for more fun crosswords? open the menu located in the top left to access our archive (this is mini 1)</p>
+    <p style="font-size:12px;">copyright zapcatproductions 2026</p>
+    <button id="startBtn">Start</button>
+  </div>
+</div>
+
 <div id="topbar">
-  ← Back
-  <div>00:00</div>
-  <div id="settingsBtn">⚙️</div>
+  ☰ Menu
+  <div id="timer">00:00</div>
 </div>
-
-<div id="settings">
-  <strong>Settings</strong><br><br>
-  <label><input type="checkbox" id="errorCheck"> Error Check Mode</label>
-</div>
-
-<div id="active-clue"><strong>Across 1.</strong> Having learned something</div>
 
 <div id="game">
   <div id="grid"></div>
   <div id="clues">
     <h3>Across</h3>
-    <div class="clue" data-number="1" data-direction="across">1. Having learned something</div>
-    <div class="clue" data-number="6" data-direction="across">6. What gives a reader pause?</div>
+    <div class="clue" data-id="1A">1. Having learned something</div>
+    <div class="clue" data-id="2A">2. Musical piece</div>
+
     <h3>Down</h3>
-    <div class="clue" data-number="1" data-direction="down">1. Lays</div>
-    <div class="clue" data-number="2" data-direction="down">2. Charged, in a way</div>
+    <div class="clue" data-id="1D">1. Lays</div>
+    <div class="clue" data-id="2D">2. Charged, in a way</div>
   </div>
 </div>
 
 <script>
-// Grid answers
-const gridData = [
-  ['L','E','A','R','N'],
-  ['P','A','U','S','E'],
-  ['W','H','E','R','E'],
-  [null,'C','H','I','P'],
-  [null,'S','O','N','G']
+/* DATE */
+const d=new Date();
+document.getElementById("dateTitle").textContent =
+  d.toLocaleDateString(undefined,{weekday:'long',month:'long',day:'numeric',year:'numeric'});
+
+/* PRELOADER FLOW */
+setTimeout(()=>{
+  document.getElementById("preloader").style.display="none";
+  document.getElementById("intro").style.display="flex";
+},1200);
+
+/* TIMER */
+let seconds=0, timerInt=null;
+function startTimer(){
+  timerInt=setInterval(()=>{
+    seconds++;
+    const m=String(Math.floor(seconds/60)).padStart(2,'0');
+    const s=String(seconds%60).padStart(2,'0');
+    document.getElementById("timer").textContent=`${m}:${s}`;
+  },1000);
+}
+
+/* START */
+document.getElementById("startBtn").onclick=()=>{
+  document.getElementById("intro").style.display="none";
+  startTimer();
+};
+
+/* CROSSWORD DATA (ENGINE-CORRECT) */
+const size=5;
+const solution=[
+ ['L','E','A','R','N'],
+ ['P','A','U','S','E'],
+ ['W','H','E','R','E'],
+ [null,'S','O','N','G'],
+ [null,null,'I','T','S']
 ];
 
-// Numbers
-const numbers = { '0,0':1, '1,0':6, '3,1':2 };
-
-// Clue positions
-const cluesMap = {
-  '1_across': [[0,0],[0,1],[0,2],[0,3],[0,4]],
-  '6_across': [[1,0],[1,1],[1,2],[1,3],[1,4]],
-  '1_down': [[0,0],[1,0],[2,0]],
-  '2_down': [[3,1],[4,1]]
+const words={
+ '1A':[[0,0],[0,1],[0,2],[0,3],[0,4]],
+ '2A':[[3,1],[3,2],[3,3],[3,4]],
+ '1D':[[0,0],[1,0],[2,0]],
+ '2D':[[0,2],[1,2],[2,2],[3,2],[4,2]]
 };
 
-// Build reverse map: tile -> clues
-const tileClues = {};
-for(const [key,posList] of Object.entries(cluesMap)){
-  posList.forEach(([r,c])=>{
-    const tileKey = `${r},${c}`;
-    if(!tileClues[tileKey]) tileClues[tileKey]=[];
-    tileClues[tileKey].push(key);
-  });
-}
+const grid=document.getElementById("grid");
+grid.style.gridTemplateColumns=`repeat(${size},60px)`;
 
-// Grid
-const grid = document.getElementById('grid');
-grid.style.gridTemplateColumns = `repeat(${gridData[0].length},70px)`;
-grid.style.gridTemplateRows = `repeat(${gridData.length},70px)`;
-
-const cells = [];
-for(let r=0;r<gridData.length;r++){
-  cells[r]=[];
-  for(let c=0;c<gridData[r].length;c++){
-    const cell = document.createElement('div');
-    cell.className='cell';
-    if(gridData[r][c]===null){cell.classList.add('block');}
-    else{
-      const input=document.createElement('input');
-      input.maxLength=1;
-      input.dataset.row=r;
-      input.dataset.col=c;
-      cell.appendChild(input);
-
-      const key=`${r},${c}`;
-      if(numbers[key]){
-        const n=document.createElement('div');
-        n.className='number';
-        n.textContent=numbers[key];
-        cell.appendChild(n);
-      }
-
-      // Input event for error checking
-      input.addEventListener('input',()=>{
-        if(document.getElementById('errorCheck').checked){
-          const correct = gridData[r][c].toUpperCase();
-          if(input.value.toUpperCase()!==correct) cell.classList.add('error');
-          else cell.classList.remove('error');
-        } else { cell.classList.remove('error'); }
-      });
-
-      // Clicking on tile highlights word
-      input.addEventListener('focus',()=>{selectTile(r,c)});
-    }
-    grid.appendChild(cell);
-    cells[r][c]=cell;
-  }
-}
-
-// Settings toggle
-document.getElementById('settingsBtn').onclick=()=>{
-  const settings=document.getElementById('settings');
-  settings.style.display=settings.style.display==='block'?'none':'block';
-};
-
-// Active word
+const cells=[];
 let activeWord=null;
-let activeDirection='across';
 
-function highlightWord(number,direction){
-  // Remove highlights
-  cells.flat().forEach(cell=>cell.classList.remove('highlight'));
-  document.querySelectorAll('.clue').forEach(clue=>clue.classList.remove('active'));
-
-  const key=`${number}_${direction}`;
-  const positions=cluesMap[key];
-  if(!positions) return;
-
-  positions.forEach(([r,c])=>cells[r][c].classList.add('highlight'));
-
-  const clueEl=document.querySelector(`.clue[data-number='${number}'][data-direction='${direction}']`);
-  if(clueEl) clueEl.classList.add('active');
-
-  document.getElementById('active-clue').innerHTML=`<strong>${direction.charAt(0).toUpperCase()+direction.slice(1)} ${number}.</strong> ${clueEl.textContent.split('. ').slice(1).join('. ')}`;
-
-  // Focus first input
-  const firstCell=cells[positions[0][0]][positions[0][1]];
-  const input=firstCell.querySelector('input');
-  if(input) input.focus();
-
-  activeWord=number;
-  activeDirection=direction;
+for(let r=0;r<size;r++){
+ cells[r]=[];
+ for(let c=0;c<size;c++){
+  const cell=document.createElement("div");
+  cell.className="cell";
+  if(solution[r][c]==null){cell.classList.add("block");}
+  else{
+    const input=document.createElement("input");
+    input.maxLength=1;
+    input.onfocus=()=>selectCell(r,c);
+    cell.appendChild(input);
+  }
+  grid.appendChild(cell);
+  cells[r][c]=cell;
+ }
 }
 
-// Clicking clue
-document.querySelectorAll('.clue').forEach(clue=>{
-  clue.addEventListener('click',()=>{
-    const number=clue.dataset.number;
-    const direction=clue.dataset.direction;
+function clearActive(){
+  cells.flat().forEach(c=>c.classList.remove("active"));
+  document.querySelectorAll(".clue").forEach(c=>c.classList.remove("active"));
+}
 
-    // toggle direction if same clue
-    if(activeWord==number){
-      const otherDir = direction==='across'?'down':'across';
-      if(cluesMap[`${number}_${otherDir}`]){ highlightWord(number,otherDir); return; }
-    }
-    highlightWord(number,direction);
-  });
+function selectWord(id){
+  clearActive();
+  activeWord=id;
+  words[id].forEach(([r,c])=>cells[r][c].classList.add("active"));
+  document.querySelector(`.clue[data-id="${id}"]`).classList.add("active");
+}
+
+function selectCell(r,c){
+  const matches=Object.entries(words).filter(([_,pos])=>
+    pos.some(p=>p[0]==r&&p[1]==c)
+  ).map(m=>m[0]);
+
+  if(!matches.length) return;
+  if(matches.includes(activeWord)){
+    const next=matches.find(m=>m!==activeWord);
+    if(next) selectWord(next);
+  } else selectWord(matches[0]);
+}
+
+document.querySelectorAll(".clue").forEach(clue=>{
+  clue.onclick=()=>{
+    const id=clue.dataset.id;
+    if(id===activeWord){
+      const twin=id[1]==='A'?id[0]+'D':id[0]+'A';
+      if(words[twin]) selectWord(twin);
+    } else selectWord(id);
+  };
 });
 
-// Clicking tile selects first clue
-function selectTile(r,c){
-  const key=`${r},${c}`;
-  const clues=tileClues[key];
-  if(!clues || clues.length===0) return;
-
-  // pick active direction if possible
-  let clueKey=clues.find(k=>k.endsWith(activeDirection))||clues[0];
-  const [num,dir]=clueKey.split('_');
-  highlightWord(num,dir);
-}
-
-// Highlight first across clue initially
-highlightWord(1,'across');
+selectWord("1A");
 </script>
-
 </body>
 </html>
