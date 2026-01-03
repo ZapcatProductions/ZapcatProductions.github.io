@@ -19,7 +19,7 @@ body{
   background:#f2f2f2;
 }
 
-/* ===== TOP BAR ===== */
+/* TOP BAR */
 #topbar{
   height:48px;
   background:#9ac57a;
@@ -30,8 +30,9 @@ body{
   font-weight:600;
 }
 
-/* ===== SETTINGS ===== */
 #settingsBtn{cursor:pointer}
+
+/* SETTINGS */
 #settings{
   display:none;
   position:fixed;
@@ -43,7 +44,7 @@ body{
   z-index:10;
 }
 
-/* ===== ACTIVE CLUE ===== */
+/* ACTIVE CLUE */
 #active-clue{
   background:white;
   padding:10px;
@@ -51,17 +52,17 @@ body{
   font-size:14px;
 }
 
-/* ===== LAYOUT ===== */
+/* LAYOUT */
 #game{
   display:grid;
-  grid-template-columns:auto 320px;
+  grid-template-columns:auto 300px;
   gap:16px;
   padding:16px;
-  max-width:900px;
+  max-width:700px;
   margin:auto;
 }
 
-/* ===== GRID ===== */
+/* GRID */
 #grid{
   display:grid;
   grid-template-columns:repeat(5,48px);
@@ -77,7 +78,6 @@ body{
 }
 
 .cell.block{background:black}
-
 .cell.active{background:var(--blue)}
 .cell.complete{background:var(--white)}
 .cell.error{background:var(--red)}
@@ -104,7 +104,7 @@ body{
   pointer-events:none;
 }
 
-/* ===== CLUES ===== */
+/* CLUES */
 #clues{
   background:white;
   border:1px solid #ccc;
@@ -142,7 +142,7 @@ body{
 </div>
 
 <script>
-/* ===== TIMER ===== */
+/* TIMER */
 let t=0;
 setInterval(()=>{
   t++;
@@ -151,7 +151,7 @@ setInterval(()=>{
     String(t%60).padStart(2,'0');
 },1000);
 
-/* ===== GRID DATA ===== */
+/* GRID DATA */
 const gridData=[
  ['L','E','A','R','N'],
  ['A',null,'E',null,'A'],
@@ -170,7 +170,7 @@ const numbers={'0,0':1,'2,0':5,'0,2':2};
 const grid=document.getElementById('grid');
 const cells=[];
 
-/* ===== BUILD GRID ===== */
+/* BUILD GRID */
 for(let r=0;r<3;r++){
   cells[r]=[];
   for(let c=0;c<5;c++){
@@ -201,97 +201,98 @@ for(let r=0;r<3;r++){
   }
 }
 
-/* ===== STATE ===== */
+/* STATE */
 let activeNumber=1;
 let activeDir='across';
 
-/* ===== HELPERS ===== */
-function keyFor(num,dir){return `${num}_${dir}`}
+/* HELPERS */
+function keyFor(n,d){return `${n}_${d}`}
 
-function activate(num,dir){
-  activeNumber=num;
-  activeDir=dir;
+function activate(n,d){
+  activeNumber=n;
+  activeDir=d;
 
-  document.querySelectorAll('.cell').forEach(c=>{
-    c.classList.remove('active','complete');
+  document.querySelectorAll('.cell')
+    .forEach(c=>c.classList.remove('active','complete'));
+
+  document.querySelectorAll('.clue')
+    .forEach(c=>c.classList.remove('active'));
+
+  clues[keyFor(n,d)].forEach(([r,c])=>{
+    cells[r][c].classList.add('active');
   });
-  document.querySelectorAll('.clue').forEach(c=>c.classList.remove('active'));
 
-  const key=keyFor(num,dir);
-  clues[key].forEach(([r,c])=>cells[r][c].classList.add('active'));
-
-  document.querySelectorAll(`.clue[data-number="${num}"]`)
+  document.querySelectorAll(`.clue[data-number="${n}"]`)
     .forEach(c=>c.classList.add('active'));
 
   activeClue.textContent=
-    (dir==='across'?'Across ':'Down ')+num;
+    (d==='across'?'Across ':'Down ')+n;
 }
 
-/* ===== TILE CLICK ===== */
+/* TILE CLICK — TRUE TOGGLE */
 function selectTile(r,c){
-  const matches=[];
-  for(const k in clues){
-    if(clues[k].some(p=>p[0]==r&&p[1]==c)) matches.push(k);
-  }
+  const matches=Object.keys(clues)
+    .filter(k=>clues[k].some(p=>p[0]==r&&p[1]==c));
+
   if(!matches.length)return;
 
   const current=keyFor(activeNumber,activeDir);
-  if(matches.includes(current)){
+
+  if(matches.includes(current) && matches.length>1){
     const other=matches.find(k=>k!==current);
-    if(other){
-      const [n,d]=other.split('_');
-      activate(Number(n),d);
-    }
+    const [n,d]=other.split('_');
+    activate(+n,d);
   }else{
     const [n,d]=matches[0].split('_');
-    activate(Number(n),d);
+    activate(+n,d);
   }
 }
 
-/* ===== CLUE CLICK (TRUE TOGGLE) ===== */
+/* CLUE CLICK */
 document.querySelectorAll('.clue').forEach(clue=>{
   clue.onclick=()=>{
-    const num=Number(clue.dataset.number);
-    if(num===activeNumber){
-      activate(num,activeDir==='across'?'down':'across');
-    }else{
-      activate(num,'across');
-    }
+    const n=+clue.dataset.number;
+    activate(n, n===activeNumber && activeDir==='across' ? 'down' : 'across');
   };
 });
 
-/* ===== INPUT / ERROR CHECK ===== */
+/* INPUT + ERROR MODE */
 function handleInput(r,c,input,cell){
   cell.classList.remove('error');
 
-  if(!input.value)return;
-
-  if(errorCheck.checked){
-    if(input.value.toUpperCase()!==gridData[r][c]){
-      cell.classList.add('error');
-    }
+  if(!input.value){
+    cell.classList.remove('complete');
+    return;
   }
+
+  if(errorCheck.checked &&
+     input.value.toUpperCase()!==gridData[r][c]){
+    cell.classList.add('error');
+  }
+
   checkComplete();
 }
 
-/* ===== WORD COMPLETE ===== */
+/* WORD COMPLETE */
 function checkComplete(){
   const key=keyFor(activeNumber,activeDir);
   const done=clues[key].every(([r,c])=>{
     const i=cells[r][c].querySelector('input');
     return i && i.value.toUpperCase()===gridData[r][c];
   });
+
   clues[key].forEach(([r,c])=>{
     cells[r][c].classList.toggle('complete',done);
   });
 }
 
-/* ===== SETTINGS ===== */
+/* SETTINGS */
 settingsBtn.onclick=()=>{
-  settings.style.display=settings.style.display==='block'?'none':'block';
+  settings.style.display=
+    settings.style.display==='block'?'none':'block';
 };
 
-/* ===== START ===== */
+/* START */
 activate(1,'across');
 </script>
 
