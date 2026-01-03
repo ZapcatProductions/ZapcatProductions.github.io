@@ -23,17 +23,13 @@ body {
   font-weight: 600;
 }
 
-#timer { font-variant-numeric: tabular-nums; }
-
 /* SETTINGS */
-#settingsBtn {
-  cursor: pointer;
-}
+#settingsBtn { cursor: pointer; }
 
 #settings {
   display: none;
   position: fixed;
-  top: 60px;
+  top: 56px;
   right: 16px;
   background: white;
   border: 1px solid #ccc;
@@ -42,24 +38,12 @@ body {
   z-index: 10;
 }
 
-#settings label {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 8px;
-}
-
 /* ACTIVE CLUE */
 #active-clue {
   background: white;
   border-bottom: 1px solid #ccc;
   padding: 10px;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-#active-clue span {
-  flex: 1;
+  font-size: 14px;
 }
 
 /* LAYOUT */
@@ -75,8 +59,8 @@ body {
 /* GRID */
 #grid {
   display: grid;
-  grid-template-columns: repeat(5, 64px);
-  grid-template-rows: repeat(5, 64px);
+  grid-template-columns: repeat(5, 70px);
+  grid-template-rows: repeat(5, 70px);
   gap: 2px;
   background: black;
 }
@@ -91,27 +75,26 @@ body {
   height: 100%;
   border: none;
   text-align: center;
-  font-size: 28px;
+  font-size: 30px;
   font-weight: bold;
   text-transform: uppercase;
-  background: transparent;
+  cursor: pointer;
 }
 
-.cell input:focus { outline: none; }
+.cell input:focus {
+  outline: none;
+  background: #dbeaff;
+}
 
 .block { background: black; }
 
 .number {
   position: absolute;
-  top: 2px;
+  top: 3px;
   left: 4px;
   font-size: 10px;
   font-weight: 600;
 }
-
-.active { background: #cde8ff; }
-.current { background: #8fc6ff; }
-.incorrect { color: red; }
 
 /* CLUES */
 #clues {
@@ -124,21 +107,6 @@ body {
 .clue {
   font-size: 14px;
   padding: 4px;
-  cursor: pointer;
-}
-
-.clue.active { background: #e8f3ff; }
-
-/* COMPLETE */
-#complete {
-  display: none;
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,.6);
-  color: white;
-  font-size: 32px;
-  align-items: center;
-  justify-content: center;
 }
 </style>
 </head>
@@ -147,170 +115,83 @@ body {
 
 <div id="topbar">
   ← Back
-  <div id="timer">00:00</div>
+  <div>00:00</div>
   <div id="settingsBtn">⚙️</div>
 </div>
 
 <div id="settings">
-  <label>Auto-check <input type="checkbox" id="autocheck"></label>
-  <button onclick="reveal('letter')">Reveal letter</button><br><br>
-  <button onclick="reveal('word')">Reveal word</button><br><br>
-  <button onclick="reveal('puzzle')">Reveal puzzle</button>
+  <strong>Settings</strong><br><br>
+  Auto-check (coming soon)
 </div>
 
 <div id="active-clue">
-  <button onclick="stepClue(-1)">◀</button>
-  <span id="clueText"></span>
-  <button onclick="stepClue(1)">▶</button>
+  <strong>Across 1.</strong> Having learned something
 </div>
 
 <div id="game">
   <div id="grid"></div>
+
   <div id="clues">
     <h3>Across</h3>
-    <div id="across"></div>
+    <div class="clue">1. Having learned something</div>
+    <div class="clue">6. What gives a reader pause?</div>
+
     <h3>Down</h3>
-    <div id="down"></div>
+    <div class="clue">1. Lays</div>
+    <div class="clue">2. Charged, in a way</div>
   </div>
 </div>
 
-<div id="complete">Puzzle Complete 🎉</div>
-
 <script>
-/* PUZZLE DATA */
-const solution = [
- ['L','E','A','R','N'],
- ['P','A','U','S','E'],
- ['W','H','E','R','E'],
- [null,'C','H','I','P'],
- [null,'S','O','N','G']
+/* BASIC GRID DATA */
+const gridData = [
+  ['L','E','A','R','N'],
+  ['P','A','U','S','E'],
+  ['W','H','E','R','E'],
+  [null,'C','H','I','P'],
+  [null,'S','O','N','G']
 ];
 
-const across = [
- {n:1,r:0,c:0,a:'LEARN',clue:'Having learned something'},
- {n:6,r:1,c:0,a:'PAUSE',clue:'What gives a reader pause?'}
-];
+const numbers = {
+  '0,0':1,'1,0':6,'3,1':8
+};
 
-const down = [
- {n:1,r:0,c:0,a:'LAW',clue:'Lays'},
- {n:2,r:0,c:1,a:'EARNS',clue:'Charged, in a way'}
-];
-
-let dir='across', cur=across[0], auto=false;
-let time=0, running=true;
-
-/* TIMER */
-setInterval(()=>{
- if(running){time++;timer.textContent=
- String(Math.floor(time/60)).padStart(2,'0')+':'+
- String(time%60).padStart(2,'0')}
-},1000);
-
-/* SETTINGS */
-settingsBtn.onclick=()=>settings.style.display=
- settings.style.display?'':'block';
-autocheck.onchange=e=>auto=e.target.checked;
+const grid = document.getElementById('grid');
 
 /* BUILD GRID */
-const grid=document.getElementById('grid');
-const cells=[];
+for (let r=0;r<5;r++){
+  for (let c=0;c<5;c++){
+    const cell = document.createElement('div');
+    cell.className = 'cell';
 
-for(let r=0;r<5;r++)for(let c=0;c<5;c++){
- const cell=document.createElement('div');
- cell.className='cell';
- if(!solution[r][c]) cell.classList.add('block');
- else{
-  const i=document.createElement('input');
-  i.maxLength=1;
-  i.onfocus=()=>select(r,c);
-  i.oninput=()=>check();
-  i.onkeydown=e=>nav(e,r,c);
-  cell.appendChild(i);
-  cells.push({r,c,i});
- }
- grid.appendChild(cell);
-}
+    if (gridData[r][c] === null){
+      cell.classList.add('block');
+    } else {
+      const input = document.createElement('input');
+      input.maxLength = 1;
+      cell.appendChild(input);
 
-/* NUMBERS */
-[...across,...down].forEach(x=>{
- const idx=x.r*5+x.c;
- const n=document.createElement('div');
- n.className='number';
- n.textContent=x.n;
- grid.children[idx].appendChild(n);
-});
+      const key = r+','+c;
+      if (numbers[key]){
+        const n = document.createElement('div');
+        n.className = 'number';
+        n.textContent = numbers[key];
+        cell.appendChild(n);
+      }
+    }
 
-/* CLUES */
-function draw(list,el){
- el.innerHTML='';
- list.forEach(x=>{
-  const d=document.createElement('div');
-  d.className='clue';
-  d.textContent=x.n+'. '+x.clue;
-  d.onclick=()=>setClue(x,list===across?'across':'down');
-  x.el=d;
-  el.appendChild(d);
- });
-}
-draw(across,acrossEl); draw(down,downEl);
-
-/* GAME LOGIC */
-function setClue(x,d){
- dir=d; cur=x; highlight();
-}
-function select(r,c){
- const found=[...across,...down].find(x=>
-  dir==='across'?x.r===r&&c>=x.c&&c<x.c+x.a.length
-                :x.c===c&&r>=x.r&&r<x.r+x.a.length);
- if(found) setClue(found,dir);
-}
-function highlight(){
- document.querySelectorAll('.active,.current')
-  .forEach(e=>e.classList.remove('active','current'));
- [...across,...down].forEach(x=>x.el.classList.remove('active'));
- cur.el.classList.add('active');
- clueText.textContent=
- (dir==='across'?'Across: ':'Down: ')+cur.clue;
- for(let i=0;i<cur.a.length;i++){
-  const r=cur.r+(dir==='down'?i:0);
-  const c=cur.c+(dir==='across'?i:0);
-  const cell=grid.children[r*5+c];
-  cell.classList.add('active');
- }
+    grid.appendChild(cell);
+  }
 }
 
-/* NAVIGATION */
-function nav(e,r,c){
- const move=(dr,dc)=>{
-  const n=cells.find(x=>x.r===r+dr&&x.c===c+dc);
-  if(n) n.i.focus();
- };
- if(e.key==='ArrowRight')move(0,1);
- if(e.key==='ArrowLeft')move(0,-1);
- if(e.key==='ArrowDown')move(1,0);
- if(e.key==='ArrowUp')move(-1,0);
-}
-
-/* CHECK / COMPLETE */
-function check(){
- if(auto){
-  cells.forEach(x=>{
-   x.i.classList.toggle('incorrect',
-    x.i.value && x.i.value!==solution[x.r][x.c]);
-  });
- }
- if(cells.every(x=>x.i.value===solution[x.r][x.c])){
-  running=false;
-  complete.style.display='flex';
- }
-}
-
-/* REVEAL */
-function reveal(type){
- if(type==='puzzle')
-  cells.forEach(x=>x.i.value=solution[x.r][x.c]);
-}
-highlight();
+/* SETTINGS TOGGLE */
+const settingsBtn = document.getElementById('settingsBtn');
+const settings = document.getElementById('settings');
+settingsBtn.onclick = () => {
+  settings.style.display =
+    settings.style.display === 'block' ? 'none' : 'block';
+};
 </script>
+
 </body>
 </html>
