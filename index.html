@@ -1,146 +1,261 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
+<meta charset="UTF-8" />
 <title>Mini Crossword</title>
 
 <style>
   body {
     margin: 0;
-    height: 100vh;
+    background: #f2f2f2;
+    font-family: system-ui, sans-serif;
+  }
+
+  /* TOP BAR */
+  #topbar {
+    height: 48px;
+    background: #9ac57a;
     display: flex;
-    justify-content: center;
     align-items: center;
-    background: #e0e0e0;
-    font-family: sans-serif;
+    justify-content: space-between;
+    padding: 0 14px;
+    font-weight: 600;
   }
 
-  /* GAME CONTAINER (THE BOX IS THE GAME) */
-  #game-container {
-    width: 360px;
-    height: 360px;
-    background: white;
-    border: 2px solid black;
-    position: relative;
-    box-sizing: border-box;
-    padding: 12px;
+  /* ACTIVE CLUE BAR */
+  #active-clue {
+    background: #fff;
+    border-bottom: 1px solid #ccc;
+    padding: 10px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
   }
 
-  /* GRID SCALES TO FIT CONTAINER */
-  #grid {
-    width: 100%;
-    height: 100%;
+  #active-clue span {
+    flex: 1;
+    font-size: 16px;
+  }
+
+  /* MAIN LAYOUT */
+  #game {
     display: grid;
-    grid-template-columns: repeat(5, 1fr);
-    grid-template-rows: repeat(5, 1fr);
+    grid-template-columns: auto 320px;
+    gap: 16px;
+    padding: 16px;
+    max-width: 900px;
+    margin: auto;
+  }
+
+  /* GRID */
+  #grid {
+    display: grid;
+    grid-template-columns: repeat(5, 70px);
+    grid-template-rows: repeat(5, 70px);
     gap: 2px;
+    background: #000;
   }
 
   .cell {
+    background: white;
+    position: relative;
+    text-align: center;
+    font-size: 32px;
+    font-weight: bold;
+    line-height: 70px;
+    cursor: pointer;
+  }
+
+  .cell input {
     width: 100%;
     height: 100%;
-    border: 1px solid black;
-    box-sizing: border-box;
+    border: none;
     text-align: center;
-    font-size: 1.5em;
+    font-size: 32px;
     font-weight: bold;
+    background: transparent;
     text-transform: uppercase;
+    cursor: pointer;
+  }
+
+  .cell input:focus {
     outline: none;
   }
 
-  .cell:focus {
-    background: #eef;
-  }
-
   .block {
-    background: black;
+    background: #000;
+    cursor: default;
   }
 
-  /* AD OVERLAY */
-  #ad-overlay {
-    position: absolute;
-    inset: 0;
-    background: black;
-    color: white;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-size: 20px;
-    z-index: 10;
+  .active {
+    background: #cde8ff;
+  }
+
+  .current {
+    background: #8fc6ff;
+  }
+
+  /* CLUES */
+  #clues {
+    background: white;
+    border: 1px solid #ccc;
+    padding: 12px;
+    overflow-y: auto;
+  }
+
+  h3 {
+    margin: 8px 0;
+  }
+
+  .clue {
+    font-size: 14px;
+    padding: 4px;
+    cursor: pointer;
+  }
+
+  .clue.active {
+    background: #e8f3ff;
   }
 </style>
 </head>
 
 <body>
 
-<div id="game-container">
+<div id="topbar">
+  <div>← Back</div>
+  <div id="timer">00:00</div>
+  <div>⚙️</div>
+</div>
 
+<div id="active-clue">
+  <button id="prev">◀</button>
+  <span id="clue-text"></span>
+  <button id="next">▶</button>
+</div>
+
+<div id="game">
   <div id="grid"></div>
 
-  <div id="ad-overlay">Loading…</div>
-
+  <div id="clues">
+    <h3>Across</h3>
+    <div id="across"></div>
+    <h3>Down</h3>
+    <div id="down"></div>
+  </div>
 </div>
 
 <script>
-  /* MINI CROSSWORD LAYOUT
-     Empty string = black square
-  */
-  const layout = [
-    ["H","E","L","L","O"],
-    ["A","","","", "R"],
-    ["P","A","N","E","L"],
-    ["P","","","", "O"],
-    ["Y","E","A","R","S"]
-  ];
+/* === GRID DATA === */
+const layout = [
+  [1,1,1,1,1],
+  [1,1,1,1,1],
+  [1,1,1,1,1],
+  [0,1,1,1,1],
+  [0,1,1,1,1]
+];
 
-  const grid = document.getElementById("grid");
+/* === CLUES === */
+const across = [
+  { id: 'A1', row: 0, col: 0, len: 5, clue: 'Having learned something' },
+  { id: 'A6', row: 1, col: 0, len: 5, clue: 'What gives a reader pause?' }
+];
 
-  layout.forEach((row) => {
-    row.forEach((letter) => {
-      if (letter === "") {
-        const block = document.createElement("div");
-        block.className = "cell block";
-        grid.appendChild(block);
-      } else {
-        const input = document.createElement("input");
-        input.className = "cell";
-        input.maxLength = 1;
-        input.dataset.answer = letter;
+const down = [
+  { id: 'D1', row: 0, col: 0, len: 4, clue: 'Lays' },
+  { id: 'D2', row: 0, col: 1, len: 5, clue: 'Charged, in a way' }
+];
 
-        input.addEventListener("input", () => {
-          input.value = input.value.toUpperCase();
-          focusNext(input);
-        });
+let direction = 'across';
+let current = across[0];
 
-        input.addEventListener("keydown", (e) => {
-          if (e.key === "Backspace" && !input.value) {
-            focusPrev(input);
-          }
-        });
+/* === BUILD GRID === */
+const gridEl = document.getElementById('grid');
+const cells = [];
 
-        grid.appendChild(input);
-      }
-    });
+layout.forEach((row, r) => {
+  row.forEach((val, c) => {
+    const cell = document.createElement('div');
+    cell.className = 'cell';
+    if (!val) {
+      cell.classList.add('block');
+    } else {
+      const input = document.createElement('input');
+      input.maxLength = 1;
+      input.addEventListener('input', () => move(1));
+      input.addEventListener('keydown', e => {
+        if (e.key === 'Backspace') move(-1);
+      });
+      cell.appendChild(input);
+      cell.onclick = () => selectCell(r,c);
+      cells.push({ r, c, el: cell, input });
+    }
+    gridEl.appendChild(cell);
   });
+});
 
-  function focusNext(current) {
-    const cells = [...document.querySelectorAll(".cell:not(.block)")];
-    const i = cells.indexOf(current);
-    if (cells[i + 1]) cells[i + 1].focus();
+/* === CLUE LIST === */
+function renderClues(list, el) {
+  el.innerHTML = '';
+  list.forEach(c => {
+    const div = document.createElement('div');
+    div.className = 'clue';
+    div.textContent = c.id + '. ' + c.clue;
+    div.onclick = () => setClue(c, list === across ? 'across' : 'down');
+    el.appendChild(div);
+    c.el = div;
+  });
+}
+
+renderClues(across, document.getElementById('across'));
+renderClues(down, document.getElementById('down'));
+
+/* === GAME LOGIC === */
+function setClue(clue, dir) {
+  direction = dir;
+  current = clue;
+  highlight();
+}
+
+function selectCell(r,c) {
+  const found = [...across, ...down].find(cl =>
+    direction === 'across'
+      ? cl.row === r && c >= cl.col && c < cl.col + cl.len
+      : cl.col === c && r >= cl.row && r < cl.row + cl.len
+  );
+  if (found) setClue(found, direction);
+}
+
+function highlight() {
+  document.querySelectorAll('.active,.current').forEach(e =>
+    e.classList.remove('active','current')
+  );
+
+  [...across, ...down].forEach(c => c.el.classList.remove('active'));
+
+  current.el.classList.add('active');
+  document.getElementById('clue-text').textContent =
+    (direction === 'across' ? 'Across: ' : 'Down: ') + current.clue;
+
+  for (let i=0;i<current.len;i++) {
+    const r = current.row + (direction === 'down' ? i : 0);
+    const c = current.col + (direction === 'across' ? i : 0);
+    const cell = document.querySelector(
+      `.cell:nth-child(${r*5 + c + 1})`
+    );
+    cell.classList.add('active');
   }
+}
 
-  function focusPrev(current) {
-    const cells = [...document.querySelectorAll(".cell:not(.block)")];
-    const i = cells.indexOf(current);
-    if (cells[i - 1]) cells[i - 1].focus();
-  }
+function move(step) {
+  const active = document.activeElement;
+  if (!active) return;
+  const cellIndex = cells.findIndex(c => c.input === active);
+  const next = cells[cellIndex + step];
+  if (next) next.input.focus();
+}
 
-  /* SIMULATED AD */
-  setTimeout(() => {
-    document.getElementById("ad-overlay").style.display = "none";
-    const first = document.querySelector(".cell:not(.block)");
-    if (first) first.focus();
-  }, 3000);
+/* INIT */
+highlight();
 </script>
 
 </body>
