@@ -6,294 +6,295 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
-:root{
-  --grey:#e0e0e0;
-  --blue:#cfe3ff;
-  --white:#ffffff;
-  --red:#ffb3b3;
-}
-
-body{
-  margin:0;
-  font-family:system-ui,sans-serif;
-  background:#f2f2f2;
+body {
+  margin: 0;
+  font-family: system-ui, sans-serif;
+  background: #f2f2f2;
 }
 
 /* TOP BAR */
-#topbar{
-  height:48px;
-  background:#9ac57a;
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  padding:0 14px;
-  font-weight:600;
+#topbar {
+  background: #9ac57a;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 14px;
+  font-weight: 600;
 }
 
-#settingsBtn{cursor:pointer}
-
 /* SETTINGS */
-#settings{
-  display:none;
-  position:fixed;
-  top:56px;
-  right:16px;
-  background:white;
-  border:1px solid #ccc;
-  padding:12px;
-  z-index:10;
+#settingsBtn { cursor: pointer; }
+
+#settings {
+  display: none;
+  position: fixed;
+  top: 56px;
+  right: 16px;
+  background: white;
+  border: 1px solid #ccc;
+  padding: 12px;
+  width: 220px;
+  z-index: 10;
 }
 
 /* ACTIVE CLUE */
-#active-clue{
-  background:white;
-  padding:10px;
-  border-bottom:1px solid #ccc;
-  font-size:14px;
+#active-clue {
+  background: white;
+  border-bottom: 1px solid #ccc;
+  padding: 10px;
+  font-size: 14px;
 }
 
 /* LAYOUT */
-#game{
-  display:grid;
-  grid-template-columns:auto 300px;
-  gap:16px;
-  padding:16px;
-  max-width:700px;
-  margin:auto;
+#game {
+  display: grid;
+  grid-template-columns: auto 320px;
+  gap: 16px;
+  padding: 16px;
+  max-width: 900px;
+  margin: auto;
 }
 
 /* GRID */
-#grid{
-  display:grid;
-  grid-template-columns:repeat(5,48px);
-  gap:2px;
-  background:black;
+#grid {
+  display: grid;
+  gap: 2px;
+  background: black;
 }
 
-.cell{
-  width:48px;
-  height:48px;
-  background:var(--grey);
-  position:relative;
+.cell {
+  width: 70px;
+  height: 70px;
+  background: #fff;
+  position: relative;
+  font-weight: bold;
+  font-size: 28px;
+  text-transform: uppercase;
+  text-align: center;
+  line-height: 70px;
 }
 
-.cell.block{background:black}
-.cell.active{background:var(--blue)}
-.cell.complete{background:var(--white)}
-.cell.error{background:var(--red)}
-
-.cell input{
-  width:100%;
-  height:100%;
-  border:none;
-  background:transparent;
-  text-align:center;
-  font-size:20px;
-  font-weight:bold;
-  text-transform:uppercase;
+.cell.block {
+  background: black;
 }
 
-.cell input:focus{outline:none}
+.cell.highlight {
+  background: #dbeaff;
+}
 
-.number{
-  position:absolute;
-  top:3px;
-  left:4px;
-  font-size:9px;
-  font-weight:600;
-  pointer-events:none;
+.cell.error {
+  background: #ffcccc;
+}
+
+.cell input {
+  width: 100%;
+  height: 100%;
+  border: none;
+  text-align: center;
+  font-size: 28px;
+  text-transform: uppercase;
+  background: transparent;
+  font-weight: bold;
+}
+
+.cell input:focus {
+  outline: none;
+}
+
+/* NUMBER */
+.number {
+  position: absolute;
+  top: 3px;
+  left: 4px;
+  font-size: 10px;
+  font-weight: 600;
 }
 
 /* CLUES */
-#clues{
-  background:white;
-  border:1px solid #ccc;
-  padding:12px;
+#clues {
+  background: white;
+  border: 1px solid #ccc;
+  padding: 12px;
+  overflow-y: auto;
 }
 
-.clue{cursor:pointer;padding:4px}
-.clue.active{background:var(--blue)}
+.clue {
+  font-size: 14px;
+  padding: 4px;
+  cursor: pointer;
+}
+
+.clue.active {
+  background: #dbeaff;
+}
 </style>
 </head>
 
 <body>
 
 <div id="topbar">
-  <div id="timer">00:00</div>
+  ← Back
+  <div>00:00</div>
   <div id="settingsBtn">⚙️</div>
 </div>
 
 <div id="settings">
-  <label><input type="checkbox" id="errorCheck"> Error check mode</label>
+  <strong>Settings</strong><br><br>
+  <label><input type="checkbox" id="errorCheck"> Error Check Mode</label>
 </div>
 
-<div id="active-clue"></div>
+<div id="active-clue">
+  <strong>Across 1.</strong> Having learned something
+</div>
 
 <div id="game">
   <div id="grid"></div>
+
   <div id="clues">
     <h3>Across</h3>
-    <div class="clue" data-number="1">1. Learned</div>
-    <div class="clue" data-number="5">5. Reader pause</div>
+    <div class="clue" data-number="1" data-direction="across">1. Having learned something</div>
+    <div class="clue" data-number="6" data-direction="across">6. What gives a reader pause?</div>
+
     <h3>Down</h3>
-    <div class="clue" data-number="1">1. Puts down</div>
-    <div class="clue" data-number="2">2. Eat</div>
+    <div class="clue" data-number="1" data-direction="down">1. Lays</div>
+    <div class="clue" data-number="2" data-direction="down">2. Charged, in a way</div>
   </div>
 </div>
 
 <script>
-/* TIMER */
-let t=0;
-setInterval(()=>{
-  t++;
-  timer.textContent=
-    String(Math.floor(t/60)).padStart(2,'0')+':' +
-    String(t%60).padStart(2,'0');
-},1000);
-
-/* GRID DATA */
-const gridData=[
- ['L','E','A','R','N'],
- ['A',null,'E',null,'A'],
- ['Y','O','U','R','E']
+const gridData = [
+  ['L','E','A','R','N'],
+  ['P','A','U','S','E'],
+  ['W','H','E','R','E'],
+  [null,'C','H','I','P'],
+  [null,'S','O','N','G']
 ];
 
-const clues={
- '1_across':[[0,0],[0,1],[0,2],[0,3],[0,4]],
- '5_across':[[2,0],[2,1],[2,2],[2,3],[2,4]],
- '1_down':[[0,0],[1,0],[2,0]],
- '2_down':[[0,2],[1,2],[2,2]]
+// Map numbers to clues
+const numbers = {
+  '0,0':1,
+  '1,0':6,
+  '3,1':2
 };
 
-const numbers={'0,0':1,'2,0':5,'0,2':2};
+// Clue positions
+const cluesMap = {
+  '1_across': [[0,0],[0,1],[0,2],[0,3],[0,4]],
+  '6_across': [[1,0],[1,1],[1,2],[1,3],[1,4]],
+  '1_down': [[0,0],[1,0],[2,0]],
+  '2_down': [[3,1],[4,1]]
+};
 
-const grid=document.getElementById('grid');
-const cells=[];
+const grid = document.getElementById('grid');
+const errorCheckToggle = document.getElementById('errorCheck');
 
-/* BUILD GRID */
-for(let r=0;r<3;r++){
-  cells[r]=[];
-  for(let c=0;c<5;c++){
-    const cell=document.createElement('div');
-    cell.className='cell';
+// Dynamic grid size
+grid.style.gridTemplateColumns = `repeat(${gridData[0].length},70px)`;
+grid.style.gridTemplateRows = `repeat(${gridData.length},70px)`;
 
-    if(gridData[r][c]==null){
+// Build grid
+const cells = [];
+for (let r=0;r<gridData.length;r++){
+  cells[r] = [];
+  for (let c=0;c<gridData[r].length;c++){
+    const cell = document.createElement('div');
+    cell.className = 'cell';
+
+    if(gridData[r][c]===null){
       cell.classList.add('block');
-    }else{
-      const input=document.createElement('input');
-      input.maxLength=1;
+    } else {
+      const input = document.createElement('input');
+      input.maxLength = 1;
+      input.dataset.row = r;
+      input.dataset.col = c;
       cell.appendChild(input);
 
-      const k=`${r},${c}`;
-      if(numbers[k]){
-        const n=document.createElement('div');
-        n.className='number';
-        n.textContent=numbers[k];
+      const key = `${r},${c}`;
+      if(numbers[key]){
+        const n = document.createElement('div');
+        n.className = 'number';
+        n.textContent = numbers[key];
         cell.appendChild(n);
       }
 
-      input.onfocus=()=>selectTile(r,c);
-      input.oninput=()=>handleInput(r,c,input,cell);
+      // Input event for error checking
+      input.addEventListener('input', () => {
+        if(errorCheckToggle.checked){
+          const correct = gridData[r][c].toUpperCase();
+          if(input.value.toUpperCase() !== correct){
+            cell.classList.add('error');
+          } else {
+            cell.classList.remove('error');
+          }
+        } else {
+          cell.classList.remove('error');
+        }
+      });
     }
 
     grid.appendChild(cell);
-    cells[r][c]=cell;
+    cells[r][c] = cell;
   }
 }
 
-/* STATE */
-let activeNumber=1;
-let activeDir='across';
-
-/* HELPERS */
-function keyFor(n,d){return `${n}_${d}`}
-
-function activate(n,d){
-  activeNumber=n;
-  activeDir=d;
-
-  document.querySelectorAll('.cell')
-    .forEach(c=>c.classList.remove('active','complete'));
-
-  document.querySelectorAll('.clue')
-    .forEach(c=>c.classList.remove('active'));
-
-  clues[keyFor(n,d)].forEach(([r,c])=>{
-    cells[r][c].classList.add('active');
-  });
-
-  document.querySelectorAll(`.clue[data-number="${n}"]`)
-    .forEach(c=>c.classList.add('active'));
-
-  activeClue.textContent=
-    (d==='across'?'Across ':'Down ')+n;
-}
-
-/* TILE CLICK — TRUE TOGGLE */
-function selectTile(r,c){
-  const matches=Object.keys(clues)
-    .filter(k=>clues[k].some(p=>p[0]==r&&p[1]==c));
-
-  if(!matches.length)return;
-
-  const current=keyFor(activeNumber,activeDir);
-
-  if(matches.includes(current) && matches.length>1){
-    const other=matches.find(k=>k!==current);
-    const [n,d]=other.split('_');
-    activate(+n,d);
-  }else{
-    const [n,d]=matches[0].split('_');
-    activate(+n,d);
-  }
-}
-
-/* CLUE CLICK */
-document.querySelectorAll('.clue').forEach(clue=>{
-  clue.onclick=()=>{
-    const n=+clue.dataset.number;
-    activate(n, n===activeNumber && activeDir==='across' ? 'down' : 'across');
-  };
-});
-
-/* INPUT + ERROR MODE */
-function handleInput(r,c,input,cell){
-  cell.classList.remove('error');
-
-  if(!input.value){
-    cell.classList.remove('complete');
-    return;
-  }
-
-  if(errorCheck.checked &&
-     input.value.toUpperCase()!==gridData[r][c]){
-    cell.classList.add('error');
-  }
-
-  checkComplete();
-}
-
-/* WORD COMPLETE */
-function checkComplete(){
-  const key=keyFor(activeNumber,activeDir);
-  const done=clues[key].every(([r,c])=>{
-    const i=cells[r][c].querySelector('input');
-    return i && i.value.toUpperCase()===gridData[r][c];
-  });
-
-  clues[key].forEach(([r,c])=>{
-    cells[r][c].classList.toggle('complete',done);
-  });
-}
-
-/* SETTINGS */
-settingsBtn.onclick=()=>{
-  settings.style.display=
-    settings.style.display==='block'?'none':'block';
+// Settings toggle
+document.getElementById('settingsBtn').onclick = () => {
+  const settings = document.getElementById('settings');
+  settings.style.display = settings.style.display==='block' ? 'none':'block';
 };
 
-/* START */
-activate(1,'across');
+// Highlight word
+let activeWord = null;
+let activeDirection = 'across';
+
+function highlightWord(number,direction){
+  cells.flat().forEach(cell => cell.classList.remove('highlight'));
+  document.querySelectorAll('.clue').forEach(clue=>clue.classList.remove('active'));
+
+  const key = `${number}_${direction}`;
+  const positions = cluesMap[key];
+  if(!positions) return;
+
+  positions.forEach(([r,c]) => {
+    cells[r][c].classList.add('highlight');
+  });
+
+  const clueEl = document.querySelector(`.clue[data-number='${number}'][data-direction='${direction}']`);
+  if(clueEl) clueEl.classList.add('active');
+
+  document.getElementById('active-clue').innerHTML = `<strong>${direction.charAt(0).toUpperCase()+direction.slice(1)} ${number}.</strong> ${clueEl.textContent.split('. ').slice(1).join('. ')}`;
+
+  // Focus first input
+  const firstCell = cells[positions[0][0]][positions[0][1]];
+  const input = firstCell.querySelector('input');
+  if(input) input.focus();
+
+  activeWord = number;
+  activeDirection = direction;
+}
+
+// Click clues
+document.querySelectorAll('.clue').forEach(clue => {
+  clue.addEventListener('click', () => {
+    const number = clue.dataset.number;
+    const direction = clue.dataset.direction;
+
+    // toggle direction if same clue
+    if(activeWord == number){
+      const otherDirection = direction==='across'?'down':'across';
+      if(cluesMap[`${number}_${otherDirection}`]){
+        highlightWord(number,otherDirection);
+        return;
+      }
+    }
+
+    highlightWord(number,direction);
+  });
+});
+
+// Highlight first across clue initially
+highlightWord(1,'across');
 </script>
 
 </body>
