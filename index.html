@@ -1,1 +1,282 @@
-<!DOCTYPE html> <html lang="en"> <head> <meta charset="UTF-8"> <title>Mini Crossword</title> <meta name="viewport" content="width=device-width, initial-scale=1.0"> <style> body { margin: 0; font-family: system-ui, sans-serif; background: #f2f2f2; } /* TOP BAR */ #topbar { background: #9ac57a; height: 48px; display: flex; align-items: center; justify-content: space-between; padding: 0 14px; font-weight: 600; } /* SETTINGS */ #settingsBtn { cursor: pointer; } #settings { display: none; position: fixed; top: 56px; right: 16px; background: white; border: 1px solid #ccc; padding: 12px; width: 220px; z-index: 10; } /* ACTIVE CLUE */ #active-clue { background: white; border-bottom: 1px solid #ccc; padding: 10px; font-size: 14px; } /* LAYOUT */ #game { display: grid; grid-template-columns: auto 320px; gap: 16px; padding: 16px; max-width: 900px; margin: auto; } /* GRID */ #grid { display: grid; gap: 2px; background: black; } .cell { width: 70px; height: 70px; background: #fff; position: relative; font-weight: bold; font-size: 28px; text-transform: uppercase; text-align: center; line-height: 70px; } .cell.block { background: black; } .cell.highlight { background: #dbeaff; } .cell.error { background: #ffcccc; } .cell input { width: 100%; height: 100%; border: none; text-align: center; font-size: 28px; text-transform: uppercase; background: transparent; font-weight: bold; } .cell input:focus { outline: none; } /* NUMBER */ .number { position: absolute; top: 3px; left: 4px; font-size: 10px; font-weight: 600; } /* CLUES */ #clues { background: white; border: 1px solid #ccc; padding: 12px; overflow-y: auto; } .clue { font-size: 14px; padding: 4px; cursor: pointer; } .clue.active { background: #dbeaff; } </style> </head> <body> <div id="topbar"> ← Back <div>00:00</div> <div id="settingsBtn">⚙️</div> </div> <div id="settings"> <strong>Settings</strong><br><br> <label><input type="checkbox" id="errorCheck"> Error Check Mode</label> </div> <div id="active-clue"> <strong>Across 1.</strong> Having learned something </div> <div id="game"> <div id="grid"></div> <div id="clues"> <h3>Across</h3> <div class="clue" data-number="1" data-direction="across">1. Having learned something</div> <div class="clue" data-number="6" data-direction="across">6. What gives a reader pause?</div> <h3>Down</h3> <div class="clue" data-number="1" data-direction="down">1. Lays</div> <div class="clue" data-number="2" data-direction="down">2. Charged, in a way</div> </div> </div> <script> const gridData = [ ['L','E','A','R','N'], ['P','A','U','S','E'], ['W','H','E','R','E'], [null,'C','H','I','P'], [null,'S','O','N','G'] ]; // Map numbers to clues const numbers = { '0,0':1, '1,0':6, '3,1':2 }; // Clue positions const cluesMap = { '1_across': [[0,0],[0,1],[0,2],[0,3],[0,4]], '6_across': [[1,0],[1,1],[1,2],[1,3],[1,4]], '1_down': [[0,0],[1,0],[2,0]], '2_down': [[3,1],[4,1]] }; const grid = document.getElementById('grid'); const errorCheckToggle = document.getElementById('errorCheck'); // Dynamic grid size grid.style.gridTemplateColumns = repeat(${gridData[0].length},70px); grid.style.gridTemplateRows = repeat(${gridData.length},70px); // Build grid const cells = []; for (let r=0;r<gridData.length;r++){ cells[r] = []; for (let c=0;c<gridData[r].length;c++){ const cell = document.createElement('div'); cell.className = 'cell'; if(gridData[r][c]===null){ cell.classList.add('block'); } else { const input = document.createElement('input'); input.maxLength = 1; input.dataset.row = r; input.dataset.col = c; cell.appendChild(input); const key = ${r},${c}; if(numbers[key]){ const n = document.createElement('div'); n.className = 'number'; n.textContent = numbers[key]; cell.appendChild(n); } // Input event for error checking input.addEventListener('input', () => { if(errorCheckToggle.checked){ const correct = gridData[r][c].toUpperCase(); if(input.value.toUpperCase() !== correct){ cell.classList.add('error'); } else { cell.classList.remove('error'); } } else { cell.classList.remove('error'); } }); } grid.appendChild(cell); cells[r][c] = cell; } } // Settings toggle document.getElementById('settingsBtn').onclick = () => { const settings = document.getElementById('settings'); settings.style.display = settings.style.display==='block' ? 'none':'block'; }; // Highlight word let activeWord = null; let activeDirection = 'across'; function highlightWord(number,direction){ cells.flat().forEach(cell => cell.classList.remove('highlight')); document.querySelectorAll('.clue').forEach(clue=>clue.classList.remove('active')); const key = ${number}_${direction}; const positions = cluesMap[key]; if(!positions) return; positions.forEach(([r,c]) => { cells[r][c].classList.add('highlight'); }); const clueEl = document.querySelector(.clue[data-number='${number}'][data-direction='${direction}']); if(clueEl) clueEl.classList.add('active'); document.getElementById('active-clue').innerHTML = <strong>${direction.charAt(0).toUpperCase()+direction.slice(1)} ${number}.</strong> ${clueEl.textContent.split('. ').slice(1).join('. ')}; // Focus first input const firstCell = cells[positions[0][0]][positions[0][1]]; const input = firstCell.querySelector('input'); if(input) input.focus(); activeWord = number; activeDirection = direction; } // Click clues document.querySelectorAll('.clue').forEach(clue => { clue.addEventListener('click', () => { const number = clue.dataset.number; const direction = clue.dataset.direction; // toggle direction if same clue if(activeWord == number){ const otherDirection = direction==='across'?'down':'across'; if(cluesMap[${number}_${otherDirection}]){ highlightWord(number,otherDirection); return; } } highlightWord(number,direction); }); }); // Highlight first across clue initially highlightWord(1,'across'); </script> </body> </html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Mini Crossword</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+body {
+    margin: 0;
+    font-family: system-ui, sans-serif;
+    background: #f2f2f2;
+}
+
+/* TOP BAR */
+#topbar {
+    background: #9ac57a;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 14px;
+    font-weight: 600;
+}
+
+/* SETTINGS */
+#settingsBtn { cursor: pointer; }
+#settings {
+    display: none;
+    position: fixed;
+    top: 56px;
+    right: 16px;
+    background: white;
+    border: 1px solid #ccc;
+    padding: 12px;
+    width: 220px;
+    z-index: 10;
+}
+
+/* ACTIVE CLUE */
+#active-clue {
+    background: white;
+    border-bottom: 1px solid #ccc;
+    padding: 10px;
+    font-size: 14px;
+}
+
+/* LAYOUT */
+#game {
+    display: grid;
+    grid-template-columns: auto 320px;
+    gap: 16px;
+    padding: 16px;
+    max-width: 900px;
+    margin: auto;
+}
+
+/* GRID */
+#grid {
+    display: grid;
+    gap: 2px;
+    background: black;
+    border: 2px solid black;
+}
+
+.cell {
+    width: 70px;
+    height: 70px;
+    background: #808080; /* default grey */
+    position: relative;
+    font-weight: bold;
+    font-size: 28px;
+    text-transform: uppercase;
+    text-align: center;
+    line-height: 70px;
+}
+
+.cell.block { background: black; }
+.cell.highlight { background: #dbeaff; }
+.cell.error { background: #ff4c4c; }
+.cell.correct { background: white; }
+
+.cell input {
+    width: 100%;
+    height: 100%;
+    border: none;
+    text-align: center;
+    font-size: 28px;
+    text-transform: uppercase;
+    background: transparent;
+    font-weight: bold;
+}
+
+.cell input:focus { outline: none; }
+
+/* NUMBER */
+.number {
+    position: absolute;
+    top: 3px;
+    left: 4px;
+    font-size: 10px;
+    font-weight: 600;
+}
+
+/* CLUES */
+#clues {
+    background: white;
+    border: 1px solid #ccc;
+    padding: 12px;
+    overflow-y: auto;
+}
+
+.clue {
+    font-size: 14px;
+    padding: 4px;
+    cursor: pointer;
+}
+
+.clue.active { background: #dbeaff; }
+</style>
+</head>
+<body>
+
+<div id="topbar">
+    ← Back
+    <div>00:00</div>
+    <div id="settingsBtn">⚙️</div>
+</div>
+
+<div id="settings">
+    <strong>Settings</strong><br><br>
+    <label><input type="checkbox" id="errorCheck"> Error Check Mode</label>
+</div>
+
+<div id="active-clue">
+    <strong>Across 1.</strong> Having learned something
+</div>
+
+<div id="game">
+    <div id="grid"></div>
+    <div id="clues">
+        <h3>Across</h3>
+        <div class="clue" data-number="1" data-direction="across">1. Having learned something</div>
+        <div class="clue" data-number="6" data-direction="across">6. What gives a reader pause?</div>
+        <h3>Down</h3>
+        <div class="clue" data-number="1" data-direction="down">1. Lays</div>
+        <div class="clue" data-number="2" data-direction="down">2. Charged, in a way</div>
+    </div>
+</div>
+
+<script>
+const gridData = [
+    ['L','E','A','R','N'],
+    ['P','A','U','S','E'],
+    ['W','H','E','R','E'],
+    [null,'C','H','I','P'],
+    [null,'S','O','N','G']
+];
+
+// Map numbers to clues
+const numbers = { '0,0':1, '1,0':6, '3,1':2 };
+
+// Clue positions
+const cluesMap = {
+    '1_across': [[0,0],[0,1],[0,2],[0,3],[0,4]],
+    '6_across': [[1,0],[1,1],[1,2],[1,3],[1,4]],
+    '1_down': [[0,0],[1,0],[2,0]],
+    '2_down': [[3,1],[4,1]]
+};
+
+const grid = document.getElementById('grid');
+const errorCheckToggle = document.getElementById('errorCheck');
+
+// Correct grid layout
+grid.style.gridTemplateColumns = `repeat(${gridData[0].length},70px)`;
+grid.style.gridTemplateRows = `repeat(${gridData.length},70px)`;
+
+// Build grid
+const cells = [];
+for (let r=0;r<gridData.length;r++){
+    cells[r] = [];
+    for (let c=0;c<gridData[r].length;c++){
+        const cell = document.createElement('div');
+        cell.className = 'cell';
+        if(gridData[r][c]===null){
+            cell.classList.add('block');
+        } else {
+            const input = document.createElement('input');
+            input.maxLength = 1;
+            input.dataset.row = r;
+            input.dataset.col = c;
+            cell.appendChild(input);
+
+            const key = `${r},${c}`;
+            if(numbers[key]){
+                const n = document.createElement('div');
+                n.className = 'number';
+                n.textContent = numbers[key];
+                cell.appendChild(n);
+            }
+
+            // Input event for error checking
+            input.addEventListener('input', () => {
+                const correct = gridData[r][c].toUpperCase();
+                if(errorCheckToggle.checked){
+                    if(input.value.toUpperCase() !== correct && input.value !== ''){
+                        cell.classList.add('error');
+                        cell.classList.remove('correct');
+                    } else if(input.value.toUpperCase() === correct){
+                        cell.classList.add('correct');
+                        cell.classList.remove('error');
+                    } else {
+                        cell.classList.remove('error');
+                        cell.classList.remove('correct');
+                    }
+                } else {
+                    cell.classList.remove('error');
+                    cell.classList.remove('correct');
+                }
+            });
+        }
+        grid.appendChild(cell);
+        cells[r][c] = cell;
+    }
+}
+
+// Settings toggle
+document.getElementById('settingsBtn').onclick = () => {
+    const settings = document.getElementById('settings');
+    settings.style.display = settings.style.display==='block' ? 'none':'block';
+};
+
+// Highlight word
+let activeWord = null;
+let activeDirection = 'across';
+
+function highlightWord(number,direction){
+    cells.flat().forEach(cell => cell.classList.remove('highlight'));
+    document.querySelectorAll('.clue').forEach(clue=>clue.classList.remove('active'));
+    const key = `${number}_${direction}`;
+    const positions = cluesMap[key];
+    if(!positions) return;
+
+    positions.forEach(([r,c]) => {
+        cells[r][c].classList.add('highlight');
+    });
+
+    const clueEl = document.querySelector(`.clue[data-number='${number}'][data-direction='${direction}']`);
+    if(clueEl) clueEl.classList.add('active');
+
+    document.getElementById('active-clue').innerHTML = `<strong>${direction.charAt(0).toUpperCase()+direction.slice(1)} ${number}.</strong> ${clueEl.textContent.split('. ').slice(1).join('. ')}`;
+
+    // Focus first input
+    const firstCell = cells[positions[0][0]][positions[0][1]];
+    const input = firstCell.querySelector('input');
+    if(input) input.focus();
+
+    activeWord = number;
+    activeDirection = direction;
+}
+
+// Click clues
+document.querySelectorAll('.clue').forEach(clue => {
+    clue.addEventListener('click', () => {
+        const number = clue.dataset.number;
+        const direction = clue.dataset.direction;
+        // Toggle direction if same clue
+        if(activeWord == number){
+            const otherDirection = direction==='across'?'down':'across';
+            if(cluesMap[`${number}_${otherDirection}`]){
+                highlightWord(number,otherDirection);
+                return;
+            }
+        }
+        highlightWord(number,direction);
+    });
+});
+
+// Highlight first across clue initially
+highlightWord(1,'across');
+</script>
+</body>
+</html>
