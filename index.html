@@ -5,18 +5,16 @@
 <title>Mini Crossword</title>
 
 <style>
-  /* PAGE SETUP */
   body {
     margin: 0;
     height: 100vh;
     display: flex;
     justify-content: center;
-    align-items: center; /* IMPORTANT */
+    align-items: center;
     background: #e0e0e0;
     font-family: sans-serif;
   }
 
-  /* GAME CONTAINER (THE SQUARE) */
   #game-container {
     width: 360px;
     height: 360px;
@@ -28,13 +26,34 @@
     align-items: center;
   }
 
-  /* PLACEHOLDER GAME CONTENT */
-  #game-content {
-    font-size: 18px;
-    color: #333;
+  /* CROSSWORD GRID */
+  #grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    grid-template-rows: repeat(5, 1fr);
+    gap: 2px;
+    width: 300px;
+    height: 300px;
   }
 
-  /* AD / LOADING OVERLAY */
+  .cell {
+    border: 1px solid #000;
+    text-transform: uppercase;
+    font-size: 22px;
+    text-align: center;
+    line-height: 1;
+    outline: none;
+  }
+
+  .cell:focus {
+    background: #eef;
+  }
+
+  .block {
+    background: #000;
+  }
+
+  /* AD OVERLAY */
   #ad-overlay {
     position: absolute;
     inset: 0;
@@ -53,23 +72,68 @@
 
 <div id="game-container">
 
-  <!-- GAME CONTENT (WILL BECOME CROSSWORD) -->
-  <div id="game-content">
-    Game will load here
-  </div>
+  <!-- GAME -->
+  <div id="grid"></div>
 
   <!-- AD OVERLAY -->
-  <div id="ad-overlay">
-    Loading…
-  </div>
+  <div id="ad-overlay">Loading…</div>
 
 </div>
 
 <script>
-  /* SIMULATE AD LOADING */
+  /* SIMPLE 5x5 MINI CROSSWORD */
+  const layout = [
+    ["H","E","L","L","O"],
+    ["A","", "","", "R"],
+    ["P","A","N","E","L"],
+    ["P","", "","", "O"],
+    ["Y","E","A","R","S"]
+  ];
+
+  const grid = document.getElementById("grid");
+
+  layout.forEach((row, r) => {
+    row.forEach((letter, c) => {
+      if (letter === "") {
+        const block = document.createElement("div");
+        block.className = "cell block";
+        grid.appendChild(block);
+      } else {
+        const input = document.createElement("input");
+        input.className = "cell";
+        input.maxLength = 1;
+        input.dataset.answer = letter;
+        input.addEventListener("input", () => {
+          input.value = input.value.toUpperCase();
+          focusNext(input);
+        });
+        input.addEventListener("keydown", e => {
+          if (e.key === "Backspace" && !input.value) {
+            focusPrev(input);
+          }
+        });
+        grid.appendChild(input);
+      }
+    });
+  });
+
+  function focusNext(current) {
+    const cells = [...document.querySelectorAll(".cell:not(.block)")];
+    const i = cells.indexOf(current);
+    if (cells[i + 1]) cells[i + 1].focus();
+  }
+
+  function focusPrev(current) {
+    const cells = [...document.querySelectorAll(".cell:not(.block)")];
+    const i = cells.indexOf(current);
+    if (cells[i - 1]) cells[i - 1].focus();
+  }
+
+  /* SIMULATE AD LOAD */
   setTimeout(() => {
-    const ad = document.getElementById("ad-overlay");
-    if (ad) ad.style.display = "none";
+    document.getElementById("ad-overlay").style.display = "none";
+    const firstCell = document.querySelector(".cell:not(.block)");
+    if (firstCell) firstCell.focus();
   }, 3000);
 </script>
 
