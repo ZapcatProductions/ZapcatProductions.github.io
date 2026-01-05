@@ -2,51 +2,248 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Pokémon Mini Crossword</title>
+<title>Pokémon Mini</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <style>
-*{box-sizing:border-box;}
-html,body{margin:0;padding:0;font-family:system-ui,sans-serif;background:#0b1220;color:#eaf2ff;height:100%;overflow:hidden;}
-#header{height:48px;background:#1e3a8a;display:flex;justify-content:space-between;align-items:center;padding:0 14px;font-weight:600;}
-#header-right{display:flex;gap:14px;align-items:center;}
-#settings-btn{cursor:pointer;}
-#main{display:flex;height:calc(100vh-48px);}
-#grid-wrap{flex:1;padding:16px;overflow:auto;display:flex;justify-content:center;align-items:center;}
-#grid{display:grid;grid-gap:2px;background:black;}
-.cell{width:46px;height:46px;position:relative;display:flex;justify-content:center;align-items:center;}
-.cell.white{background:#1f2937;}
-.cell.black{background:black;}
-.cell input{width:100%;height:100%;text-align:center;font-size:20px;border:none;background:transparent;color:#eaf2ff;text-transform:uppercase;caret-color:#93c5fd;}
-.cell input:focus{outline:none;}
-.cell.highlight{background:#2563eb;}
-.cell.active{background:#60a5fa;}
-.number{position:absolute;top:2px;left:4px;font-size:10px;opacity:0.8;}
-#clues{width:300px;background:#0f172a;border-left:1px solid #1e3a8a;padding:14px;overflow-y:auto;}
-.section{font-weight:bold;color:#60a5fa;margin-top:12px;}
-.clue{padding:6px;cursor:pointer;}
-.clue.active{background:#1e40af;}
-#settings-panel{position:fixed;right:0;top:48px;width:260px;height:calc(100vh-48px);background:#020617;border-left:1px solid #1e3a8a;padding:14px;display:none;z-index:5000;}
-.setting{margin-bottom:12px;}
-.setting label{display:flex;justify-content:space-between;cursor:pointer;}
-#boot-screen,#ad-screen{position:fixed;inset:0;background:#020617;display:flex;justify-content:center;align-items:center;z-index:9999;}
-.hidden{display:none;}
-.loader-box{text-align:center;}
-.loader-title{font-size:22px;font-weight:700;margin-bottom:12px;}
-.loader-sub{opacity:0.7;}
+/* =========================================================
+   GLOBAL RESET
+========================================================= */
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background: #0b1220;
+  color: #eaf2ff;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  height: 100%;
+  overflow: hidden;
+}
+
+/* =========================================================
+   LOADING SCREENS
+========================================================= */
+#boot-screen,
+#ad-screen {
+  position: fixed;
+  inset: 0;
+  background: #020617;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+
+#boot-screen.hidden,
+#ad-screen.hidden {
+  display: none;
+}
+
+.loader-box {
+  text-align: center;
+}
+
+.loader-title {
+  font-size: 22px;
+  font-weight: 700;
+  margin-bottom: 12px;
+}
+
+.loader-sub {
+  opacity: 0.7;
+}
+
+/* =========================================================
+   HEADER
+========================================================= */
+#header {
+  height: 48px;
+  background: #1e3a8a;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 14px;
+  font-weight: 600;
+}
+
+#title {
+  font-size: 16px;
+}
+
+#header-right {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+#timer {
+  font-variant-numeric: tabular-nums;
+}
+
+#settings-btn {
+  cursor: pointer;
+}
+
+/* =========================================================
+   MAIN LAYOUT
+========================================================= */
+#main {
+  display: grid;
+  grid-template-columns: auto 380px;
+  height: calc(100vh - 48px);
+}
+
+/* =========================================================
+   GRID
+========================================================= */
+#grid-wrap {
+  padding: 24px;
+  overflow: auto;
+}
+
+#grid {
+  display: grid;
+  gap: 2px;
+  background: black;
+}
+
+.cell {
+  width: 46px;
+  height: 46px;
+  background: #1f2937;
+  position: relative;
+}
+
+.cell.block {
+  background: black;
+}
+
+.cell input {
+  width: 100%;
+  height: 100%;
+  background: transparent;
+  border: none;
+  color: #eaf2ff;
+  font-size: 20px;
+  text-align: center;
+  text-transform: uppercase;
+  caret-color: #93c5fd;
+}
+
+.cell input:focus {
+  outline: none;
+}
+
+.cell.highlight {
+  background: #2563eb;
+}
+
+.cell.active {
+  background: #60a5fa;
+}
+
+.number {
+  position: absolute;
+  top: 2px;
+  left: 4px;
+  font-size: 10px;
+  opacity: 0.8;
+}
+
+/* =========================================================
+   CLUES
+========================================================= */
+#clues {
+  background: #0f172a;
+  border-left: 1px solid #1e3a8a;
+  padding: 14px;
+  overflow-y: auto;
+}
+
+.section {
+  font-weight: bold;
+  color: #60a5fa;
+  margin-top: 12px;
+}
+
+.clue {
+  padding: 6px;
+  cursor: pointer;
+}
+
+.clue.active {
+  background: #1e40af;
+}
+
+/* =========================================================
+   SETTINGS PANEL
+========================================================= */
+#settings-panel {
+  position: fixed;
+  right: 0;
+  top: 48px;
+  width: 260px;
+  height: calc(100vh - 48px);
+  background: #020617;
+  border-left: 1px solid #1e3a8a;
+  padding: 14px;
+  display: none;
+  z-index: 5000;
+}
+
+.setting {
+  margin-bottom: 12px;
+}
+
+.setting label {
+  display: flex;
+  justify-content: space-between;
+  cursor: pointer;
+}
 </style>
 </head>
+
 <body>
 
-<!-- LOADING SCREENS -->
-<div id="boot-screen"><div class="loader-box"><div class="loader-title">Pokémon Mini</div><div class="loader-sub">Loading crossword…</div></div></div>
-<div id="ad-screen" class="hidden"><div class="loader-box"><div class="loader-title">Advertisement</div><div class="loader-sub">Please wait…</div></div></div>
+<!-- =========================================================
+     LOADING SCREENS
+========================================================= -->
+<div id="boot-screen">
+  <div class="loader-box">
+    <div class="loader-title">Pokémon Mini</div>
+    <div class="loader-sub">Loading crossword…</div>
+  </div>
+</div>
 
-<!-- HEADER -->
-<div id="header"><div>Pokémon Mini</div><div id="header-right"><div id="timer">00:00</div><div id="settings-btn">⚙</div></div></div>
+<div id="ad-screen" class="hidden">
+  <div class="loader-box">
+    <div class="loader-title">Advertisement</div>
+    <div class="loader-sub">Please wait…</div>
+  </div>
+</div>
 
-<!-- MAIN -->
+<!-- =========================================================
+     HEADER
+========================================================= -->
+<div id="header">
+  <div id="title">Pokémon Mini</div>
+  <div id="header-right">
+    <div id="timer">00:00</div>
+    <div id="settings-btn">⚙</div>
+  </div>
+</div>
+
+<!-- =========================================================
+     MAIN
+========================================================= -->
 <div id="main">
-  <div id="grid-wrap"><div id="grid"></div></div>
+  <div id="grid-wrap">
+    <div id="grid"></div>
+  </div>
+
   <div id="clues">
     <div class="section">ACROSS</div>
     <div id="across"></div>
@@ -55,98 +252,238 @@ html,body{margin:0;padding:0;font-family:system-ui,sans-serif;background:#0b1220
   </div>
 </div>
 
-<!-- SETTINGS -->
+<!-- =========================================================
+     SETTINGS
+========================================================= -->
 <div id="settings-panel">
-  <div class="setting"><label>Auto-advance<input type="checkbox" id="auto-advance" checked></label></div>
+  <div class="setting">
+    <label>
+      <span>Auto-advance</span>
+      <input type="checkbox" id="auto-advance" checked>
+    </label>
+  </div>
+  <div class="setting">
+    <label>
+      <span>Skip filled</span>
+      <input type="checkbox" id="skip-filled" checked>
+    </label>
+  </div>
+  <div class="setting">
+    <label>
+      <span>Show mistakes</span>
+      <input type="checkbox" id="show-mistakes">
+    </label>
+  </div>
 </div>
 
 <script>
-// ===== TIMER =====
-let seconds=0,timerInterval=null;
-function startTimer(){if(timerInterval)return;timerInterval=setInterval(()=>{seconds++;renderTimer();},1000);}
-function renderTimer(){const m=String(Math.floor(seconds/60)).padStart(2,'0');const s=String(seconds%60).padStart(2,'0');document.getElementById('timer').textContent=`${m}:${s}`;}
+/* =========================================================
+   TIMER
+========================================================= */
+let seconds = 0;
+let timerInterval = null;
 
-// ===== SETTINGS TOGGLE =====
-const settingsBtn=document.getElementById('settings-btn');
-const settingsPanel=document.getElementById('settings-panel');
-settingsBtn.onclick=()=>{settingsPanel.style.display=settingsPanel.style.display==='block'?'none':'block';};
+function startTimer() {
+  if (timerInterval) return;
+  timerInterval = setInterval(() => {
+    seconds++;
+    renderTimer();
+  }, 1000);
+}
 
-// ===== CROSSWORD DATA =====
-// 6x6 Pokémon grid inside black border (8x8)
-const ROWS=8, COLS=8;
-const GRID=[
-  [null,null,null,null,null,null,null,null],
-  [null,'B','U','L','B','A','S',null],
-  [null,'I','V','Y','S','A','U',null],
-  [null,'S','Q','U','I','R','T',null],
-  [null,'C','H','A','R','M','A',null],
-  [null,'P','I','K','A','C','H',null],
-  [null,'J','I','G','G','L','Y',null],
-  [null,null,null,null,null,null,null,null]
+function renderTimer() {
+  const m = String(Math.floor(seconds / 60)).padStart(2, '0');
+  const s = String(seconds % 60).padStart(2, '0');
+  document.getElementById('timer').textContent = `${m}:${s}`;
+}
+
+/* =========================================================
+   SETTINGS TOGGLE
+========================================================= */
+const settingsBtn = document.getElementById('settings-btn');
+const settingsPanel = document.getElementById('settings-panel');
+
+settingsBtn.onclick = () => {
+  settingsPanel.style.display =
+    settingsPanel.style.display === 'block' ? 'none' : 'block';
+};
+
+/* =========================================================
+   GRID DATA
+========================================================= */
+const GRID = [
+['B','U','L','B','A','S','A','U','R',null,null,null,null,null,null,null],
+[null,null,null,null,null,null,null,'I','V','Y','S','A','U','R',null,null],
+[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],
+['V','E','N','U','S','A','U','R',null,null,null,null,null,null,null],
+[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],
+['C','H','A','R','M','A','N','D','E','R',null,null,null,null,null,null],
+[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],
+['C','H','A','R','M','E','L','E','O','N',null,null,null,null,null,null],
+[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],
+['C','H','A','R','I','Z','A','R','D',null,null,null,null,null,null,null],
+[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],
+['S','Q','U','I','R','T','L','E',null,null,null,null,null,null,null,null],
+[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],
+['W','A','R','T','O','R','T','L','E',null,null,null,null,null,null,null],
+[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],
+[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null]
 ];
 
-// Clues for each Pokémon (numbered left to right, top to bottom)
-const ACROSS_CLUES={
-1:"Bulbasaur",
-2:"Ivysaur",
-3:"Squirtle",
-4:"Charmander",
-5:"Pikachu",
-6:"Jigglypuff"
+/* =========================================================
+   CLUES
+========================================================= */
+const ACROSS_CLUES = {
+1:"Starter Pokémon that begins the Grass line",
+3:"Bulbasaur’s middle evolution",
+4:"Final Grass starter evolution",
+5:"Fire starter Pokémon",
+6:"Charmander’s middle evolution",
+7:"Final Fire starter evolution",
+8:"Water starter Pokémon",
+9:"Squirtle’s middle evolution"
 };
 
-const DOWN_CLUES={
-1:"B->I line (Bulbasaur/Ivysaur)",
-2:"U->V line (letters intersecting)",
-3:"L->Y line",
-4:"B->S line",
-5:"A->A line",
-6:"S->U line"
+const DOWN_CLUES = {
+10:"Final Water starter evolution"
 };
 
-// ===== ENGINE =====
-const gridEl=document.getElementById('grid'), acrossEl=document.getElementById('across'), downEl=document.getElementById('down');
-gridEl.style.gridTemplateColumns=`repeat(${COLS},46px)`;
-const cells=[],across=[],down=[],numberMap={};
-let clueNumber=1,active=null;
-for(let r=0;r<ROWS;r++){
-  cells[r]=[];
-  for(let c=0;c<COLS;c++){
-    const cell=document.createElement('div');
-    if(GRID[r][c]===null){cell.className='cell black';gridEl.appendChild(cell);cells[r][c]=cell;continue;}
-    cell.className='cell white';
-    const input=document.createElement('input');input.maxLength=1;cell.appendChild(input);
-    // Clue numbers (manual for simplicity)
-    if((r===1&&c===1)||(r===2&&c===1)||(r===3&&c===1)||(r===4&&c===1)||(r===5&&c===1)||(r===6&&c===1)){
-        const n=document.createElement('div'); n.className='number'; n.textContent=clueNumber; cell.appendChild(n);
-        // Across clues (for first letter of each across Pokémon)
-        across.push({number:clueNumber,cells:[[r,c],[r,c+1],[r,c+2],[r,c+3],[r,c+4],[r,c+5]]});
-        // Down clues (for first letter of each down Pokémon)
-        down.push({number:clueNumber,cells:[[r,c],[r+1,c],[r+2,c],[r+3,c],[r+4,c],[r+5,c]]});
-        numberMap[clueNumber]=ACROSS_CLUES[clueNumber]||DOWN_CLUES[clueNumber];
-        clueNumber++;
+/* =========================================================
+   ENGINE
+========================================================= */
+const gridEl = document.getElementById('grid');
+const acrossEl = document.getElementById('across');
+const downEl = document.getElementById('down');
+
+const rows = GRID.length;
+const cols = GRID[0].length;
+
+gridEl.style.gridTemplateColumns = `repeat(${cols}, 46px)`;
+
+const cells = [];
+let clueNumber = 1;
+const across = [];
+const down = [];
+
+const isLetter = (r,c) => GRID[r] && GRID[r][c];
+
+for (let r = 0; r < rows; r++) {
+  cells[r] = [];
+  for (let c = 0; c < cols; c++) {
+    const cell = document.createElement('div');
+    cell.className = 'cell';
+
+    if (!isLetter(r,c)) {
+      cell.classList.add('block');
+      gridEl.appendChild(cell);
+      cells[r][c] = cell;
+      continue;
     }
-    cell.onclick=()=>activateCell(r,c);gridEl.appendChild(cell);cells[r][c]=cell;
+
+    const input = document.createElement('input');
+    input.maxLength = 1;
+    cell.appendChild(input);
+
+    const startAcross = !isLetter(r,c-1) && isLetter(r,c+1);
+    const startDown = !isLetter(r-1,c) && isLetter(r+1,c);
+
+    if (startAcross || startDown) {
+      const n = document.createElement('div');
+      n.className = 'number';
+      n.textContent = clueNumber;
+      cell.appendChild(n);
+
+      if (startAcross) {
+        let cc = c;
+        const list = [];
+        while (isLetter(r,cc)) list.push([r,cc++]);
+        across.push({ number: clueNumber, cells: list });
+      }
+
+      if (startDown) {
+        let rr = r;
+        const list = [];
+        while (isLetter(rr,c)) list.push([rr++,c]);
+        down.push({ number: clueNumber, cells: list });
+      }
+
+      clueNumber++;
+    }
+
+    cell.onclick = () => activateFromCell(r,c);
+    gridEl.appendChild(cell);
+    cells[r][c] = cell;
   }
 }
 
-// ===== CLUE RENDER =====
-function renderClues(list,el){list.forEach(entry=>{const d=document.createElement('div');d.className='clue';d.textContent=`${entry.number}. ${numberMap[entry.number]||''}`;d.onclick=()=>activate(entry);entry.el=d;el.appendChild(d);});}
-renderClues(across,acrossEl);renderClues(down,downEl);
+/* =========================================================
+   CLUE RENDER
+========================================================= */
+function renderClues(list, el, map) {
+  list.forEach(entry => {
+    const d = document.createElement('div');
+    d.className = 'clue';
+    d.textContent = `${entry.number}. ${map[entry.number] || ''}`;
+    d.onclick = () => activate(entry);
+    entry.el = d;
+    el.appendChild(d);
+  });
+}
 
-// ===== ACTIVE CELL =====
-function clearHighlights(){document.querySelectorAll('.cell').forEach(c=>c.classList.remove('highlight','active'));document.querySelectorAll('.clue').forEach(c=>c.classList.remove('active'));}
-function activate(entry){clearHighlights();entry.cells.forEach(([r,c],i)=>{cells[r][c].classList.add('highlight');if(i===0)cells[r][c].classList.add('active');});entry.el.classList.add('active');const [r,c]=entry.cells[0];cells[r][c].querySelector('input').focus();active=entry;}
-function activateCell(r,c){const hit=across.find(a=>a.cells.some(p=>p[0]===r&&p[1]===c))||down.find(d=>d.cells.some(p=>p[0]===r&&p[1]===c));if(hit)activate(hit);}
+renderClues(across, acrossEl, ACROSS_CLUES);
+renderClues(down, downEl, DOWN_CLUES);
 
-// ===== INPUT AUTO-ADVANCE =====
-document.addEventListener('input',e=>{if(!active)return;const idx=active.cells.findIndex(([r,c])=>cells[r][c].contains(e.target));if(idx>-1&&idx<active.cells.length-1){const [nr,nc]=active.cells[idx+1];cells[nr][nc].querySelector('input').focus();}});
+let active = null;
 
-// ===== STARTUP SEQUENCE =====
-function showBootScreen(){document.getElementById('boot-screen').classList.remove('hidden'); document.getElementById('ad-screen').classList.add('hidden'); setTimeout(showAdScreen,1200);}
-function showAdScreen(){document.getElementById('boot-screen').classList.add('hidden'); document.getElementById('ad-screen').classList.remove('hidden'); setTimeout(startGame,1500);}
-function startGame(){document.getElementById('ad-screen').classList.add('hidden'); activate(across[0]); startTimer();}
-window.addEventListener('DOMContentLoaded',showBootScreen);
+function clearHighlights() {
+  document.querySelectorAll('.cell').forEach(c => c.classList.remove('highlight','active'));
+  document.querySelectorAll('.clue').forEach(c => c.classList.remove('active'));
+}
+
+function activate(entry) {
+  clearHighlights();
+  entry.cells.forEach(([r,c], i) => {
+    cells[r][c].classList.add('highlight');
+    if (i === 0) cells[r][c].classList.add('active');
+  });
+  entry.el.classList.add('active');
+  const [r,c] = entry.cells[0];
+  cells[r][c].querySelector('input').focus();
+  active = entry;
+}
+
+function activateFromCell(r,c) {
+  const hit = across.find(a => a.cells.some(p => p[0]==r && p[1]==c))
+           || down.find(d => d.cells.some(p => p[0]==r && p[1]==c));
+  if (hit) activate(hit);
+}
+
+/* =========================================================
+   INPUT HANDLING
+========================================================= */
+document.addEventListener('input', e => {
+  if (!active) return;
+  const idx = active.cells.findIndex(([r,c]) => cells[r][c].contains(e.target));
+  if (idx > -1 && idx < active.cells.length - 1) {
+    const [nr,nc] = active.cells[idx+1];
+    cells[nr][nc].querySelector('input').focus();
+  }
+});
+
+/* =========================================================
+   STARTUP SEQUENCE
+========================================================= */
+setTimeout(() => {
+  document.getElementById('boot-screen').classList.add('hidden');
+  document.getElementById('ad-screen').classList.remove('hidden');
+
+  setTimeout(() => {
+    document.getElementById('ad-screen').classList.add('hidden');
+    activate(across[0]);
+    startTimer();
+  }, 1500);
+}, 1200);
 </script>
+
 </body>
 </html>
