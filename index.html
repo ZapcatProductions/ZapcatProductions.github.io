@@ -1,278 +1,287 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>Mini Pokémon Crossword</title>
+<meta charset="UTF-8" />
+<title>Gen 1 Fire Pokémon – Mini Crossword</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <style>
-@import url('https://fonts.googleapis.com/css?family=Annie+Use+Your+Telescope|Libre+Baskerville');
-
-body {
-  font-family: 'Libre Baskerville';
-  display: grid;
-  grid-template-rows: 1fr 5fr 5fr 1fr;
-  grid-template-columns: 1fr 1fr;
-  grid-gap: 15px;
-  align-items: center;
-  justify-items: center;
-  margin: 0;
-  padding: 10px;
+body{
+  font-family: system-ui, -apple-system, Segoe UI, Arial;
+  background:#0b1220;
+  color:#f5f7ff;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:14px;
+  margin:0;
+  padding:20px;
 }
 
-h1 {
-  grid-row: 1;
-  grid-column: 1/3;
-  padding: 0;
-  margin: 0;
+h1{margin:0;}
+
+.crossword{
+  display:grid;
+  grid-template-columns:repeat(6,50px);
+  grid-template-rows:repeat(6,50px);
+  gap:3px;
 }
 
-main {
-  grid-row: 2;
-  grid-column: 1/3;
-  display: grid;
-  grid-template-rows: repeat(6, 8vmin);
-  grid-template-columns: repeat(6, 8vmin);
-  grid-gap: 2px;
+.cell{
+  width:50px;
+  height:50px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:24px;
+  text-transform:uppercase;
+  background:white;
+  color:black;
+  border-radius:6px;
+  box-sizing:border-box;
 }
 
-ins, del {
-  border-radius: 2px;
+.block{
+  background:black;
 }
 
-del {
-  background-color: black;
+.cell input{
+  width:100%;
+  height:100%;
+  border:none;
+  outline:none;
+  text-align:center;
+  font-size:24px;
+  text-transform:uppercase;
+  background:transparent;
 }
 
-ins {
-  font-family: 'Annie Use Your Telescope', cursive;
-  position: relative;
-  display: grid;
-  align-items: center;
-  justify-items: center;
-  background-color: white;
-  border: 1px solid #444;
-  text-decoration: none;
-  font-size: calc(24px + 0.5vmin);
-  padding: 0;
-  margin: 0;
-  text-transform: uppercase;
-  cursor: text;
+.highlight{
+  background:#fff3cd !important;
 }
 
-ins[data-clue]:before {
-  font-family: 'Libre Baskerville';
-  position: absolute;
-  top: 1px;
-  left: 2px;
-  font-size: 10px;
-  content: attr(data-clue);
+.cursor{
+  outline:3px solid #4a90ff;
 }
 
-ins.highlight, li.current {
-  background-color: #ffd;
+.error{
+  background:#ffb3b3 !important;
 }
 
-ins.editting {
-  background-color: #ffb;
+.panel{
+  display:flex;
+  gap:20px;
+  flex-wrap:wrap;
+  justify-content:center;
 }
 
-ins.cursor {
-  box-shadow: inset 0 0 0 4px #BBB;
-  animation-name: pulse;
-  animation-duration: 0.5s;
-  animation-iteration-count: infinite;
-  animation-timing-function: ease-in-out;
-  animation-direction: alternate;
+.clues{
+  background:#101a33;
+  padding:10px 14px;
+  border-radius:10px;
+  min-width:240px;
 }
 
-ins.error {
-  background-color: #fbb;
+button{
+  padding:8px 14px;
+  border-radius:8px;
+  border:none;
+  cursor:pointer;
 }
-
-@keyframes pulse {
-  from { box-shadow: inset 0 0 0 4px #BBB; }
-  to   { box-shadow: inset 0 0 0 6px #BBB; }
-}
-
-ul { list-style:none; padding:0 15px; }
-li.heading { font-weight:bold; padding: 10px 0; cursor:default; }
-li[data-clue] { padding:2px 5px; cursor:pointer; }
 </style>
 </head>
 <body>
-<h1>Pokémon Mini Crossword</h1>
 
-<main>
-  <!-- 6x6 grid -->
-  <ins data-clue="1" data-answer="E"></ins>
-  <ins data-clue="2" data-answer="V"></ins>
-  <ins data-clue="3" data-answer="A"></ins>
-  <ins></ins>
-  <ins data-clue="4" data-answer="R"></ins>
-  <ins></ins>
+<h1>Gen 1 Fire Pokémon Mini Crossword</h1>
+<div>Use arrow keys to move • SPACE toggles Across/Down</div>
 
-  <ins data-clue="5" data-answer="G"></ins>
-  <ins></ins>
-  <ins></ins>
-  <ins data-clue="6" data-answer="M"></ins>
-  <ins></ins>
-  <ins></ins>
+<div class="crossword" id="grid"></div>
 
-  <ins data-clue="7" data-answer="A"></ins>
-  <ins></ins>
-  <ins data-clue="8" data-answer="S"></ins>
-  <ins></ins>
-  <ins></ins>
-  <ins></ins>
+<div>
+  Direction: <strong id="dirLabel">Across</strong>
+  &nbsp;|&nbsp;
+  <button id="checkBtn">Toggle error check</button>
+</div>
 
-  <ins></ins>
-  <ins data-clue="9" data-answer="P"></ins>
-  <ins></ins>
-  <ins></ins>
-  <ins></ins>
-  <ins></ins>
+<div class="panel">
+  <div class="clues">
+    <strong>Across</strong>
+    <ol>
+      <li>1. Fox Pokémon</li>
+      <li>2. Spits lava</li>
+      <li>3. Fire horse</li>
+    </ol>
+  </div>
 
-  <ins data-clue="10" data-answer="J"></ins>
-  <ins></ins>
-  <ins></ins>
-  <ins></ins>
-  <ins></ins>
-  <ins></ins>
-
-  <ins data-clue="11" data-answer="C"></ins>
-  <ins></ins>
-  <ins></ins>
-  <ins data-clue="12" data-answer="Y"></ins>
-  <ins></ins>
-  <ins></ins>
-</main>
-
-<ul>
-  <li class="heading">Across</li>
-  <li data-clue="1" data-dir="across" data-length="1">1. Pikachu type (1)</li>
-  <li data-clue="4" data-dir="across" data-length="1">4. Evolution of Charmander (1)</li>
-  <li data-clue="6" data-dir="across" data-length="1">6. Legendary bird (1)</li>
-  <li data-clue="8" data-dir="across" data-length="1">8. Water starter (1)</li>
-  <li data-clue="10" data-dir="across" data-length="1">10. Eevee evolution (1)</li>
-  <li data-clue="11" data-dir="across" data-length="1">11. Fire starter (1)</li>
-</ul>
-
-<ul>
-  <li class="heading">Down</li>
-  <li data-clue="1" data-dir="down" data-length="1">1. Electric move (1)</li>
-  <li data-clue="2" data-dir="down" data-length="1">2. Grass starter (1)</li>
-  <li data-clue="3" data-dir="down" data-length="1">3. Water Pokémon (1)</li>
-  <li data-clue="5" data-dir="down" data-length="1">5. Legendary Pokémon (1)</li>
-  <li data-clue="7" data-dir="down" data-length="1">7. Dragon Pokémon (1)</li>
-  <li data-clue="9" data-dir="down" data-length="1">9. Fire type (1)</li>
-  <li data-clue="12" data-dir="down" data-length="1">12. Psychic Pokémon (1)</li>
-</ul>
+  <div class="clues">
+    <strong>Down</strong>
+    <ol>
+      <li>1. Six-tailed Pokémon</li>
+      <li>2. Volcano Pokémon</li>
+      <li>3. Evolves from Growlithe’s friend? (joke clue – same word)</li>
+    </ol>
+  </div>
+</div>
 
 <script>
-let index = Array.from(document.querySelector('main').children);
-let clues = Array.from(document.querySelectorAll('li[data-clue]'));
+/*
+  Answers (Gen-1 Fire Pokémon only)
 
-let state = { index:null, clue:null, cursor:0, answers:{}, dir:null, length:null };
+  VULPIX
+  MAGMAR
+  PONYTA
+*/
 
-function highlightClues(c,d,l){
-  // remove old highlights
-  index.forEach(el=>el.classList.remove('highlight'));
-  // highlight both across/down if overlapping
-  let s = index.indexOf(document.querySelector('ins[data-clue="'+c+'"]'));
-  for (let x=0;x<l;x++){
-    if(d==='across') index[s+x].classList.add('highlight');
-    else index[s+x*6].classList.add('highlight');
+const ANSWERS = {
+  across:[
+    {row:0,col:0,word:"VULPIX"},
+    {row:2,col:0,word:"MAGMAR"},
+    {row:4,col:0,word:"PONYTA"}
+  ],
+  down:[
+    {row:0,col:0,word:"VULPIX"},
+    {row:0,col:2,word:"MAGMAR"},
+    {row:0,col:4,word:"PONYTA"}
+  ]
+};
+
+const gridSize = 6;
+const grid = document.getElementById("grid");
+const dirLabel = document.getElementById("dirLabel");
+const checkBtn = document.getElementById("checkBtn");
+
+let direction = "across"; // or "down"
+let errorMode = false;
+let cursor = {row:0,col:0};
+
+// ---------- Build grid ----------
+const cells = [];
+
+for(let r=0;r<gridSize;r++){
+  cells[r]=[];
+  for(let c=0;c<gridSize;c++){
+    const div=document.createElement("div");
+    div.className="cell";
+    const input=document.createElement("input");
+    input.maxLength=1;
+    div.appendChild(input);
+    grid.appendChild(div);
+    cells[r][c]={div,input,solution:null};
   }
-  // find overlapping clues
-  index.forEach((cell,i)=>{
-    if(cell.classList.contains('highlight') && cell.dataset.clue && cell.dataset.clue!=c){
-      cell.classList.add('highlight');
+}
+
+// ---------- Fill solutions ----------
+function place(word,row,col,dir){
+  for(let i=0;i<word.length;i++){
+    let r=row+(dir==="down"?i:0);
+    let c=col+(dir==="across"?i:0);
+    cells[r][c].solution = word[i];
+  }
+}
+
+ANSWERS.across.forEach(w=>place(w.word,w.row,w.col,"across"));
+ANSWERS.down.forEach(w=>place(w.word,w.row,w.col,"down"));
+
+// fill unused with blocks
+for(let r=0;r<gridSize;r++){
+  for(let c=0;c<gridSize;c++){
+    if(!cells[r][c].solution){
+      cells[r][c].div.classList.add("block");
+      cells[r][c].input.disabled=true;
     }
+  }
+}
+
+// ---------- Highlight helpers ----------
+function clearHighlights(){
+  cells.flat().forEach(c=>{
+    c.div.classList.remove("highlight","cursor","error");
   });
 }
 
-function editClue() {
-  Array.from(document.querySelectorAll('.cursor,.editting,.current')).map(el=>el.classList.remove("cursor","editting","current"));
-  let c = parseInt(this.getAttribute("data-clue"));
-  let l = parseInt(this.getAttribute("data-length"));
-  let d = this.getAttribute("data-dir");
-  state.clue = c; state.dir=d; state.length=l;
-  let s = index.indexOf(document.querySelector('ins[data-clue="'+c+'"]'));
-  state.index=s;
-  for(let x=0;x<l;x++){
-    if(d==='across') index[s+x].classList.add('editting');
-    else index[s+x*6].classList.add('editting');
+function highlightCurrentWord(){
+  clearHighlights();
+  const list = direction==="across"?ANSWERS.across:ANSWERS.down;
+
+  for(const w of list){
+    const inWord =
+      (direction==="across" && w.row===cursor.row &&
+        cursor.col>=w.col && cursor.col<w.col+w.word.length)
+      ||
+      (direction==="down" && w.col===cursor.col &&
+        cursor.row>=w.row && cursor.row<w.row+w.word.length);
+
+    if(inWord){
+      for(let i=0;i<w.word.length;i++){
+        let r=w.row+(direction==="down"?i:0);
+        let c=w.col+(direction==="across"?i:0);
+        cells[r][c].div.classList.add("highlight");
+      }
+    }
   }
-  state.cursor = state.answers[c+'-'+d]?state.answers[c+'-'+d].length:0;
-  if(d==='across') index[s+state.cursor].classList.add('cursor');
-  else index[s+state.cursor*6].classList.add('cursor');
-  document.querySelector('li[data-clue="'+c+'"][data-dir="'+d+'"]').classList.add('current');
-  highlightClues(c,d,l);
+  cells[cursor.row][cursor.col].div.classList.add("cursor");
 }
 
-clues.forEach(clue=>{
-  ['mouseover','mouseout'].map(e=> clue.addEventListener(e, function(){ highlightClues(parseInt(this.dataset.clue),this.dataset.dir,parseInt(this.dataset.length)) }));
-  clue.addEventListener('click', editClue);
-});
+function moveCursor(dr,dc){
+  let nr = Math.min(Math.max(cursor.row+dr,0),gridSize-1);
+  let nc = Math.min(Math.max(cursor.col+dc,0),gridSize-1);
+  if(cells[nr][nc].input.disabled) return;
+  cursor={row:nr,col:nc};
+  highlightCurrentWord();
+}
 
-document.addEventListener('keydown', e=>{
-  if(!state.clue) return;
-  e.preventDefault();
-  let key = e.key.toUpperCase();
-  switch(key){
-    case "TAB":{
-      let cli = document.querySelector('li[data-clue="'+state.clue+'"][data-dir="'+state.dir+'"]');
-      let c = clues.indexOf(cli);
-      let nc = e.shiftKey?c-1:c+1;
-      if(nc<0) nc=clues.length-1; if(nc>=clues.length) nc=0;
-      editClue.bind(clues[nc])();
-      return;
-    }
-    case "BACKSPACE":
-      state.answers[state.clue+'-'+state.dir] = (state.answers[state.clue+'-'+state.dir]||'').slice(0,-1);
-      break;
-    case "SHIFT": case "ENTER": case " ":
-      return;
-    default:
-      if(key.length>1) return;
-      if((state.answers[state.clue+'-'+state.dir]||'').length<state.length)
-        state.answers[state.clue+'-'+state.dir] = (state.answers[state.clue+'-'+state.dir]||'') + key;
-      break;
-  }
+// ---------- Error checking ----------
+function updateErrors(){
+  cells.flat().forEach(c=>{
+    if(!errorMode){ c.div.classList.remove("error"); return; }
+    if(!c.solution || !c.input.value) return;
+    if(c.input.value.toUpperCase()!==c.solution) c.div.classList.add("error");
+    else c.div.classList.remove("error");
+  });
+}
 
-  // auto cursor move
-  if(state.dir==='across'){
-    index[state.index+state.cursor].classList.remove('cursor');
-    state.cursor = state.answers[state.clue+'-'+state.dir].length;
-    if(state.cursor>=state.length) state.cursor=state.length-1;
-    index[state.index+state.cursor].classList.add('cursor');
-  } else {
-    index[state.index+state.cursor*6].classList.remove('cursor');
-    state.cursor = state.answers[state.clue+'-'+state.dir].length;
-    if(state.cursor>=state.length) state.cursor=state.length-1;
-    index[state.index+state.cursor*6].classList.add('cursor');
-  }
+// ---------- Input handling ----------
+cells.flat().forEach((cell,idx)=>{
+  cell.input.addEventListener("input",e=>{
+    cell.input.value = cell.input.value.toUpperCase();
+    updateErrors();
 
-  // fill letters & check errors
-  for(let x=0;x<state.length;x++){
-    let cell;
-    if(state.dir==='across') cell = index[state.index+x];
-    else cell = index[state.index+x*6];
-    let answer = (state.answers[state.clue+'-'+state.dir]||'')[x]||'';
-    cell.textContent = answer;
-    if(cell.dataset.answer && answer && answer!==cell.dataset.answer) cell.classList.add('error');
-    else cell.classList.remove('error');
-  }
-});
+    if(direction==="across") moveCursor(0,1);
+    else moveCursor(1,0);
+  });
 
-// click a numbered cell to jump to that clue
-Array.from(document.querySelectorAll('ins[data-clue]')).forEach(el=>{
-  el.addEventListener('click', function(){
-    let c = parseInt(this.dataset.clue);
-    let lis = Array.from(document.querySelectorAll('li[data-clue="'+c+'"]'));
-    if(lis.length===1) editClue.bind(lis[0])();
-    else editClue.bind(lis[state.dir==='across'?1:0])();
+  cell.input.addEventListener("focus",()=>{
+    cursor={
+      row:Math.floor(idx/gridSize),
+      col:idx%gridSize
+    };
+    highlightCurrentWord();
   });
 });
+
+document.addEventListener("keydown",e=>{
+  if(e.key===" "){
+    direction = direction==="across"?"down":"across";
+    dirLabel.textContent = direction[0].toUpperCase()+direction.slice(1);
+    highlightCurrentWord();
+    e.preventDefault();
+  }
+
+  if(e.key==="ArrowUp") moveCursor(-1,0);
+  if(e.key==="ArrowDown") moveCursor(1,0);
+  if(e.key==="ArrowLeft") moveCursor(0,-1);
+  if(e.key==="ArrowRight") moveCursor(0,1);
+  updateErrors();
+});
+
+checkBtn.onclick=()=>{
+  errorMode=!errorMode;
+  updateErrors();
+  checkBtn.textContent = errorMode?"Hide error check":"Show error check";
+};
+
+// initial highlight
+highlightCurrentWord();
 </script>
 </body>
 </html>
