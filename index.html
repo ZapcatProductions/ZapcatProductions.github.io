@@ -2,52 +2,63 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Pokémon Mini</title>
+<title>Pokémon Mini Crossword</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <style>
-*{box-sizing:border-box}html,body{margin:0;padding:0;background:#0b1220;color:#eaf2ff;font-family:system-ui,-apple-system,BlinkMacSystemFont,sans-serif;height:100%;overflow:hidden}
-#boot-screen,#ad-screen{position:fixed;inset:0;background:#020617;display:flex;align-items:center;justify-content:center;z-index:9999}
-#boot-screen.hidden,#ad-screen.hidden{display:none}
-.loader-box{text-align:center}
-.loader-title{font-size:22px;font-weight:700;margin-bottom:12px}
-.loader-sub{opacity:.7}
-#header{height:48px;background:#1e3a8a;display:flex;align-items:center;justify-content:space-between;padding:0 14px;font-weight:600}
+/* GLOBAL RESET */
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;height:100%;background:#0b1220;color:#eaf2ff;font-family:system-ui,-apple-system,BlinkMacSystemFont,sans-serif;overflow:hidden}
+/* LOADING SCREENS */
+#boot,#ad{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:#020617;z-index:9999}
+#boot.hidden,#ad.hidden{display:none}
+.loader{text-align:center}
+.loader h1{font-size:22px;margin-bottom:10px}
+.loader p{opacity:.7}
+/* HEADER */
+#header{height:48px;background:#1e3a8a;display:flex;align-items:center;justify-content:space-between;padding:0 12px;font-weight:600}
 #title{font-size:16px}
-#header-right{display:flex;align-items:center;gap:14px}
+#header-right{display:flex;align-items:center;gap:12px}
 #timer{font-variant-numeric:tabular-nums}
 #settings-btn{cursor:pointer}
-#main{display:grid;grid-template-columns:auto 380px;height:calc(100vh - 48px)}
-#grid-wrap{padding:24px;overflow:auto}
+/* MAIN LAYOUT */
+#main{display:grid;grid-template-columns:auto 240px;height:calc(100vh - 48px)}
+#grid-wrap{padding:16px;overflow:auto}
 #grid{display:grid;gap:2px;background:black}
-.cell{width:46px;height:46px;position:relative;background:#000}
+.cell{width:38px;height:38px;position:relative;background:#000}
 .cell.letter{background:#1f2937}
-.cell input{width:100%;height:100%;background:transparent;border:none;color:#eaf2ff;font-size:20px;text-align:center;text-transform:uppercase;caret-color:#93c5fd}
+.cell input{width:100%;height:100%;background:transparent;border:none;color:#eaf2ff;font-size:18px;text-align:center;text-transform:uppercase;caret-color:#93c5fd}
 .cell input:focus{outline:none}
 .cell.highlight{background:#2563eb}
 .cell.active{background:#60a5fa}
-.number{position:absolute;top:2px;left:4px;font-size:10px;opacity:.8}
-#clues{background:#0f172a;border-left:1px solid #1e3a8a;padding:14px;overflow-y:auto}
-.section{font-weight:bold;color:#60a5fa;margin-top:12px}
-.clue{padding:6px;cursor:pointer}
+.number{position:absolute;top:1px;left:2px;font-size:9px;opacity:.8}
+/* CLUES */
+#clues{background:#0f172a;border-left:1px solid #1e3a8a;padding:12px;overflow-y:auto}
+.section{font-weight:bold;color:#60a5fa;margin-top:10px}
+.clue{padding:4px;cursor:pointer}
 .clue.active{background:#1e40af}
-#settings-panel{position:fixed;right:0;top:48px;width:260px;height:calc(100vh - 48px);background:#020617;border-left:1px solid #1e3a8a;padding:14px;display:none;z-index:5000}
-.setting{margin-bottom:12px}
+/* SETTINGS */
+#settings-panel{position:fixed;right:0;top:48px;width:240px;height:calc(100vh - 48px);background:#020617;border-left:1px solid #1e3a8a;padding:12px;display:none;z-index:5000}
+.setting{margin-bottom:10px}
 .setting label{display:flex;justify-content:space-between;cursor:pointer}
 </style>
 </head>
 <body>
-<div id="boot-screen">
-  <div class="loader-box">
-    <div class="loader-title">Pokémon Mini</div>
-    <div class="loader-sub">Loading crossword…</div>
+
+<!-- LOADING SCREENS -->
+<div id="boot">
+  <div class="loader">
+    <h1>Pokémon Mini</h1>
+    <p>Loading crossword…</p>
   </div>
 </div>
-<div id="ad-screen" class="hidden">
-  <div class="loader-box">
-    <div class="loader-title">Advertisement</div>
-    <div class="loader-sub">Please wait…</div>
+<div id="ad" class="hidden">
+  <div class="loader">
+    <h1>Advertisement</h1>
+    <p>Please wait…</p>
   </div>
 </div>
+
+<!-- HEADER -->
 <div id="header">
   <div id="title">Pokémon Mini</div>
   <div id="header-right">
@@ -55,6 +66,8 @@
     <div id="settings-btn">⚙</div>
   </div>
 </div>
+
+<!-- MAIN -->
 <div id="main">
   <div id="grid-wrap">
     <div id="grid"></div>
@@ -66,6 +79,8 @@
     <div id="down"></div>
   </div>
 </div>
+
+<!-- SETTINGS PANEL -->
 <div id="settings-panel">
   <div class="setting">
     <label>
@@ -86,48 +101,76 @@
     </label>
   </div>
 </div>
+
 <script>
+/* TIMER */
 let seconds=0,timerInterval=null;
-function startTimer(){if(timerInterval)return;timerInterval=setInterval(()=>{seconds++;renderTimer()},1e3)}
-function renderTimer(){const m=String(Math.floor(seconds/60)).padStart(2,'0'),s=String(seconds%60).padStart(2,'0');document.getElementById('timer').textContent=`${m}:${s}`}
+function startTimer(){if(timerInterval)return;timerInterval=setInterval(()=>{seconds++;renderTimer()},1000)}
+function renderTimer(){let m=String(Math.floor(seconds/60)).padStart(2,'0'),s=String(seconds%60).padStart(2,'0');document.getElementById('timer').textContent=`${m}:${s}`}
+
+/* SETTINGS TOGGLE */
 const settingsBtn=document.getElementById('settings-btn'),settingsPanel=document.getElementById('settings-panel');
 settingsBtn.onclick=()=>{settingsPanel.style.display=settingsPanel.style.display==='block'?'none':'block'}
 
+/* GRID DATA (10x10 Boston-Style Mini-Crossword) */
 const GRID=[
-['B','U','L','B','A','S','A','U','R','C','H','A','R','M','A','N','D'],
-['I','V','Y','S','A','U','R','C','H','A','R','M','E','L','E','O'],
-['V','E','N','U','S','A','U','R','C','H','A','R','I','Z','A','R','D'],
-['C','H','A','R','M','A','N','D','E','R','S','Q','U','I','R','T','L'],
-['C','H','A','R','M','E','L','E','O','N','W','A','R','T','O','R','T'],
-['C','H','A','R','I','Z','A','R','D','B','U','L','B','A','S','A','U'],
-['S','Q','U','I','R','T','L','E','I','V','Y','S','A','U','R','V','E'],
-['W','A','R','T','O','R','T','L','E','V','E','N','U','S','A','U','R'],
-['B','U','L','B','A','S','A','U','R','C','H','A','R','M','A','N','D'],
-['I','V','Y','S','A','U','R','C','H','A','R','M','E','L','E','O'],
-['V','E','N','U','S','A','U','R','C','H','A','R','I','Z','A','R','D'],
-['C','H','A','R','M','A','N','D','E','R','S','Q','U','I','R','T','L'],
-['C','H','A','R','M','E','L','E','O','N','W','A','R','T','O','R','T'],
-['C','H','A','R','I','Z','A','R','D','B','U','L','B','A','S','A','U'],
-['S','Q','U','I','R','T','L','E','I','V','Y','S','A','U','R','V','E'],
-['W','A','R','T','O','R','T','L','E','V','E','N','U','S','A','U','R']
+['B','U','L','B','A','S','A','U','R',null],
+[null,null,'I',null,null,'V',null,'Y','S','A'],
+['C','H','A','R','M','A','N','D','E','R'],
+[null,'C',null,'H','A','R','M','E','L','E'],
+['S','Q','U','I','R','T','L','E',null],
+[null,'W',null,'A','R','T','O','R','T','L'],
+['C','H','A','R','I','Z','A','R','D',null],
+['B','U','L','B','A','S','A','U','R',null],
+['I','V','Y','S','A','U','R',null,null,null],
+['C','H','A','R','M','E','L','E','O','N',null]
 ];
-const ACROSS_CLUES={1:"Grass starter",2:"Grass mid-evo",3:"Grass final",4:"Fire starter",5:"Fire mid-evo",6:"Fire final"};
-const DOWN_CLUES={7:"Water starter",8:"Water mid-evo",9:"Water final",10:"Grass starter intersect",11:"Fire starter intersect",12:"Final Water starter"};
 
+/* CLUES */
+const ACROSS_CLUES={1:"Grass starter",3:"Fire starter",5:"Water starter",7:"Final Fire starter"};
+const DOWN_CLUES={2:"Grass mid-evo",4:"Fire mid-evo",6:"Final Water starter",8:"Grass final"};
+
+/* ENGINE */
 const gridEl=document.getElementById('grid'),acrossEl=document.getElementById('across'),downEl=document.getElementById('down');
-const rows=GRID.length,cols=GRID[0].length;gridEl.style.gridTemplateColumns=`repeat(${cols},46px)`;
-const cells=[],across=[],down=[];let clueNumber=1;
+const rows=GRID.length,cols=GRID[0].length;
+gridEl.style.gridTemplateColumns=`repeat(${cols},38px)`;
+const cells=[],across=[],down=[];
+let clueNumber=1;
 const isLetter=(r,c)=>GRID[r]&&GRID[r][c]!==null;
-for(let r=0;r<rows;r++){cells[r]=[];for(let c=0;c<cols;c++){const cell=document.createElement('div');cell.className=isLetter(r,c)?'cell letter':'cell';if(isLetter(r,c)){const input=document.createElement('input');input.maxLength=1;cell.appendChild(input)}const startAcross=!isLetter(r,c-1)&&isLetter(r,c+1),startDown=!isLetter(r-1,c)&&isLetter(r+1,c);if(startAcross||startDown){const n=document.createElement('div');n.className='number';n.textContent=clueNumber;cell.appendChild(n);if(startAcross){let cc=c,list=[];while(isLetter(r,cc))list.push([r,cc++]);across.push({number:clueNumber,cells:list})}if(startDown){let rr=r,list=[];while(isLetter(rr,c))list.push([rr++,c]);down.push({number:clueNumber,cells:list})}clueNumber++}cell.onclick=()=>activateFromCell(r,c);gridEl.appendChild(cell);cells[r][c]=cell}}
 
+for(let r=0;r<rows;r++){
+  cells[r]=[];
+  for(let c=0;c<cols;c++){
+    const cell=document.createElement('div');
+    cell.className=isLetter(r,c)?'cell letter':'cell';
+    if(isLetter(r,c)){
+      const input=document.createElement('input');input.maxLength=1;cell.appendChild(input);
+    }
+    const startAcross=!isLetter(r,c-1)&&isLetter(r,c+1),startDown=!isLetter(r-1,c)&&isLetter(r+1,c);
+    if(startAcross||startDown){
+      const n=document.createElement('div');n.className='number';n.textContent=clueNumber;cell.appendChild(n);
+      if(startAcross){let cc=c,list=[];while(isLetter(r,cc))list.push([r,cc++]);across.push({number:clueNumber,cells:list})}
+      if(startDown){let rr=r,list=[];while(isLetter(rr,c))list.push([rr++,c]);down.push({number:clueNumber,cells:list})}
+      clueNumber++;
+    }
+    cell.onclick=()=>activateFromCell(r,c);
+    gridEl.appendChild(cell);
+    cells[r][c]=cell;
+  }
+}
+
+/* CLUE RENDER */
 function renderClues(list,el,map){list.forEach(entry=>{const d=document.createElement('div');d.className='clue';d.textContent=`${entry.number}. ${map[entry.number]||''}`;d.onclick=()=>activate(entry);entry.el=d;el.appendChild(d)})}
 renderClues(across,acrossEl,ACROSS_CLUES);renderClues(down,downEl,DOWN_CLUES);
+
 let active=null;
 function clearHighlights(){document.querySelectorAll('.cell').forEach(c=>c.classList.remove('highlight','active'));document.querySelectorAll('.clue').forEach(c=>c.classList.remove('active'))}
 function activate(entry){clearHighlights();entry.cells.forEach(([r,c],i)=>{cells[r][c].classList.add('highlight');if(i===0)cells[r][c].classList.add('active')});entry.el.classList.add('active');const [r,c]=entry.cells[0];cells[r][c].querySelector('input').focus();active=entry}
 function activateFromCell(r,c){const hit=across.find(a=>a.cells.some(p=>p[0]==r&&p[1]==c))||down.find(d=>d.cells.some(p=>p[0]==r&&p[1]==c));if(hit)activate(hit)}
 document.addEventListener('input',e=>{if(!active)return;const idx=active.cells.findIndex(([r,c])=>cells[r][c].contains(e.target));if(idx>-1&&idx<active.cells.length-1){const [nr,nc]=active.cells[idx+1];cells[nr][nc].querySelector('input').focus()}})
-setTimeout(()=>{document.getElementById('boot-screen').classList.add('hidden');document.getElementById('ad-screen').classList.remove('hidden');setTimeout(()=>{document.getElementById('ad-screen').classList.add('hidden');activate(across[0]);startTimer()},1500)},1200)
+
+/* STARTUP SEQUENCE */
+setTimeout(()=>{document.getElementById('boot').classList.add('hidden');document.getElementById('ad').classList.remove('hidden');setTimeout(()=>{document.getElementById('ad').classList.add('hidden');activate(across[0]);startTimer()},1200)},1200)
 </script>
 </body>
 </html>
