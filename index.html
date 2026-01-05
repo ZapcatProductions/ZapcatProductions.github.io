@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Mini Crossword</title>
+<title>Mini Pokémon Crossword</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <style>
 *{box-sizing:border-box;}html,body{margin:0;padding:0;height:100%;font-family:system-ui,sans-serif;background:#0b1220;color:#eaf2ff;overflow:hidden;}
@@ -35,7 +35,7 @@
 </head>
 <body>
 <div id="header">
-  <div id="title">Mini Crossword</div>
+  <div id="title">Mini Pokémon Crossword</div>
   <div id="header-right">
     <div id="timer">00:00</div>
     <div id="settings-btn">⚙</div>
@@ -56,32 +56,41 @@
 </div>
 
 <div id="start-container">
-  <div>Welcome to Mini Crossword!</div>
+  <div>Welcome to Mini Pokémon Crossword!</div>
   <button id="start-game">Start Game</button>
   <div id="thankyou">Thank you for playing!</div>
 </div>
 
 <script>
 // =========================
-// PUZZLE DATA (MODULAR)
+// PUZZLE DATA
 // =========================
 let puzzleData = {
   grid:[
-    ['B','U','L','B','A'],
-    ['.','I','.','Y','S'],
-    ['C','H','A','R','M'],
-    ['.','E','.','L','E'],
-    ['S','Q','U','I','R']
+    ['B','U','L','B','A','S','A','U','R'],
+    ['P',null,null,null,null,null,null,null,'I'],
+    ['I',null,'C','H','A','R','M','A','N','D'],
+    ['K',null,null,null,null,null,null,null,'U'],
+    ['A','S','Q','U','I','R','T','L','E'],
+    ['M',null,null,null,null,null,null,null,'O'],
+    ['C','H','I','K','O','R','I','T','E'],
+    ['M',null,null,null,null,null,null,null,'O']
   ],
   across:{
-    1:{text:"Grass starter",row:0,col:0,length:5},
-    3:{text:"Middle fire",row:2,col:0,length:5},
-    5:{text:"Water starter",row:4,col:0,length:5}
+    1:{text:"Grass starter",row:0,col:0,length:9},
+    5:{text:"Water starter",row:4,col:0,length:8},
+    7:{text:"Baby bird Pokémon",row:6,col:0,length:9},
+    2:{text:"Fire starter",row:2,col:2,length:8},
+    3:{text:"Flying type",row:0,col:8,length:1},
+    4:{text:"Rare feline Pokémon",row:6,col:8,length:1}
   },
   down:{
-    1:{text:"Bulbasaur evolution",row:0,col:0,length:5},
-    2:{text:"Charmander evolution",row:0,col:3,length:3},
-    3:{text:"Squirtle evolution",row:2,col:4,length:3}
+    1:{text:"Bulbasaur evolution",row:0,col:0,length:2},
+    2:{text:"Squirtle evolution",row:4,col:2,length:3},
+    3:{text:"Legendary dog",row:0,col:8,length:2},
+    4:{text:"Starter Pokémon",row:0,col:4,length:3},
+    5:{text:"Chikorita evolution",row:6,col:0,length:2},
+    6:{text:"Water type",row:4,col:4,length:3}
   }
 };
 
@@ -116,7 +125,6 @@ const rows=puzzleData.grid.length;
 const cols=puzzleData.grid[0].length;
 gridEl.style.gridTemplateColumns=`repeat(${cols},50px)`;
 
-// AUTO NUMBERING
 let clueNumber=1;
 let acrossList=[],downList=[];
 for(let r=0;r<rows;r++){
@@ -124,7 +132,7 @@ for(let r=0;r<rows;r++){
   for(let c=0;c<cols;c++){
     const cell=document.createElement('div');cell.className='cell';
     const val=puzzleData.grid[r][c];
-    if(val==='.'||!val){cell.classList.add('block');gridEl.appendChild(cell);cells[r][c]=cell;continue;}
+    if(val===null){cell.classList.add('block');gridEl.appendChild(cell);cells[r][c]=cell;continue;}
     const input=document.createElement('input');input.maxLength=1;input.dataset.row=r;input.dataset.col=c;cell.appendChild(input);
 
     // NUMBER LOGIC
@@ -132,8 +140,8 @@ for(let r=0;r<rows;r++){
     const startDown=(r===0||!puzzleData.grid[r-1][c])&&(r<rows-1 && puzzleData.grid[r+1][c]);
     if(startAcross||startDown){
       const n=document.createElement('div');n.className='number';n.textContent=clueNumber;cell.appendChild(n);
-      if(startAcross){let list=[];let cc=c;while(cc<cols && puzzleData.grid[r][cc] && puzzleData.grid[r][cc]!=='.'){list.push([r,cc]);cc++;}acrossList.push({number:clueNumber,cells:list});}
-      if(startDown){let list=[];let rr=r;while(rr<rows && puzzleData.grid[rr][c] && puzzleData.grid[rr][c]!=='.'){list.push([rr,c]);rr++;}downList.push({number:clueNumber,cells:list});}
+      if(startAcross){let list=[];let cc=c;while(cc<cols && puzzleData.grid[r][cc]!==null){list.push([r,cc]);cc++;}acrossList.push({number:clueNumber,cells:list});}
+      if(startDown){let list=[];let rr=r;while(rr<rows && puzzleData.grid[rr][c]!==null){list.push([rr,c]);rr++;}downList.push({number:clueNumber,cells:list});}
       clueNumber++;
     }
 
