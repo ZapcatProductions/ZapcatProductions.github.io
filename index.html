@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Gen 1 Water Pokémon Mini Crossword</title>
+<title>Gen-1 Water Pokémon Mini Crossword</title>
 
 <style>
 body{
@@ -22,24 +22,10 @@ body{
   display:none;
 }
 
-h1{
-  text-align:center;
-  margin-bottom:5px;
-}
+h1{text-align:center;margin-bottom:5px;}
 
-#topBar{
-  display:flex;
-  justify-content:center;
-  gap:20px;
-  align-items:center;
-  margin-bottom:10px;
-}
+#timer{text-align:center;margin-bottom:8px;}
 
-#timer{
-  font-size:18px;
-}
-
-/* grid */
 main{
   display:grid;
   grid-template-columns:repeat(6,60px);
@@ -48,13 +34,9 @@ main{
   justify-content:center;
 }
 
-ins,del{
-  border-radius:6px;
-}
+ins,del{border-radius:6px;}
 
-del{
-  background:black;
-}
+del{background:black;}
 
 ins{
   background:white;
@@ -64,9 +46,9 @@ ins{
   display:flex;
   align-items:center;
   justify-content:center;
-  position:relative;
   text-transform:uppercase;
-  cursor:text;
+  cursor:pointer;
+  position:relative;
 }
 
 ins[data-clue]:before{
@@ -78,49 +60,22 @@ ins[data-clue]:before{
   content:attr(data-clue);
 }
 
-.highlight{
-  background:#d8f1ff !important;
-}
+.highlight{background:#d8f1ff !important;}
+.cursor{box-shadow:inset 0 0 0 3px #3399ff;}
+.error{background:#ffb3b3 !important;}
 
-.cursor{
-  box-shadow:inset 0 0 0 3px #3399ff;
-}
-
-.error{
-  background:#ffb3b3 !important;
-}
-
-/* clue lists */
 .panels{
   display:flex;
   justify-content:center;
   gap:40px;
-  margin-top:15px;
+  margin-top:10px;
 }
 
-ul{
-  list-style:none;
-  padding:0;
-}
+li.heading{font-weight:bold;margin-bottom:5px;}
+li[data-clue]{cursor:pointer;}
+li.current{color:#7cc8ff;}
 
-li.heading{
-  font-weight:bold;
-  margin-bottom:5px;
-}
-
-li[data-clue]{
-  padding:2px 0;
-  cursor:pointer;
-}
-
-li.current{
-  color:#7cc8ff;
-}
-
-/* title screen */
-#titleScreen{
-  text-align:center;
-}
+#titleScreen{text-align:center;}
 
 button{
   padding:10px 25px;
@@ -131,36 +86,31 @@ button{
   background:#3a8dff;
   color:white;
 }
-
-button:hover{
-  filter:brightness(1.15);
-}
 </style>
 </head>
 
 <body>
 
+<!-- TITLE -->
 <div id="titleScreen">
   <h1>Gen-1 Water Pokémon Crossword</h1>
-  <p>6×6 Mini Crossword — Water-type Pokémon only</p>
+  <p>Water-type Pokémon only</p>
   <button id="startBtn">Start Game</button>
 </div>
 
+<!-- GAME -->
 <div id="gameWrapper">
-
 <h1>Gen-1 Water Pokémon Crossword</h1>
+<div id="timer">Time: 0:00</div>
 
-<div id="topBar">
-  <div id="timer">Time: 0:00</div>
-  <label>
-    <input type="checkbox" id="errorToggle" checked>
-    Error check
-  </label>
-</div>
+<label style="display:block;text-align:center;">
+<input type="checkbox" id="errorToggle" checked>
+Error check
+</label>
 
 <main id="grid">
 
-<!-- Row 1 -->
+<!-- Row 1 BLASTO -->
 <ins data-clue="1" data-answer="B"></ins>
 <ins data-answer="L"></ins>
 <ins data-answer="A"></ins>
@@ -168,7 +118,7 @@ button:hover{
 <ins data-answer="T"></ins>
 <ins data-answer="O"></ins>
 
-<!-- Row 2 -->
+<!-- Row 2 IS- LAP -->
 <ins data-answer="I"></ins>
 <ins data-answer="S"></ins>
 <del></del>
@@ -176,7 +126,7 @@ button:hover{
 <ins data-answer="A"></ins>
 <ins data-answer="P"></ins>
 
-<!-- Row 3 -->
+<!-- Row 3 RAS POL -->
 <ins data-answer="R"></ins>
 <ins data-answer="A"></ins>
 <ins data-answer="S"></ins>
@@ -184,7 +134,7 @@ button:hover{
 <ins data-answer="O"></ins>
 <ins data-answer="L"></ins>
 
-<!-- Row 4 -->
+<!-- Row 4 IWRATH -->
 <ins data-answer="I"></ins>
 <ins data-answer="W"></ins>
 <ins data-answer="R"></ins>
@@ -192,7 +142,7 @@ button:hover{
 <ins data-answer="T"></ins>
 <ins data-answer="H"></ins>
 
-<!-- Row 5 -->
+<!-- Row 5 DEWGON -->
 <ins data-clue="4" data-answer="D"></ins>
 <ins data-answer="E"></ins>
 <ins data-answer="W"></ins>
@@ -200,7 +150,7 @@ button:hover{
 <ins data-answer="O"></ins>
 <ins data-answer="N"></ins>
 
-<!-- Row 6 -->
+<!-- Row 6 GYARAD -->
 <ins data-clue="5" data-answer="G"></ins>
 <ins data-answer="Y"></ins>
 <ins data-answer="A"></ins>
@@ -211,239 +161,181 @@ button:hover{
 </main>
 
 <div class="panels">
-
 <ul id="across">
 <li class="heading">Across</li>
 <li data-dir="across" data-clue="1" data-length="6">1. Final evolution of Squirtle</li>
-<li data-dir="across" data-clue="2" data-length="3">2. Ice/Water Pokémon often rides trainers</li>
-<li data-dir="across" data-clue="3" data-length="3">3. Tadpole that became a fighter</li>
-<li data-dir="across" data-clue="4" data-length="6">4. Ice-type seal evolution</li>
-<li data-dir="across" data-clue="5" data-length="6">5. Massive serpentine Water/Flying Pokémon</li>
+<li data-dir="across" data-clue="2" data-length="3">2. Ferry Pokémon with shell</li>
+<li data-dir="across" data-clue="3" data-length="3">3. Tadpole fighter</li>
+<li data-dir="across" data-clue="4" data-length="6">4. Ice-seal evolution</li>
+<li data-dir="across" data-clue="5" data-length="6">5. Massive sea serpent</li>
 </ul>
 
 <ul id="down">
 <li class="heading">Down</li>
 <li data-dir="down" data-clue="1" data-length="6">1. Uses Hydro Pump</li>
-<li data-dir="down" data-clue="2" data-length="4">2. Found ferrying people in Kanto</li>
+<li data-dir="down" data-clue="2" data-length="4">2. Rides ocean waves</li>
 <li data-dir="down" data-clue="3" data-length="5">3. Evolves from Poliwhirl</li>
 <li data-dir="down" data-clue="4" data-length="5">4. Sleeps on drifting ice</li>
 <li data-dir="down" data-clue="5" data-length="6">5. Known for Hyper Beam</li>
 </ul>
-
 </div>
 </div>
 
 <script>
-/***************
- TITLE + TIMER
-****************/
-
-let startBtn = document.getElementById("startBtn");
-let titleScreen = document.getElementById("titleScreen");
-let gameWrapper = document.getElementById("gameWrapper");
-
-let seconds = 0;
+/* ---------- TITLE + TIMER ---------- */
+let startBtn=document.getElementById("startBtn");
+let titleScreen=document.getElementById("titleScreen");
+let gameWrapper=document.getElementById("gameWrapper");
+let seconds=0;
 let timerInterval;
 
-startBtn.onclick = () => {
-  titleScreen.style.display = "none";
-  gameWrapper.style.display = "block";
-  timerInterval = setInterval(()=>{
+startBtn.onclick=()=>{
+  titleScreen.style.display="none";
+  gameWrapper.style.display="block";
+  timerInterval=setInterval(()=>{
     seconds++;
-    let m = Math.floor(seconds/60);
-    let s = seconds%60;
-    document.getElementById("timer").textContent =
-      "Time: " + m + ":" + (s<10?"0":"") + s;
+    let m=Math.floor(seconds/60);
+    let s=seconds%60;
+    document.getElementById("timer").textContent=
+      "Time: "+m+":"+(s<10?"0":"")+s;
   },1000);
 };
 
-/***************
- GAME LOGIC
-****************/
+/* ---------- GRID LOGIC ---------- */
+const W=6;
+const cells=[...document.querySelectorAll("main ins")];
+const clues=[...document.querySelectorAll("li[data-clue]")];
+const errorToggle=document.getElementById("errorToggle");
 
-const GRID_WIDTH = 6;
+let state={clue:null,dir:null,length:null,start:0,cursor:0};
 
-const cells = Array.from(document.querySelectorAll("main ins"));
-const clues = Array.from(document.querySelectorAll("li[data-clue]"));
-
-let errorToggle = document.getElementById("errorToggle");
-
-let state = {clue:null,dir:null,length:null,index:0,cursor:0};
-
-function clearVisual(){
+function clearVis(){
   cells.forEach(c=>c.classList.remove("highlight","cursor"));
   clues.forEach(c=>c.classList.remove("current"));
 }
 
-/***************
- MAP CELLS TO CLUES (fixes tile-click bug)
-****************/
-
-cells.forEach(c=>{ c.dataset.across = ""; c.dataset.down = ""; });
-
-// build across
-document.querySelectorAll("#across li[data-clue]").forEach(li=>{
-  let num = li.dataset.clue;
-  let len = parseInt(li.dataset.length);
-  let startCell = document.querySelector(`ins[data-clue="${num}"]`);
-  let startIndex = cells.indexOf(startCell);
-
-  for(let i=0;i<len;i++){
-    cells[startIndex+i].dataset.across = num;
-  }
-});
-
-// build down
-document.querySelectorAll("#down li[data-clue]").forEach(li=>{
-  let num = li.dataset.clue;
-  let len = parseInt(li.dataset.length);
-  let startCell = document.querySelector(`ins[data-clue="${num}"]`);
-  let startIndex = cells.indexOf(startCell);
-
-  for(let i=0;i<len;i++){
-    cells[startIndex + i*GRID_WIDTH].dataset.down = num;
-  }
-});
-
-function highlight(cnum,dir,len){
-  clearVisual();
-  let start = cells.indexOf(document.querySelector(`ins[data-clue="${cnum}"]`));
-
-  for(let i=0;i<len;i++){
-    let idx = dir==="across" ? start+i : start+i*GRID_WIDTH;
+function highlight(){
+  clearVis();
+  let start=state.start;
+  for(let i=0;i<state.length;i++){
+    let idx=state.dir==="across"?start+i:start+i*W;
     cells[idx].classList.add("highlight");
   }
-}
-
-function editClue(){
-  state.clue = parseInt(this.dataset.clue);
-  state.dir = this.dataset.dir;
-  state.length = parseInt(this.dataset.length);
-
-  this.classList.add("current");
-
-  let start = cells.indexOf(document.querySelector(`ins[data-clue="${state.clue}"]`));
-  state.index = start;
-  state.cursor = 0;
-
   moveCursor();
-  highlight(state.clue,state.dir,state.length);
 }
-
-/***************
- TILE CLICK -> selects correct clue
-****************/
-
-cells.forEach(cell=>{
-  cell.addEventListener("click",()=>{
-    // prefer current direction if possible
-    let pickDir = state.dir || "across";
-
-    let clueNum =
-      (pickDir==="across" && cell.dataset.across) ? cell.dataset.across :
-      (pickDir==="down"   && cell.dataset.down)   ? cell.dataset.down :
-      cell.dataset.across || cell.dataset.down;
-
-    if(!clueNum) return;
-
-    // find clue element
-    let clueEl = document.querySelector(`li[data-clue='${clueNum}']`);
-    state.dir = clueEl.dataset.dir;
-    state.clue = parseInt(clueNum);
-    state.length = parseInt(clueEl.dataset.length);
-
-    clearVisual();
-    clueEl.classList.add("current");
-
-    // starting index
-    state.index = cells.indexOf(
-      document.querySelector(`ins[data-clue='${clueNum}']`)
-    );
-
-    // cursor position relative to start
-    if(state.dir==="across"){
-      state.cursor = (cells.indexOf(cell) - state.index);
-    } else {
-      state.cursor = Math.floor((cells.indexOf(cell) - state.index)/GRID_WIDTH);
-    }
-
-    highlight(state.clue,state.dir,state.length);
-    moveCursor();
-  });
-});
 
 function moveCursor(){
   cells.forEach(c=>c.classList.remove("cursor"));
-  let pos = state.dir==="across" ?
-    state.index+state.cursor :
-    state.index+state.cursor*GRID_WIDTH;
+  let pos=state.dir==="across"?
+    state.start+state.cursor:
+    state.start+state.cursor*W;
   cells[pos].classList.add("cursor");
 }
 
-/***************
- ERROR CHECK FUNCTION
-****************/
+function selectClue(num,dir,len){
+  state.clue=num;
+  state.dir=dir;
+  state.length=len;
+  state.start=cells.indexOf(
+    document.querySelector(`ins[data-clue="${num}"]`)
+  );
+  state.cursor=0;
+  document
+    .querySelector(`li[data-clue="${num}"][data-dir="${dir}"]`)
+    .classList.add("current");
+  highlight();
+}
 
-function checkErrors(){
-  if(!errorToggle.checked) return;
+/* --- clicking clue text --- */
+clues.forEach(li=>{
+  li.addEventListener("click",()=>{
+    clearVis();
+    selectClue(
+      parseInt(li.dataset.clue),
+      li.dataset.dir,
+      parseInt(li.dataset.length)
+    );
+  });
+});
 
-  cells.forEach(cell=>{
-    if(!cell.dataset.answer) return;
-
-    let t = cell.textContent.trim().toUpperCase();
-
-    if(!t){
-      cell.classList.remove("error");
-      return;
+/* --- clicking tiles selects relevant clue automatically --- */
+cells.forEach((cell,idx)=>{
+  cell.addEventListener("click",()=>{
+    // find closest across or down clue anchor before it
+    let up=idx;
+    while(up>=0 && !cells[up].dataset.clue) up--;
+    if(up>=0){
+      let anchor=cells[up].dataset.clue;
+      let acrossLi=document.querySelector(`#across li[data-clue="${anchor}"]`);
+      if(acrossLi){
+        selectClue(parseInt(anchor),"across",parseInt(acrossLi.dataset.length));
+        state.cursor=idx-up;
+        highlight();
+        return;
+      }
     }
 
-    if(t !== cell.dataset.answer) cell.classList.add("error");
-    else cell.classList.remove("error");
+    let up2=idx;
+    while(up2>=0 && !cells[up2].dataset.clue) up2-=W;
+    if(up2>=0){
+      let anchor=cells[up2].dataset.clue;
+      let downLi=document.querySelector(`#down li[data-clue="${anchor}"]`);
+      if(downLi){
+        selectClue(parseInt(anchor),"down",parseInt(downLi.dataset.length));
+        state.cursor=Math.floor((idx-up2)/W);
+        highlight();
+      }
+    }
+  });
+});
+
+/* ---------- ERROR CHECK ---------- */
+function checkErrors(){
+  if(!errorToggle.checked) return;
+  cells.forEach(c=>{
+    if(!c.dataset.answer){c.classList.remove("error");return;}
+    let t=c.textContent.trim().toUpperCase();
+    if(!t){c.classList.remove("error");return;}
+    if(t!==c.dataset.answer) c.classList.add("error");
+    else c.classList.remove("error");
   });
 }
 
-clues.forEach(c=>c.onclick = editClue);
-
+/* ---------- KEYBOARD ---------- */
 document.addEventListener("keydown",e=>{
   if(state.clue===null) return;
 
-  // arrows move cursor
-  if(e.key==="ArrowRight" && state.dir==="across" && state.cursor<state.length-1){
-    state.cursor++; moveCursor(); return;
-  }
-  if(e.key==="ArrowLeft" && state.dir==="across" && state.cursor>0){
-    state.cursor--; moveCursor(); return;
-  }
-  if(e.key==="ArrowDown" && state.dir==="down" && state.cursor<state.length-1){
-    state.cursor++; moveCursor(); return;
-  }
-  if(e.key==="ArrowUp" && state.dir==="down" && state.cursor>0){
-    state.cursor--; moveCursor(); return;
-  }
+  if(e.key==="ArrowRight"&&state.dir==="across"&&state.cursor<state.length-1)
+    {state.cursor++;moveCursor();return;}
+  if(e.key==="ArrowLeft"&&state.dir==="across"&&state.cursor>0)
+    {state.cursor--;moveCursor();return;}
+  if(e.key==="ArrowDown"&&state.dir==="down"&&state.cursor<state.length-1)
+    {state.cursor++;moveCursor();return;}
+  if(e.key==="ArrowUp"&&state.dir==="down"&&state.cursor>0)
+    {state.cursor--;moveCursor();return;}
 
-  // typing
-  if(e.key.length===1 && e.key.match(/[a-z]/i)){
-    let pos = state.dir==="across" ?
-      state.index+state.cursor :
-      state.index+state.cursor*GRID_WIDTH;
+  /* typing */
+  if(e.key.length===1 && /[a-z]/i.test(e.key)){
+    let pos=state.dir==="across"?
+      state.start+state.cursor:
+      state.start+state.cursor*W;
 
-    cells[pos].textContent = e.key.toUpperCase();
+    cells[pos].textContent=e.key.toUpperCase();
 
-    checkErrors();
-
-    // auto advance
     if(state.cursor<state.length-1){
       state.cursor++;
       moveCursor();
     }
+
+    checkErrors();
   }
 
   if(e.key==="Backspace"){
-    let pos = state.dir==="across" ?
-      state.index+state.cursor :
-      state.index+state.cursor*GRID_WIDTH;
+    let pos=state.dir==="across"?
+      state.start+state.cursor:
+      state.start+state.cursor*W;
 
-    cells[pos].textContent = "";
+    cells[pos].textContent="";
     if(state.cursor>0) state.cursor--;
     moveCursor();
     checkErrors();
