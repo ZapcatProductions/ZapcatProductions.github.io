@@ -13,8 +13,9 @@ html,body{margin:0;padding:0;font-family:system-ui,sans-serif;background:#0b1220
 #main{display:flex;height:calc(100vh-48px);}
 #grid-wrap{flex:1;padding:16px;overflow:auto;display:flex;justify-content:center;align-items:center;}
 #grid{display:grid;grid-gap:2px;background:black;}
-.cell{width:46px;height:46px;background:#1f2937;position:relative;display:flex;justify-content:center;align-items:center;}
-.cell.block{background:black;}
+.cell{width:46px;height:46px;position:relative;display:flex;justify-content:center;align-items:center;}
+.cell.white{background:#1f2937;}
+.cell.black{background:black;}
 .cell input{width:100%;height:100%;text-align:center;font-size:20px;border:none;background:transparent;color:#eaf2ff;text-transform:uppercase;caret-color:#93c5fd;}
 .cell input:focus{outline:none;}
 .cell.highlight{background:#2563eb;}
@@ -71,53 +72,41 @@ const settingsPanel=document.getElementById('settings-panel');
 settingsBtn.onclick=()=>{settingsPanel.style.display=settingsPanel.style.display==='block'?'none':'block';};
 
 // ===== CROSSWORD DATA =====
-// 6x6 Pokémon mini crossword
-const GRID=[
-['B','U','L','B','A','S'],
-['I','V','Y','S','A','U'],
-['V','E','N','U','S','A'],
-['C','H','A','R','M','A'],
-['C','H','A','R','M','E'],
-['S','Q','U','I','R','T']
-];
+// 6x6 Pokémon grid inside black border
+const POKEMON_ACROSS=["BULBASAUR","IVYSAUR","VENUSAUR","CHARMANDER","CHARMELEON","CHARIZARD"];
+const POKEMON_DOWN=["SQUIRTLE","WARTORTLE","BLASTOISE","PIKACHU","RAICHU","JIGGLYPUFF"];
 
-const ACROSS_CLUES={
-1:"Bulbasaur",
-2:"Ivysaur",
-3:"Venusaur",
-4:"Charmander",
-5:"Charmeleon",
-6:"Squirtle"
-};
-const DOWN_CLUES={
-1:"B->V line",
-2:"U->E line",
-3:"L->N line",
-4:"B->R line",
-5:"A->M line",
-6:"S->A line"
-};
+// Build grid with border: 8x8 (6x6 + 2 border)
+const ROWS=8, COLS=8;
+const GRID=[];
+for(let r=0;r<ROWS;r++){
+    GRID[r]=[];
+    for(let c=0;c<COLS;c++){
+        if(r===0||r===ROWS-1||c===0||c===COLS-1){GRID[r][c]=null;} // black border
+        else{GRID[r][c]='';} // white cell
+    }
+}
 
 // ===== ENGINE =====
 const gridEl=document.getElementById('grid'), acrossEl=document.getElementById('across'), downEl=document.getElementById('down');
-const rows=GRID.length, cols=GRID[0].length;
-gridEl.style.gridTemplateColumns=`repeat(${cols},46px)`;
+gridEl.style.gridTemplateColumns=`repeat(${COLS},46px)`;
 const cells=[],across=[],down=[],numberMap={};
 let clueNumber=1,active=null;
-const isLetter=(r,c)=>GRID[r]&&GRID[r][c];
-for(let r=0;r<rows;r++){
+for(let r=0;r<ROWS;r++){
   cells[r]=[];
-  for(let c=0;c<cols;c++){
-    const cell=document.createElement('div');cell.className='cell';
-    if(!isLetter(r,c)){cell.classList.add('block');gridEl.appendChild(cell);cells[r][c]=cell;continue;}
+  for(let c=0;c<COLS;c++){
+    const cell=document.createElement('div');
+    if(!GRID[r][c]){cell.className='cell black';gridEl.appendChild(cell);cells[r][c]=cell;continue;}
+    cell.className='cell white';
     const input=document.createElement('input');input.maxLength=1;cell.appendChild(input);
-    const startAcross=!isLetter(r,c-1)&&isLetter(r,c+1);
-    const startDown=!isLetter(r-1,c)&&isLetter(r+1,c);
-    if(startAcross||startDown){
-      const n=document.createElement('div');n.className='number';n.textContent=clueNumber;cell.appendChild(n);
-      if(startAcross){let cc=c,list=[];while(isLetter(r,cc))list.push([r,cc++]);across.push({number:clueNumber,cells:list});numberMap[clueNumber]=ACROSS_CLUES[clueNumber];}
-      if(startDown){let rr=r,list=[];while(isLetter(rr,c))list.push([rr++,c]);down.push({number:clueNumber,cells:list});numberMap[clueNumber]=DOWN_CLUES[clueNumber];}
-      clueNumber++;
+    // Determine if clue starts here (simplified numbering)
+    const startAcross = (c===1);
+    const startDown = (r===1);
+    if(startAcross || startDown){
+        const n=document.createElement('div'); n.className='number'; n.textContent=clueNumber; cell.appendChild(n);
+        if(startAcross){across.push({number:clueNumber,cells:[[r,c],[r,c+1],[r,c+2],[r,c+3],[r,c+4],[r,c+5]]}); numberMap[clueNumber]=POKEMON_ACROSS[clueNumber-1];}
+        if(startDown){down.push({number:clueNumber,cells:[[r,c],[r+1,c],[r+2,c],[r+3,c],[r+4,c],[r+5,c]]}); numberMap[clueNumber]=POKEMON_DOWN[clueNumber-1];}
+        clueNumber++;
     }
     cell.onclick=()=>activateCell(r,c);gridEl.appendChild(cell);cells[r][c]=cell;
   }
@@ -136,16 +125,10 @@ function activateCell(r,c){const hit=across.find(a=>a.cells.some(p=>p[0]===r&&p[
 document.addEventListener('input',e=>{if(!active)return;const idx=active.cells.findIndex(([r,c])=>cells[r][c].contains(e.target));if(idx>-1&&idx<active.cells.length-1){const [nr,nc]=active.cells[idx+1];cells[nr][nc].querySelector('input').focus();}});
 
 // ===== STARTUP SEQUENCE =====
-function startGame(){
-  document.getElementById('boot-screen').classList.add('hidden');
-  document.getElementById('ad-screen').classList.remove('hidden');
-  setTimeout(()=>{
-    document.getElementById('ad-screen').classList.add('hidden');
-    activate(across[0]);
-    startTimer();
-  },1000);
-}
-setTimeout(startGame,1000);
+function showBootScreen(){document.getElementById('boot-screen').classList.remove('hidden'); document.getElementById('ad-screen').classList.add('hidden'); setTimeout(showAdScreen,1200);}
+function showAdScreen(){document.getElementById('boot-screen').classList.add('hidden'); document.getElementById('ad-screen').classList.remove('hidden'); setTimeout(startGame,1500);}
+function startGame(){document.getElementById('ad-screen').classList.add('hidden'); activate(across[0]); startTimer();}
+window.addEventListener('DOMContentLoaded',showBootScreen);
 </script>
 </body>
 </html>
