@@ -2,21 +2,21 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Crosshare-style Mini Crossword</title>
+<title>Crosshare – Pokémon Mini</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
 body {
   margin: 0;
   font-family: system-ui, sans-serif;
-  background: #1e1e1e;
-  color: #fff;
+  background: #0b1220;
+  color: #eaf2ff;
 }
 
 /* HEADER */
 #header {
   height: 48px;
-  background: #7a4a24;
+  background: #1e3a8a;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -24,10 +24,10 @@ body {
   font-weight: 600;
 }
 
-/* MAIN LAYOUT */
+/* LAYOUT */
 #main {
   display: grid;
-  grid-template-columns: auto 360px;
+  grid-template-columns: auto 380px;
   height: calc(100vh - 48px);
 }
 
@@ -36,15 +36,15 @@ body {
   display: grid;
   gap: 2px;
   background: black;
-  padding: 16px;
-  justify-content: center;
+  padding: 24px;
+  justify-content: start;
   align-content: start;
 }
 
 .cell {
-  width: 52px;
-  height: 52px;
-  background: #444;
+  width: 46px;
+  height: 46px;
+  background: #1f2937;
   position: relative;
 }
 
@@ -57,44 +57,37 @@ body {
   height: 100%;
   background: transparent;
   border: none;
-  color: white;
-  font-size: 24px;
+  color: #eaf2ff;
+  font-size: 20px;
   text-align: center;
   text-transform: uppercase;
 }
 
-.cell input:focus {
-  outline: none;
-}
+.cell input:focus { outline: none; }
 
-.cell.highlight {
-  background: #9c6a3d;
-}
-
-.cell.active {
-  background: #c78a52;
-}
+.cell.highlight { background: #2563eb; }
+.cell.active { background: #60a5fa; }
 
 .number {
   position: absolute;
   top: 2px;
   left: 4px;
-  font-size: 11px;
+  font-size: 10px;
   opacity: 0.8;
 }
 
 /* CLUES */
 #clues {
-  background: #222;
-  border-left: 1px solid #333;
-  padding: 12px;
+  background: #0f172a;
+  border-left: 1px solid #1e3a8a;
+  padding: 14px;
   overflow-y: auto;
 }
 
-.section-title {
+.section {
   font-weight: bold;
-  margin: 12px 0 6px;
-  color: #c78a52;
+  color: #60a5fa;
+  margin-top: 12px;
 }
 
 .clue {
@@ -103,7 +96,7 @@ body {
 }
 
 .clue.active {
-  background: #333;
+  background: #1e40af;
 }
 </style>
 </head>
@@ -119,129 +112,134 @@ body {
   <div id="grid"></div>
 
   <div id="clues">
-    <div class="section-title">ACROSS</div>
+    <div class="section">ACROSS</div>
     <div id="across"></div>
-
-    <div class="section-title">DOWN</div>
+    <div class="section">DOWN</div>
     <div id="down"></div>
   </div>
 </div>
 
 <script>
-// ================= GRID DEFINITION =================
-// null = black square
+/* ================= GRID (16x16) ================= */
 const GRID = [
-  ['E','G','G',null,null],
-  ['C',null,'U',null,null],
-  ['L',null,'G','L','A'],
-  ['A',null,null,null,null],
-  ['I',null,'F','L','O']
+['B','U','L','B','A','S','A','U','R',null,null,null,null,null,null,null],
+[null,null,null,null,null,null,null,'I','V','Y','S','A','U','R',null,null],
+[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],
+['V','E','N','U','S','A','U','R',null,null,null,null,null,null,null],
+[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],
+['C','H','A','R','M','A','N','D','E','R',null,null,null,null,null,null],
+[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],
+['C','H','A','R','M','E','L','E','O','N',null,null,null,null,null,null],
+[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],
+['C','H','A','R','I','Z','A','R','D',null,null,null,null,null,null,null],
+[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],
+['S','Q','U','I','R','T','L','E',null,null,null,null,null,null,null,null],
+[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],
+['W','A','R','T','O','R','T','L','E',null,null,null,null,null,null,null],
+[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],
+[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null]
 ];
 
-// Clue text indexed by number
+/* ================= CLUES ================= */
 const ACROSS_CLUES = {
-  1: "Sherlock's creator's monogram",
-  4: "Attack en masse",
-  6: "Collection of songs"
+1:"Starter Pokémon that begins the Grass line",
+3:"Bulbasaur’s middle evolution",
+4:"Final Grass starter evolution",
+5:"Fire starter Pokémon",
+6:"Charmander’s middle evolution",
+7:"Final Fire starter evolution",
+8:"Water starter Pokémon",
+9:"Squirtle’s middle evolution"
 };
 
 const DOWN_CLUES = {
-  1: "He shrugged, according to Ayn Rand",
-  2: "Serpentine yoga pose",
-  3: "Celtic priest"
+10:"Final Water starter evolution",
+11:"Electric mascot Pokémon",
+12:"Evolved form of Pikachu",
+13:"Pokémon famous for many evolutions",
+14:"Team Rocket’s talking Pokémon",
+15:"Confused duck Pokémon",
+16:"Legendary Psychic Pokémon"
 };
 
-// ================= BUILD GRID =================
+/* ================= ENGINE ================= */
 const gridEl = document.getElementById('grid');
+const acrossEl = document.getElementById('across');
+const downEl = document.getElementById('down');
+
 const rows = GRID.length;
 const cols = GRID[0].length;
-gridEl.style.gridTemplateColumns = `repeat(${cols},52px)`;
+gridEl.style.gridTemplateColumns = `repeat(${cols},46px)`;
 
 const cells = [];
 let number = 1;
 const across = [];
 const down = [];
 
-function isLetter(r,c){
-  return GRID[r]?.[c] !== null && GRID[r]?.[c] !== undefined;
-}
+const isLetter = (r,c)=>GRID[r]?.[c];
 
 for(let r=0;r<rows;r++){
-  cells[r] = [];
+  cells[r]=[];
   for(let c=0;c<cols;c++){
-    const cell = document.createElement('div');
-    cell.className = 'cell';
+    const cell=document.createElement('div');
+    cell.className='cell';
 
     if(!isLetter(r,c)){
       cell.classList.add('block');
       gridEl.appendChild(cell);
-      cells[r][c] = cell;
+      cells[r][c]=cell;
       continue;
     }
 
-    const input = document.createElement('input');
-    input.maxLength = 1;
+    const input=document.createElement('input');
+    input.maxLength=1;
     cell.appendChild(input);
 
-    const startAcross = isLetter(r,c) && !isLetter(r,c-1) && isLetter(r,c+1);
-    const startDown = isLetter(r,c) && !isLetter(r-1,c) && isLetter(r+1,c);
+    const startAcross=!isLetter(r,c-1)&&isLetter(r,c+1);
+    const startDown=!isLetter(r-1,c)&&isLetter(r+1,c);
 
-    if(startAcross || startDown){
-      const num = document.createElement('div');
-      num.className = 'number';
-      num.textContent = number;
-      cell.appendChild(num);
+    if(startAcross||startDown){
+      const n=document.createElement('div');
+      n.className='number';
+      n.textContent=number;
+      cell.appendChild(n);
 
       if(startAcross){
-        let cc=c;
-        const word=[];
-        while(isLetter(r,cc)){
-          word.push([r,cc]);
-          cc++;
-        }
-        across.push({number, cells: word});
+        let cc=c, arr=[];
+        while(isLetter(r,cc)){ arr.push([r,cc]); cc++; }
+        across.push({number, cells:arr});
       }
-
       if(startDown){
-        let rr=r;
-        const word=[];
-        while(isLetter(rr,c)){
-          word.push([rr,c]);
-          rr++;
-        }
-        down.push({number, cells: word});
+        let rr=r, arr=[];
+        while(isLetter(rr,c)){ arr.push([rr,c]); rr++; }
+        down.push({number, cells:arr});
       }
-
       number++;
     }
 
+    cell.onclick=()=>toggleFromCell(r,c);
     gridEl.appendChild(cell);
-    cells[r][c] = cell;
+    cells[r][c]=cell;
   }
 }
 
-// ================= CLUES =================
-const acrossEl = document.getElementById('across');
-const downEl = document.getElementById('down');
-
-function renderClues(list, container, direction){
-  list.forEach(entry=>{
-    const div = document.createElement('div');
-    div.className = 'clue';
-    div.textContent = `${entry.number}. ${(direction==='across'?ACROSS_CLUES:DOWN_CLUES)[entry.number] || ''}`;
-    div.onclick = ()=>activate(entry, direction);
-    container.appendChild(div);
-    entry.el = div;
+function render(list, el, clues){
+  list.forEach(e=>{
+    const d=document.createElement('div');
+    d.className='clue';
+    d.textContent=`${e.number}. ${clues[e.number]||''}`;
+    d.onclick=()=>activate(e);
+    el.appendChild(d);
+    e.el=d;
   });
 }
 
-renderClues(across, acrossEl, 'across');
-renderClues(down, downEl, 'down');
+render(across,acrossEl,ACROSS_CLUES);
+render(down,downEl,DOWN_CLUES);
 
-// ================= INTERACTION =================
-let active = null;
+let active=null;
 
-function activate(entry, direction){
+function activate(entry){
   document.querySelectorAll('.cell').forEach(c=>c.classList.remove('highlight','active'));
   document.querySelectorAll('.clue').forEach(c=>c.classList.remove('active'));
 
@@ -251,27 +249,28 @@ function activate(entry, direction){
   });
 
   entry.el.classList.add('active');
-
-  const [r,c] = entry.cells[0];
+  const [r,c]=entry.cells[0];
   cells[r][c].querySelector('input').focus();
-  active = entry;
+  active=entry;
 }
 
-// Auto-advance
+function toggleFromCell(r,c){
+  const hits=[];
+  across.forEach(a=>a.cells.some(p=>p[0]==r&&p[1]==c)&&hits.push(a));
+  down.forEach(d=>d.cells.some(p=>p[0]==r&&p[1]==c)&&hits.push(d));
+  if(hits.length) activate(hits[0]);
+}
+
 document.addEventListener('input',e=>{
   if(!active) return;
-  const input = e.target;
-  if(input.tagName!=='INPUT') return;
-
-  const pos = active.cells.findIndex(([r,c])=>cells[r][c].contains(input));
-  if(pos>-1 && pos<active.cells.length-1){
-    const [nr,nc] = active.cells[pos+1];
+  const idx=active.cells.findIndex(([r,c])=>cells[r][c].contains(e.target));
+  if(idx>-1&&idx<active.cells.length-1){
+    const [nr,nc]=active.cells[idx+1];
     cells[nr][nc].querySelector('input').focus();
   }
 });
 
-// Initial
-activate(across[0],'across');
+activate(across[0]);
 </script>
 
 </body>
