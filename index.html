@@ -2,104 +2,288 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Mini Crossword</title>
+<title>Pokémon Mini Crossword</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <style>
-*{box-sizing:border-box;}
-body{margin:0;padding:0;font-family:system-ui,sans-serif;background:#0b1220;color:#eaf2ff;display:flex;justify-content:center;align-items:flex-start;height:100vh;}
-#crossword-container{display:flex;gap:20px;padding:20px;}
-#grid{display:grid;grid-template-columns:repeat(5,60px);grid-gap:2px;}
-.cell{width:60px;height:60px;position:relative;background:#1f2937;display:flex;justify-content:center;align-items:center;}
-.cell.block{background:black;}
-.cell input{width:100%;height:100%;border:none;background:transparent;color:#eaf2ff;font-size:24px;text-align:center;text-transform:uppercase;caret-color:#93c5fd;}
-.cell input:focus{outline:none;}
-.number{position:absolute;top:2px;left:3px;font-size:12px;opacity:0.7;}
-.cell.highlight{background:#2563eb;}
-.cell.active{background:#60a5fa;}
-#clues{width:200px;background:#0f172a;padding:10px;overflow-y:auto;}
-h3{color:#60a5fa;margin:5px 0;}
-.clue{cursor:pointer;margin:2px 0;padding:2px;}
-.clue.active{background:#1e40af;}
+/* =========================================================
+   GLOBAL RESET
+========================================================= */
+* { box-sizing: border-box; }
+html, body { margin:0; padding:0; height:100%; font-family: system-ui, sans-serif; background:#0b1220; color:#eaf2ff; overflow:hidden; }
+
+/* =========================================================
+   LOADING SCREEN
+========================================================= */
+#loading-screen { position: fixed; inset:0; background:#020617; display:flex; align-items:center; justify-content:center; flex-direction:column; z-index:9999; }
+#loading-screen.hidden { display:none; }
+.loader-title { font-size:24px; font-weight:700; margin-bottom:10px; }
+.loader-sub { opacity:0.7; }
+
+/* =========================================================
+   HEADER
+========================================================= */
+#header { height:48px; background:#1e3a8a; display:flex; align-items:center; justify-content:space-between; padding:0 14px; font-weight:600; }
+#title { font-size:16px; }
+#header-right { display:flex; align-items:center; gap:14px; }
+#timer { font-variant-numeric: tabular-nums; }
+#start-btn, #settings-btn { cursor:pointer; user-select:none; }
+
+/* =========================================================
+   MAIN LAYOUT
+========================================================= */
+#main { display:flex; height:calc(100vh - 48px); padding:20px; }
+#grid-wrap { flex:1; display:flex; justify-content:center; align-items:center; }
+#grid { display:grid; gap:2px; background:black; }
+
+/* Grid cells */
+.cell { width:50px; height:50px; background:#1f2937; position:relative; display:flex; align-items:center; justify-content:center; }
+.cell.block { background:black; }
+.cell input { width:100%; height:100%; background:transparent; border:none; color:#eaf2ff; font-size:20px; text-align:center; text-transform:uppercase; caret-color:#93c5fd; }
+.cell input:focus { outline:none; }
+.cell.highlight { background:#2563eb; }
+.cell.active { background:#60a5fa; }
+.number { position:absolute; top:2px; left:4px; font-size:12px; opacity:0.8; }
+
+/* =========================================================
+   CLUES PANEL
+========================================================= */
+#clues { width:280px; background:#0f172a; border-left:1px solid #1e3a8a; padding:14px; overflow-y:auto; }
+.section { font-weight:bold; color:#60a5fa; margin-top:12px; }
+.clue { padding:6px; cursor:pointer; }
+.clue.active { background:#1e40af; }
+
+/* =========================================================
+   SETTINGS PANEL
+========================================================= */
+#settings-panel { position:fixed; right:0; top:48px; width:260px; height:calc(100vh - 48px); background:#020617; border-left:1px solid #1e3a8a; padding:14px; display:none; z-index:5000; }
+.setting { margin-bottom:12px; }
+.setting label { display:flex; justify-content:space-between; cursor:pointer; }
+
+/* =========================================================
+   START BUTTON
+========================================================= */
+#start-container { position:fixed; inset:0; background:rgba(11,18,32,0.95); display:flex; flex-direction:column; align-items:center; justify-content:center; z-index:1000; }
+#start-container button { padding:10px 20px; font-size:18px; cursor:pointer; background:#2563eb; border:none; color:white; border-radius:6px; margin-top:10px; }
+#thankyou { margin-top:20px; font-size:14px; color:#93c5fd; }
 </style>
 </head>
 <body>
-<div id="crossword-container">
-  <div id="grid"></div>
-  <div id="clues">
-    <h3>ACROSS</h3><div id="across"></div>
-    <h3>DOWN</h3><div id="down"></div>
+
+<!-- LOADING -->
+<div id="loading-screen">
+  <div class="loader-title">Pokémon Mini Crossword</div>
+  <div class="loader-sub">Loading puzzle…</div>
+</div>
+
+<!-- HEADER -->
+<div id="header">
+  <div id="title">Pokémon Mini</div>
+  <div id="header-right">
+    <div id="timer">00:00</div>
+    <div id="start-btn">▶ Start</div>
+    <div id="settings-btn">⚙</div>
   </div>
 </div>
+
+<!-- MAIN -->
+<div id="main">
+  <div id="grid-wrap"><div id="grid"></div></div>
+  <div id="clues">
+    <div class="section">ACROSS</div>
+    <div id="across"></div>
+    <div class="section">DOWN</div>
+    <div id="down"></div>
+  </div>
+</div>
+
+<!-- SETTINGS -->
+<div id="settings-panel">
+  <div class="setting"><label>Auto-advance<input type="checkbox" id="auto-advance" checked></label></div>
+  <div class="setting"><label>Show mistakes<input type="checkbox" id="show-mistakes"></label></div>
+</div>
+
+<!-- START SCREEN -->
+<div id="start-container">
+  <div>Welcome to Pokémon Mini Crossword!</div>
+  <button id="start-game">Start Game</button>
+  <div id="thankyou">Thank you for playing!</div>
+</div>
+
 <script>
-// ===== DATA MODEL =====
-const puzzle={
-  grid:[
-    ['C','A','T',null,'S'],
-    ['O',null,'O',null,'E'],
-    ['W','A','R','S','H'],
-    [null,'E',null,'T',null],
-    ['F','O','X',null,'Y']
+// =========================================================
+// PUZZLE DATA (5x5 Mini Crossword)
+// =========================================================
+const puzzleData = {
+  grid: [
+    ['B','U','L','B','A'],
+    ['.','I','.','Y','S'],
+    ['C','H','A','R','M'],
+    ['.','E','.','L','E'],
+    ['S','Q','U','I','R']
   ],
-  clues:{
-    across:{
-      1:{text:"Feline pet",x:0,y:0,length:3,direction:"across"},
-      2:{text:"Sneaky animal",x:4,y:0,length:3,direction:"across"},
-      3:{text:"To clean with water",x:2,y:0,length:4,direction:"across"}
-    },
-    down:{
-      1:{text:"Opposite of off",x:0,y:0,length:3,direction:"down"},
-      2:{text:"Common greeting",x:0,y:4,length:3,direction:"down"},
-      3:{text:"Bird sound",x:1,y:1,length:3,direction:"down"}
-    }
+  across: {
+    1: { text:"Grass starter", row:0, col:0, length:5 },
+    3: { text:"Middle fire", row:2, col:0, length:5 },
+    5: { text:"Water starter", row:4, col:0, length:5 }
+  },
+  down: {
+    1: { text:"Bulbasaur evolution", row:0, col:0, length:5 },
+    2: { text:"Charmander evolution", row:0, col:3, length:3 },
+    3: { text:"Squirtle evolution", row:2, col:4, length:3 }
   }
 };
 
-// ===== ENGINE =====
+// =========================================================
+// GLOBAL VARS
+// =========================================================
 const gridEl=document.getElementById('grid');
 const acrossEl=document.getElementById('across');
 const downEl=document.getElementById('down');
-const rows=puzzle.grid.length, cols=puzzle.grid[0].length;
-const cells=[], across=[], down=[];
-let clueCounter=1, activeWord=null;
+const startContainer=document.getElementById('start-container');
+const startBtn=document.getElementById('start-game');
+const loadingScreen=document.getElementById('loading-screen');
 
-// CREATE GRID
+const settingsBtn=document.getElementById('settings-btn');
+const settingsPanel=document.getElementById('settings-panel');
+
+const timerEl=document.getElementById('timer');
+let timerInterval=null, seconds=0;
+let activeEntry=null;
+
+// =========================================================
+// TIMER FUNCTIONS
+// =========================================================
+function startTimer(){
+  if(timerInterval) return;
+  timerInterval=setInterval(()=>{
+    seconds++;
+    let m=String(Math.floor(seconds/60)).padStart(2,'0');
+    let s=String(seconds%60).padStart(2,'0');
+    timerEl.textContent=`${m}:${s}`;
+  },1000);
+}
+
+// =========================================================
+// SETTINGS TOGGLE
+// =========================================================
+settingsBtn.onclick=()=>{settingsPanel.style.display=settingsPanel.style.display==='block'?'none':'block';}
+
+// =========================================================
+// GRID GENERATION
+// =========================================================
+const rows=puzzleData.grid.length;
+const cols=puzzleData.grid[0].length;
+gridEl.style.gridTemplateColumns=`repeat(${cols},50px)`;
+
+const cells=[];
+
+// Create grid cells
 for(let r=0;r<rows;r++){
   cells[r]=[];
   for(let c=0;c<cols;c++){
     const cell=document.createElement('div');
     cell.className='cell';
-    const letter=puzzle.grid[r][c];
-    if(!letter){cell.classList.add('block');gridEl.appendChild(cell);cells[r][c]=cell;continue;}
-    const input=document.createElement('input'); input.maxLength=1; cell.appendChild(input);
-
-    // check if clue starts here
-    const startAcross = Object.values(puzzle.clues.across).some(cl=>cl.x===r && cl.y===c);
-    const startDown = Object.values(puzzle.clues.down).some(cl=>cl.x===r && cl.y===c);
-    if(startAcross || startDown){
-      const n=document.createElement('div'); n.className='number'; n.textContent=clueCounter; cell.appendChild(n);
-      if(startAcross){let cc=c,list=[]; while(cc<cols && puzzle.grid[r][cc]){list.push([r,cc]);cc++;} across.push({number:clueCounter,cells:list,el:null});}
-      if(startDown){let rr=r,list=[]; while(rr<rows && puzzle.grid[rr][c]){list.push([rr,c]);rr++;} down.push({number:clueCounter,cells:list,el:null});}
-      clueCounter++;
-    }
-
-    cell.onclick=()=>activateFromCell(r,c);
+    const letter=puzzleData.grid[r][c];
+    if(letter==='.' || !letter){ cell.classList.add('block'); gridEl.appendChild(cell); cells[r][c]=cell; continue; }
+    const input=document.createElement('input'); input.maxLength=1; input.dataset.row=r; input.dataset.col=c;
+    cell.appendChild(input);
+    cell.onclick=()=>activateCell(r,c);
     gridEl.appendChild(cell);
     cells[r][c]=cell;
   }
 }
 
+// =========================================================
 // RENDER CLUES
-function renderClues(list,el,map){for(const entry of list){const div=document.createElement('div');div.className='clue';div.textContent=`${entry.number}. ${map[entry.number]||''}`;div.onclick=()=>activate(entry);entry.el=div;el.appendChild(div);}}
-renderClues(across,acrossEl,puzzle.clues.across);
-renderClues(down,downEl,puzzle.clues.down);
+// =========================================================
+function renderClues(){
+  // Across
+  for(let n in puzzleData.across){
+    const clue=puzzleData.across[n];
+    const div=document.createElement('div');
+    div.className='clue';
+    div.textContent=`${n}. ${clue.text}`;
+    div.onclick=()=>activateCell(clue.row, clue.col);
+    acrossEl.appendChild(div);
+    clue.el=div;
+  }
+  // Down
+  for(let n in puzzleData.down){
+    const clue=puzzleData.down[n];
+    const div=document.createElement('div');
+    div.className='clue';
+    div.textContent=`${n}. ${clue.text}`;
+    div.onclick=()=>activateCell(clue.row, clue.col);
+    downEl.appendChild(div);
+    clue.el=div;
+  }
+}
 
-// HIGHLIGHT LOGIC
-function clearHighlights(){document.querySelectorAll('.cell').forEach(c=>c.classList.remove('highlight','active'));document.querySelectorAll('.clue').forEach(c=>c.classList.remove('active'));}
-function activate(entry){clearHighlights();entry.cells.forEach(([r,c],i)=>{cells[r][c].classList.add('highlight');if(i===0)cells[r][c].classList.add('active');cells[r][c].querySelector('input').focus();});entry.el.classList.add('active');activeWord=entry;}
-function activateFromCell(r,c){const hit=across.concat(down).find(a=>a.cells.some(p=>p[0]===r&&p[1]===c)); if(hit) activate(hit);}
+// =========================================================
+// CELL ACTIVATION
+// =========================================================
+function activateCell(r,c){
+  clearHighlights();
+  const cell=cells[r][c];
+  cell.classList.add('active');
+  activeEntry={row:r,col:c};
+  const input=cell.querySelector('input');
+  if(input) input.focus();
+  // highlight across if exists
+  for(let n in puzzleData.across){
+    const clue=puzzleData.across[n];
+    if(clue.row===r){
+      clue.el.classList.add('active');
+    }
+  }
+  for(let n in puzzleData.down){
+    const clue=puzzleData.down[n];
+    if(clue.col===c){
+      clue.el.classList.add('active');
+    }
+  }
+}
 
-// AUTO-ADVANCE
-document.addEventListener('input',e=>{if(!activeWord)return; const idx=activeWord.cells.findIndex(([r,c])=>cells[r][c].contains(e.target)); if(idx>-1 && idx<activeWord.cells.length-1){const [nr,nc]=activeWord.cells[idx+1]; cells[nr][nc].querySelector('input').focus();}});
+function clearHighlights(){
+  document.querySelectorAll('.cell').forEach(c=>c.classList.remove('active','highlight'));
+  document.querySelectorAll('.clue').forEach(c=>c.classList.remove('active'));
+}
+
+// =========================================================
+// INPUT HANDLING
+// =========================================================
+document.addEventListener('input',e=>{
+  const target=e.target;
+  if(target.tagName!=='INPUT') return;
+  const val=target.value.toUpperCase();
+  target.value=val;
+  const r=Number(target.dataset.row);
+  const c=Number(target.dataset.col);
+  // error check
+  const correct=puzzleData.grid[r][c];
+  if(document.getElementById('show-mistakes')?.checked){
+    if(val!==correct) target.style.background='#991b1b';
+    else target.style.background='transparent';
+  }
+  // auto advance
+  const nextC=c+1;
+  if(nextC<cols && cells[r][nextC] && !cells[r][nextC].classList.contains('block')){
+    cells[r][nextC].querySelector('input').focus();
+  }
+});
+
+// =========================================================
+// START BUTTON
+// =========================================================
+startBtn.onclick=()=>{
+  startContainer.style.display='none';
+  loadingScreen.classList.add('hidden');
+  renderClues();
+  activateCell(0,0);
+  startTimer();
+}
+
 </script>
 </body>
 </html>
