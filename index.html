@@ -17,8 +17,8 @@ body {
 }
 #titleScreen {
   position: absolute;
-  top: 0; left: 0;
-  width: 100%; height: 100%;
+  top:0; left:0;
+  width:100%; height:100%;
   background: rgba(11,18,32,0.95);
   display: flex;
   flex-direction: column;
@@ -41,9 +41,11 @@ button:hover { filter: brightness(1.15); }
 
 #gameWrapper {
   display: flex;
-  gap: 20px;
-  align-items: flex-start;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
 }
+
 main {
   display: grid;
   grid-template-columns: repeat(10, 40px);
@@ -51,6 +53,7 @@ main {
   gap: 2px;
   justify-content: center;
 }
+
 ins, del {
   border-radius: 5px;
   display: flex;
@@ -61,12 +64,10 @@ ins, del {
   cursor: text;
   position: relative;
 }
+
 del { background: black; }
-ins {
-  background: white;
-  border: 1px solid #666;
-  color: black;
-}
+ins { background: white; border:1px solid #666; color:black; }
+
 ins[data-clue]:before {
   content: attr(data-clue);
   position: absolute;
@@ -74,19 +75,18 @@ ins[data-clue]:before {
   font-size: 10px;
   color: #333;
 }
+
 .highlight { background: #d8f1ff !important; }
 .cursor { box-shadow: inset 0 0 0 3px #3399ff; }
 .error { background: #ffb3b3 !important; }
 
-#panelWrapper { display: flex; flex-direction: column; gap: 15px; }
-.panels { display: flex; flex-direction: column; gap: 10px; }
-ul { list-style: none; padding: 0; margin: 0; }
-li.heading { font-weight: bold; margin-bottom: 5px; }
-li[data-clue] { cursor: pointer; padding: 2px 0; }
-li.current { color: #7cc8ff; }
+.panels { display: flex; gap: 20px; }
+ul { list-style:none; padding:0; margin:0; }
+li.heading { font-weight:bold; margin-bottom:5px; }
+li[data-clue] { cursor:pointer; padding:2px 0; }
+li.current { color:#7cc8ff; }
 
-#timer { text-align: center; margin-bottom: 10px; font-size: 16px; }
-
+#timer { font-size:16px; text-align:center; margin-bottom:10px; }
 </style>
 </head>
 <body>
@@ -97,73 +97,104 @@ li.current { color: #7cc8ff; }
   <button id="startBtn">Start Game</button>
 </div>
 
-<div id="gameWrapper">
+<div id="gameWrapper" style="display:none;">
+  <div id="timer">Time: 0:00</div>
   <main id="grid">
+    <!-- 10x10 grid for 8 Pokémon -->
+    <!-- Across: 1. ABRA, 2. EKANS, 3. SNEASEL, 4. ONIX -->
+    <!-- Down: 1. ALAKAZAM, 2. PIKACHU, 3. CHARMANDER, 4. SQUIRTLE -->
+    <!-- Black tiles = del, letter tiles = ins -->
+
     <!-- Row 1 -->
     <ins data-clues="across-1,down-1" data-answer="A" data-clue="1"></ins>
     <ins data-clues="across-1" data-answer="B"></ins>
     <ins data-clues="across-1" data-answer="R"></ins>
     <ins data-clues="across-1" data-answer="A"></ins>
     <del></del><del></del><del></del><del></del><del></del><del></del>
+    
     <!-- Row 2 -->
     <ins data-clues="down-1" data-answer="L"></ins>
-    <del></del><del></del><del></del><del></del><del></del><del></del><del></del><del></del><del></del>
-    <!-- Row 3 -->
-    <ins data-clues="down-1" data-answer="A"></ins>
-    <del></del><del></del><del></del><del></del><del></del><del></del><del></del><del></del><del></del>
-    <!-- Row 4 -->
-    <ins data-clues="down-1" data-answer="K"></ins>
-    <del></del><del></del><del></del><del></del><del></del><del></del><del></del><del></del><del></del>
-    <!-- Row 5 -->
-    <ins data-clues="down-1" data-answer="A"></ins>
-    <ins data-clues="across-2,down-2" data-answer="E" data-clue="2"></ins>
+    <del></del><del></del><del></del><ins data-clues="down-2,across-2" data-answer="E" data-clue="2"></ins>
     <ins data-clues="across-2" data-answer="K"></ins>
     <ins data-clues="across-2" data-answer="A"></ins>
     <ins data-clues="across-2" data-answer="N"></ins>
     <ins data-clues="across-2" data-answer="S"></ins>
+    <del></del><del></del>
+    
+    <!-- Row 3 -->
+    <ins data-clues="down-1" data-answer="A"></ins>
+    <del></del><del></del><del></del><ins data-clues="down-2" data-answer="K"></ins>
+    <del></del><ins data-clues="across-3,down-3" data-answer="S" data-clue="3"></ins>
+    <ins data-clues="across-3" data-answer="N"></ins>
+    <ins data-clues="across-3" data-answer="E"></ins>
+    <ins data-clues="across-3" data-answer="A"></ins>
+    <ins data-clues="across-3" data-answer="S"></ins>
+    <del></del>
+    
+    <!-- Row 4 -->
+    <ins data-clues="down-1" data-answer="K"></ins>
+    <del></del><del></del><del></del><ins data-clues="down-2" data-answer="A"></ins>
+    <del></del><ins data-clues="down-3" data-answer="E"></ins>
+    <del></del><ins data-clues="across-4,down-4" data-answer="O" data-clue="4"></ins>
+    <ins data-clues="across-4" data-answer="N"></ins>
+    <del></del><del></del><del></del>
+
+    <!-- Row 5 -->
+    <ins data-clues="down-1" data-answer="A"></ins>
+    <del></del><del></del><del></del><ins data-clues="down-2" data-answer="C"></ins>
+    <del></del><ins data-clues="down-3" data-answer="M"></ins>
+    <del></del><ins data-clues="down-4" data-answer="I"></ins>
     <del></del><del></del><del></del><del></del>
+
     <!-- Row 6 -->
     <ins data-clues="down-1" data-answer="Z"></ins>
-    <del></del><del></del><del></del><del></del><del></del><del></del><del></del><del></del><del></del>
+    <del></del><del></del><del></del><ins data-clues="down-2" data-answer="H"></ins>
+    <del></del><ins data-clues="down-3" data-answer="A"></ins>
+    <del></del><ins data-clues="down-4" data-answer="R"></ins>
+    <del></del><del></del><del></del><del></del>
+
     <!-- Row 7 -->
     <ins data-clues="down-1" data-answer="A"></ins>
-    <ins data-clues="across-3,down-3" data-answer="M" data-clue="3"></ins>
-    <ins data-clues="across-3" data-answer="E"></ins>
-    <ins data-clues="across-3" data-answer="W"></ins>
-    <del></del><del></del><del></del><del></del><del></del><del></del>
+    <del></del><del></del><del></del><ins data-clues="down-2" data-answer="U"></ins>
+    <del></del><ins data-clues="down-3" data-answer="N"></ins>
+    <del></del><ins data-clues="down-4" data-answer="T"></ins>
+    <del></del><del></del><del></del><del></del>
+
     <!-- Row 8 -->
     <ins data-clues="down-1" data-answer="M"></ins>
-    <del></del><del></del><del></del><ins data-clues="down-3" data-answer="A"></ins>
-    <del></del><del></del><del></del><del></del><del></del>
+    <del></del><del></del><del></del><ins data-clues="down-2" data-answer="C"></ins>
+    <del></del><ins data-clues="down-3" data-answer="D"></ins>
+    <del></del><ins data-clues="down-4" data-answer="L"></ins>
+    <del></del><del></del><del></del><del></del>
+
     <!-- Row 9 -->
     <ins data-clues="down-1" data-answer="A"></ins>
-    <del></del><del></del><del></del><ins data-clues="down-3" data-answer="N"></ins>
-    <del></del><del></del><del></del><del></del><del></del>
+    <del></del><del></del><del></del><ins data-clues="down-3" data-answer="E"></ins>
+    <del></del><ins data-clues="down-4" data-answer="E"></ins>
+    <del></del><del></del><del></del><del></del>
+
     <!-- Row 10 -->
     <ins data-clues="down-1" data-answer="M"></ins>
-    <del></del><del></del><del></del><ins data-clues="down-3" data-answer="A"></ins>
-    <del></del><del></del><del></del><del></del><del></del>
+    <del></del><del></del><del></del><ins data-clues="down-3" data-answer="R"></ins>
+    <del></del><ins data-clues="down-4" data-answer="T"></ins>
+    <del></del><del></del><del></del><del></del>
   </main>
 
-  <div id="panelWrapper">
-    <div class="panels">
-      <ul id="across">
-        <li class="heading">Across</li>
-        <li data-dir="across" data-clue="1" data-length="4">1. ABRA</li>
-        <li data-dir="across" data-clue="2" data-length="6">2. EKANS</li>
-        <li data-dir="across" data-clue="3" data-length="3">3. MEW</li>
-        <li data-dir="across" data-clue="4" data-length="5">4. SNEASEL</li>
-      </ul>
-    </div>
-    <div class="panels">
-      <ul id="down">
-        <li class="heading">Down</li>
-        <li data-dir="down" data-clue="1" data-length="8">1. ALAKAZAM</li>
-        <li data-dir="down" data-clue="2" data-length="5">2. ARBOK</li>
-        <li data-dir="down" data-clue="3" data-length="4">3. MANA</li>
-        <li data-dir="down" data-clue="4" data-length="4">4. ONIX</li>
-      </ul>
-    </div>
+  <div class="panels">
+    <ul id="across">
+      <li class="heading">Across</li>
+      <li data-dir="across" data-clue="1" data-length="4">1. ABRA</li>
+      <li data-dir="across" data-clue="2" data-length="5">2. EKANS</li>
+      <li data-dir="across" data-clue="3" data-length="6">3. SNEASEL</li>
+      <li data-dir="across" data-clue="4" data-length="4">4. ONIX</li>
+    </ul>
+    <ul id="down">
+      <li class="heading">Down</li>
+      <li data-dir="down" data-clue="1" data-length="8">1. ALAKAZAM</li>
+      <li data-dir="down" data-clue="2" data-length="7">2. PIKACHU</li>
+      <li data-dir="down" data-clue="3" data-length="10">3. CHARMANDER</li>
+      <li data-dir="down" data-clue="4" data-length="8">4. SQUIRTLE</li>
+    </ul>
   </div>
 </div>
 
@@ -171,12 +202,10 @@ li.current { color: #7cc8ff; }
 let startBtn = document.getElementById("startBtn");
 let titleScreen = document.getElementById("titleScreen");
 let gameWrapper = document.getElementById("gameWrapper");
-let seconds = 0, timerInterval;
-let timerElem = document.createElement("div");
-timerElem.id = "timer";
-gameWrapper.prepend(timerElem);
+let timerElem = document.getElementById("timer");
+let seconds=0, timerInterval;
 
-startBtn.onclick = ()=>{
+startBtn.onclick=()=>{
   titleScreen.style.display="none";
   gameWrapper.style.display="flex";
   seconds=0;
@@ -188,12 +217,9 @@ startBtn.onclick = ()=>{
   },1000);
 };
 
-/***************
- CROSSWORD LOGIC
-****************/
 const cells = Array.from(document.querySelectorAll("main ins"));
 const clues = Array.from(document.querySelectorAll("li[data-clue]"));
-let state = {clue:null,dir:null,cursor:0};
+let state={clue:null,dir:null,cursor:0};
 
 function clearVisual(){
   cells.forEach(c=>c.classList.remove("highlight","cursor"));
@@ -204,7 +230,7 @@ function highlight(cnum,dir){
   clearVisual();
   cells.forEach(c=>{
     if(c.dataset.clues){
-      let map = c.dataset.clues.split(",");
+      let map=c.dataset.clues.split(",");
       map.forEach(m=>{
         let [d,cl]=m.split("-");
         if(d===dir && parseInt(cl)===cnum) c.classList.add("highlight");
@@ -216,7 +242,7 @@ function highlight(cnum,dir){
 
 function moveCursor(){
   cells.forEach(c=>c.classList.remove("cursor"));
-  let highlightCells = cells.filter(c=>c.classList.contains("highlight"));
+  let highlightCells=cells.filter(c=>c.classList.contains("highlight"));
   if(highlightCells[state.cursor]) highlightCells[state.cursor].classList.add("cursor");
 }
 
@@ -257,7 +283,7 @@ document.addEventListener("keydown",e=>{
   if(e.key==="ArrowLeft" && state.dir==="across" && state.cursor>0){ state.cursor--; moveCursor(); return; }
   if(e.key==="ArrowDown" && state.dir==="down" && state.cursor<highlightCells.length-1){ state.cursor++; moveCursor(); return; }
   if(e.key==="ArrowUp" && state.dir==="down" && state.cursor>0){ state.cursor--; moveCursor(); return; }
-  
+
   if(e.key.length===1 && e.key.match(/[a-z]/i)){
     let target=highlightCells[state.cursor];
     if(target){
@@ -273,8 +299,8 @@ document.addEventListener("keydown",e=>{
     if(target){ target.textContent=""; target.classList.remove("error"); }
     if(state.cursor>0) state.cursor--; moveCursor();
   }
-
 });
 </script>
+
 </body>
 </html>
