@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Gen-1 Pokémon 10x10 Crossword</title>
+<title>Gen-1 Pokémon Crossword</title>
 <style>
 body{
   margin:0;
@@ -10,22 +10,28 @@ body{
   color:white;
   font-family:system-ui,Segoe UI,Arial;
   display:flex;
-  align-items:center;
   justify-content:center;
+  align-items:flex-start;
   min-height:100vh;
+  padding:20px;
 }
-#gameWrapper{max-width:900px;width:100%;display:none;}
-h1{text-align:center;margin-bottom:5px;}
-#timer{text-align:center;margin-bottom:8px;}
+#gameWrapper{
+  display:flex;
+  gap:20px;
+  max-width:1200px;
+}
 main{
   display:grid;
   grid-template-columns:repeat(10,50px);
   grid-template-rows:repeat(10,50px);
   gap:3px;
-  justify-content:center;
 }
-ins,del{border-radius:6px;}
-del{background:black;}
+ins,del{
+  border-radius:6px;
+}
+del{
+  background:black;
+}
 ins{
   background:white;
   color:black;
@@ -41,7 +47,7 @@ ins{
 ins[data-clue]:before{
   position:absolute;
   top:2px;
-  left:2px;
+  left:4px;
   font-size:10px;
   color:#333;
   content:attr(data-clue);
@@ -51,17 +57,17 @@ ins[data-clue]:before{
 .error{background:#ffb3b3 !important;}
 .panels{
   display:flex;
-  justify-content:center;
-  gap:40px;
-  margin-top:10px;
+  flex-direction:column;
+  gap:20px;
+  min-width:250px;
 }
+ul{list-style:none;padding:0;margin:0;}
 li.heading{font-weight:bold;margin-bottom:5px;}
-li[data-clue]{cursor:pointer;}
+li[data-clue]{cursor:pointer;margin-bottom:5px;}
 li.current{color:#7cc8ff;}
 #titleScreen{text-align:center;}
-#winScreen{text-align:center;display:none;}
 button{
-  padding:10px 20px;
+  padding:10px 25px;
   border-radius:8px;
   border:none;
   font-size:16px;
@@ -69,6 +75,7 @@ button{
   background:#3a8dff;
   color:white;
 }
+label{margin-bottom:10px;display:block;}
 </style>
 </head>
 <body>
@@ -76,110 +83,157 @@ button{
 <!-- TITLE -->
 <div id="titleScreen">
   <h1>Gen-1 Pokémon Crossword</h1>
-  <p>All types included</p>
   <button id="startBtn">Start Game</button>
 </div>
 
-<!-- WIN SCREEN -->
-<div id="winScreen">
-  <h1>🎉 You Won! 🎉</h1>
-  <p>All Pokémon correctly filled!</p>
-  <button id="restartBtn">Play Again</button>
-</div>
-
 <!-- GAME -->
-<div id="gameWrapper">
-<h1>Gen-1 Pokémon Crossword</h1>
-<div id="timer">Time: 0:00</div>
-
-<label style="display:block;text-align:center;">
-<input type="checkbox" id="errorToggle" checked> Error check
-</label>
-
+<div id="gameWrapper" style="display:none;">
 <main id="grid">
-<!-- Example 10x10 layout: B = Blastoise, C = Charizard, etc. Del = blank -->
-<!-- Row 1 -->
-<ins data-clue="1" data-answer="B"></ins><ins data-answer="L"></ins><ins data-answer="A"></ins><ins data-answer="S"></ins><ins data-answer="T"></ins><ins data-answer="O"></ins><ins data-answer="I"></ins><ins data-answer="S"></ins><ins data-answer="E"></ins><ins data-answer="D"></ins>
-<!-- Row 2 -->
-<ins data-answer="C"></ins><ins data-answer="H"></ins><ins data-answer="A"></ins><ins data-answer="R"></ins><ins data-answer="I"></ins><ins data-answer="Z"></ins><ins data-answer="A"></ins><ins data-answer="R"></ins><ins data-answer="D"></ins><del></del>
-<!-- Row 3 -->
-<ins data-answer="P"></ins><ins data-answer="I"></ins><ins data-answer="K"></ins><ins data-answer="A"></ins><ins data-clue="2" data-answer="C"></ins><ins data-answer="H"></ins><ins data-answer="A"></ins><ins data-answer="R"></ins><ins data-answer="M"></ins><ins data-answer="A"></ins>
-<!-- Row 4 -->
-<ins data-answer="S"></ins><ins data-answer="Q"></ins><ins data-answer="U"></ins><ins data-answer="I"></ins><ins data-answer="R"></ins><ins data-answer="T"></ins><ins data-answer="L"></ins><ins data-answer="E"></ins><ins data-answer="N"></ins><ins data-answer="O"></ins>
-<!-- Row 5 -->
-<ins data-answer="J"></ins><ins data-answer="I"></ins><ins data-answer="G"></ins><ins data-answer="G"></ins><ins data-answer="L"></ins><ins data-answer="Y"></ins><ins data-answer="P"></ins><ins data-answer="U"></ins><ins data-answer="F"></ins><ins data-answer="F"></ins>
-<!-- Row 6 -->
-<ins data-answer="M"></ins><ins data-answer="E"></ins><ins data-answer="W"></ins><ins data-answer="T"></ins><ins data-answer="W"></ins><ins data-answer="O"></ins><ins data-answer="O"></ins><ins data-answer="F"></ins><ins data-answer="L"></ins><ins data-answer="Y"></ins>
-<!-- Row 7 -->
-<ins data-clue="3" data-answer="V"></ins><ins data-answer="E"></ins><ins data-answer="N"></ins><ins data-answer="U"></ins><ins data-answer="S"></ins><ins data-answer="A"></ins><ins data-answer="U"></ins><ins data-answer="R"></ins><ins data-answer="K"></ins><ins data-answer="Y"></ins>
-<!-- Row 8 -->
-<ins data-answer="G"></ins><ins data-answer="A"></ins><ins data-answer="R"></ins><ins data-answer="T"></ins><ins data-answer="H"></ins><ins data-answer="A"></ins><ins data-answer="D"></ins><ins data-answer="O"></ins><ins data-answer="R"></ins><ins data-answer="N"></ins>
-<!-- Row 9 -->
-<ins data-answer="L"></ins><ins data-answer="A"></ins><ins data-answer="P"></ins><ins data-answer="R"></ins><ins data-answer="O"></ins><ins data-answer="S"></ins><ins data-answer="E"></ins><ins data-answer="D"></ins><ins data-answer="A"></ins><ins data-answer="B"></ins>
-<!-- Row 10 -->
-<ins data-answer="M"></ins><ins data-answer="E"></ins><ins data-answer="G"></ins><ins data-answer="A"></ins><ins data-answer="Z"></ins><ins data-answer="A"></ins><ins data-answer="R"></ins><ins data-answer="D"></ins><ins data-answer="O"></ins><ins data-answer="N"></ins>
+  <!-- Grid 10x10; "del" = black square, "ins" = letter tile -->
+  <!-- Layout with proper intersections, no conflicting letters -->
+
+  <!-- Row 1 -->
+  <ins data-clue="1" data-answer="C"></ins>
+  <ins data-answer="H"></ins>
+  <ins data-answer="A"></ins>
+  <ins data-answer="R"></ins>
+  <ins data-answer="I"></ins>
+  <ins data-answer="Z"></ins>
+  <ins data-answer="A"></ins>
+  <ins data-answer="R"></ins>
+  <ins data-answer="D"></ins>
+  <del></del>
+
+  <!-- Row 2 -->
+  <ins data-answer="L"></ins>
+  <del></del>
+  <ins data-answer="L"></ins>
+  <del></del>
+  <ins data-answer="O"></ins>
+  <del></del>
+  <ins data-answer="G"></ins>
+  <del></del>
+  <ins data-answer="A"></ins>
+  <del></del>
+
+  <!-- Row 3 -->
+  <ins data-answer="A"></ins>
+  <del></del>
+  <ins data-answer="P"></ins>
+  <del></del>
+  <ins data-answer="H"></ins>
+  <del></del>
+  <ins data-answer="A"></ins>
+  <del></del>
+  <ins data-answer="D"></ins>
+  <del></del>
+
+  <!-- Row 4 -->
+  <ins data-clue="2" data-answer="B"></ins>
+  <ins data-answer="L"></ins>
+  <ins data-answer="A"></ins>
+  <ins data-answer="S"></ins>
+  <ins data-answer="T"></ins>
+  <ins data-answer="O"></ins>
+  <ins data-answer="I"></ins>
+  <ins data-answer="S"></ins>
+  <ins data-answer="E"></ins>
+  <del></del>
+
+  <!-- Row 5 -->
+  <del></del><del></del><del></del><del></del><ins data-clue="3" data-answer="P"></ins>
+  <ins data-answer="O"></ins>
+  <ins data-answer="L"></ins>
+  <ins data-answer="I"></ins>
+  <ins data-answer="W"></ins>
+  <ins data-answer="H"></ins>
+
+  <!-- Row 6 -->
+  <ins data-answer="S"></ins>
+  <del></del><del></del><del></del><ins data-answer="R"></ins>
+  <ins data-answer="A"></ins>
+  <ins data-answer="T"></ins>
+  <ins data-answer="A"></ins>
+  <del></del>
+  <del></del>
+
+  <!-- Row 7 -->
+  <ins data-answer="G"></ins>
+  <ins data-answer="Y"></ins>
+  <ins data-answer="A"></ins>
+  <ins data-answer="R"></ins>
+  <ins data-answer="A"></ins>
+  <ins data-answer="D"></ins>
+  <del></del><del></del><del></del><del></del>
+
+  <!-- Row 8 -->
+  <ins data-clue="4" data-answer="D"></ins>
+  <ins data-answer="E"></ins>
+  <ins data-answer="W"></ins>
+  <ins data-answer="G"></ins>
+  <ins data-answer="O"></ins>
+  <ins data-answer="N"></ins>
+  <del></del><del></del><del></del><del></del>
+
+  <!-- Row 9 -->
+  <del></del><del></del><ins data-clue="5" data-answer="S"></ins>
+  <ins data-answer="T"></ins>
+  <ins data-answer="A"></ins>
+  <ins data-answer="R"></ins>
+  <ins data-answer="I"></ins>
+  <ins data-answer="E"></ins>
+  <ins data-answer="R"></ins>
+  <del></del>
+
+  <!-- Row 10 -->
+  <del></del><del></del><del></del><del></del><del></del><del></del><del></del><del></del><del></del><del></del>
 </main>
 
 <div class="panels">
+<label><input type="checkbox" id="errorToggle" checked> Error Check</label>
 <ul id="across">
 <li class="heading">Across</li>
-<li data-dir="across" data-clue="1" data-length="10">1. Final evolution of Squirtle</li>
-<li data-dir="across" data-clue="2" data-length="10">2. Electric mascot</li>
-<li data-dir="across" data-clue="3" data-length="10">3. Grass starter final</li>
+<li data-dir="across" data-clue="1" data-length="9">1. Fire Pokémon that evolves from Charmeleon</li>
+<li data-dir="across" data-clue="2" data-length="8">2. Large turtle Pokémon</li>
+<li data-dir="across" data-clue="3" data-length="5">3. Evolves from Poliwhirl</li>
+<li data-dir="across" data-clue="4" data-length="6">4. Ice-type seal Pokémon</li>
+<li data-dir="across" data-clue="5" data-length="7">5. Star-shaped Pokémon</li>
 </ul>
 <ul id="down">
 <li class="heading">Down</li>
-<li data-dir="down" data-clue="1" data-length="10">1. Fire starter final</li>
-<li data-dir="down" data-clue="2" data-length="10">2. Psychic legendary</li>
-<li data-dir="down" data-clue="3" data-length="10">3. Dragon legendary</li>
+<li data-dir="down" data-clue="1" data-length="8">1. Uses Hydro Pump</li>
+<li data-dir="down" data-clue="2" data-length="3">2. Tiny fire Pokémon</li>
+<li data-dir="down" data-clue="3" data-length="6">3. Poisonous Pokémon</li>
+<li data-dir="down" data-clue="4" data-length="6">4. Evolution of Dewgong</li>
+<li data-dir="down" data-clue="5" data-length="5">5. Known for Hyper Beam</li>
 </ul>
 </div>
 </div>
 
 <script>
 let startBtn=document.getElementById("startBtn");
-let restartBtn=document.getElementById("restartBtn");
 let titleScreen=document.getElementById("titleScreen");
 let gameWrapper=document.getElementById("gameWrapper");
-let winScreen=document.getElementById("winScreen");
 let seconds=0;
 let timerInterval;
 
-startBtn.onclick=startGame;
-restartBtn.onclick=()=>{
-  location.reload();
-};
-
-function startGame(){
+startBtn.onclick=()=>{
   titleScreen.style.display="none";
-  gameWrapper.style.display="block";
-  seconds=0;
+  gameWrapper.style.display="flex";
   timerInterval=setInterval(()=>{
     seconds++;
     let m=Math.floor(seconds/60);
     let s=seconds%60;
-    document.getElementById("timer").textContent="Time: "+m+":"+(s<10?"0":"")+s;
+    document.getElementById("timer")?.textContent=
+      "Time: "+m+":"+(s<10?"0":"")+s;
   },1000);
-}
+};
 
-/* ---------- GRID LOGIC ---------- */
 const W=10;
 const cells=[...document.querySelectorAll("main ins")];
 const clues=[...document.querySelectorAll("li[data-clue]")];
 const errorToggle=document.getElementById("errorToggle");
-
 let state={clue:null,dir:null,length:null,start:0,cursor:0,alt:false};
-
-// Precompute start indexes
-const clueStarts={};
-cells.forEach((cell,idx)=>{
-  if(cell.dataset.clue){
-    const num=cell.dataset.clue;
-    if(!clueStarts[num]) clueStarts[num]={};
-    clueStarts[num].across=idx;
-    clueStarts[num].down=idx;
-  }
-});
 
 function clearVis(){
   cells.forEach(c=>c.classList.remove("highlight","cursor"));
@@ -206,75 +260,65 @@ function selectClue(num,dir,len){
   state.clue=num;
   state.dir=dir;
   state.length=len;
-  state.start=clueStarts[num][dir];
+  state.start=cells.indexOf(document.querySelector(`ins[data-clue="${num}"]`));
   state.cursor=0;
   state.alt=false;
-  clearVis();
-  document.querySelector(`li[data-clue="${num}"][data-dir="${dir}"]`).classList.add("current");
+  document.querySelectorAll("li").forEach(li=>li.classList.remove("current"));
+  document.querySelector(`li[data-clue="${num}"][data-dir="${dir}"]`)?.classList.add("current");
   highlight();
 }
 
-/* --- click clue text --- */
+// clue click
 clues.forEach(li=>{
   li.addEventListener("click",()=>{
     selectClue(parseInt(li.dataset.clue),li.dataset.dir,parseInt(li.dataset.length));
   });
 });
 
-/* --- click tile selects clue --- */
+// tile click
 cells.forEach((cell,idx)=>{
   cell.addEventListener("click",()=>{
-    let clueNum=cell.dataset.clue;
-    if(!clueNum) return;
-    const acrossLi=document.querySelector(`#across li[data-clue="${clueNum}"]`);
-    const downLi=document.querySelector(`#down li[data-clue="${clueNum}"]`);
+    if(!cell.dataset.clue) return;
+    let clueNum = cell.dataset.clue;
+    let acrossLi=document.querySelector(`#across li[data-clue="${clueNum}"]`);
+    let downLi=document.querySelector(`#down li[data-clue="${clueNum}"]`);
     if(acrossLi && downLi){
-      state.alt=!state.alt;
-      const dir=state.alt?"down":"across";
-      const len=parseInt((dir==="across"?acrossLi.dataset.length:downLi.dataset.length));
-      selectClue(clueNum,dir,len);
+      state.alt = !state.alt;
+      selectClue(clueNum,state.alt?"down":"across",parseInt(state.alt?"down":acrossLi.dataset.length));
     } else if(acrossLi) selectClue(clueNum,"across",parseInt(acrossLi.dataset.length));
     else if(downLi) selectClue(clueNum,"down",parseInt(downLi.dataset.length));
   });
 });
 
-/* ---------- ERROR CHECK ---------- */
+// error check
 function checkErrors(){
   if(!errorToggle.checked) return;
-  let allCorrect=true;
   cells.forEach(c=>{
     if(!c.dataset.answer){c.classList.remove("error");return;}
     let t=c.textContent.trim().toUpperCase();
-    if(!t){c.classList.remove("error"); allCorrect=false; return;}
-    if(t!==c.dataset.answer){c.classList.add("error"); allCorrect=false;}
+    if(!t){c.classList.remove("error");return;}
+    if(t!==c.dataset.answer) c.classList.add("error");
     else c.classList.remove("error");
   });
-  if(allCorrect) showWin();
 }
 
-function showWin(){
-  clearInterval(timerInterval);
-  gameWrapper.style.display="none";
-  winScreen.style.display="block";
-}
-
-/* ---------- KEYBOARD ---------- */
+// keyboard input
 document.addEventListener("keydown",e=>{
   if(state.clue===null) return;
   if(e.key==="ArrowRight"&&state.dir==="across"&&state.cursor<state.length-1){state.cursor++;moveCursor();return;}
   if(e.key==="ArrowLeft"&&state.dir==="across"&&state.cursor>0){state.cursor--;moveCursor();return;}
   if(e.key==="ArrowDown"&&state.dir==="down"&&state.cursor<state.length-1){state.cursor++;moveCursor();return;}
   if(e.key==="ArrowUp"&&state.dir==="down"&&state.cursor>0){state.cursor--;moveCursor();return;}
+
   if(e.key.length===1 && /[a-z]/i.test(e.key)){
     let pos=state.dir==="across"?state.start+state.cursor:state.start+state.cursor*W;
-    if(cells[pos]) cells[pos].textContent=e.key.toUpperCase();
-    if(state.cursor<state.length-1) state.cursor++;
-    moveCursor();
+    cells[pos].textContent=e.key.toUpperCase();
+    if(state.cursor<state.length-1){state.cursor++;moveCursor();}
     checkErrors();
   }
   if(e.key==="Backspace"){
     let pos=state.dir==="across"?state.start+state.cursor:state.start+state.cursor*W;
-    if(cells[pos]) cells[pos].textContent="";
+    cells[pos].textContent="";
     if(state.cursor>0) state.cursor--;
     moveCursor();
     checkErrors();
