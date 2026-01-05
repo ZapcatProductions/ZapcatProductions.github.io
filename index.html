@@ -27,10 +27,16 @@ h1{
   margin-bottom:5px;
 }
 
-#timer{
-  text-align:center;
-  font-size:18px;
+#topBar{
+  display:flex;
+  justify-content:center;
+  gap:20px;
+  align-items:center;
   margin-bottom:10px;
+}
+
+#timer{
+  font-size:18px;
 }
 
 /* grid */
@@ -143,21 +149,16 @@ button:hover{
 <div id="gameWrapper">
 
 <h1>Gen-1 Water Pokémon Crossword</h1>
-<div id="timer">Time: 0:00</div>
+
+<div id="topBar">
+  <div id="timer">Time: 0:00</div>
+  <label>
+    <input type="checkbox" id="errorToggle" checked>
+    Error check
+  </label>
+</div>
 
 <main id="grid">
-<!-- Answers placed as data-answer for validation -->
-<!-- 6×6 crossword pattern -->
-
-<!-- ACROSS ANSWERS USED:
-1 BLASTOISE
-2 LAPRAS
-3 POLIWRATH
-4 DEWGONG
-5 GYARADOS
-6 SQUIRTLE
-Unique set — no duplicate clues down
--->
 
 <!-- Row 1 -->
 <ins data-clue="1" data-answer="B"></ins>
@@ -206,6 +207,7 @@ Unique set — no duplicate clues down
 <ins data-answer="R"></ins>
 <ins data-answer="A"></ins>
 <ins data-answer="D"></ins>
+
 </main>
 
 <div class="panels">
@@ -259,8 +261,12 @@ startBtn.onclick = () => {
  GAME LOGIC
 ****************/
 
+const GRID_WIDTH = 6;
+
 const cells = Array.from(document.querySelectorAll("main ins"));
 const clues = Array.from(document.querySelectorAll("li[data-clue]"));
+
+let errorToggle = document.getElementById("errorToggle");
 
 let state = {clue:null,dir:null,length:null,index:0,cursor:0};
 
@@ -269,12 +275,42 @@ function clearVisual(){
   clues.forEach(c=>c.classList.remove("current"));
 }
 
+/***************
+ MAP CELLS TO CLUES (fixes tile-click bug)
+****************/
+
+cells.forEach(c=>{ c.dataset.across = ""; c.dataset.down = ""; });
+
+// build across
+document.querySelectorAll("#across li[data-clue]").forEach(li=>{
+  let num = li.dataset.clue;
+  let len = parseInt(li.dataset.length);
+  let startCell = document.querySelector(`ins[data-clue="${num}"]`);
+  let startIndex = cells.indexOf(startCell);
+
+  for(let i=0;i<len;i++){
+    cells[startIndex+i].dataset.across = num;
+  }
+});
+
+// build down
+document.querySelectorAll("#down li[data-clue]").forEach(li=>{
+  let num = li.dataset.clue;
+  let len = parseInt(li.dataset.length);
+  let startCell = document.querySelector(`ins[data-clue="${num}"]`);
+  let startIndex = cells.indexOf(startCell);
+
+  for(let i=0;i<len;i++){
+    cells[startIndex + i*GRID_WIDTH].dataset.down = num;
+  }
+});
+
 function highlight(cnum,dir,len){
   clearVisual();
   let start = cells.indexOf(document.querySelector(`ins[data-clue="${cnum}"]`));
 
   for(let i=0;i<len;i++){
-    let idx = dir==="across" ? start+i : start+i*6;
+    let idx = dir==="across" ? start+i : start+i*GRID_WIDTH;
     cells[idx].classList.add("highlight");
   }
 }
@@ -294,12 +330,76 @@ function editClue(){
   highlight(state.clue,state.dir,state.length);
 }
 
+/***************
+ TILE CLICK -> selects correct clue
+****************/
+
+cells.forEach(cell=>{
+  cell.addEventListener("click",()=>{
+    // prefer current direction if possible
+    let pickDir = state.dir || "across";
+
+    let clueNum =
+      (pickDir==="across" && cell.dataset.across) ? cell.dataset.across :
+      (pickDir==="down"   && cell.dataset.down)   ? cell.dataset.down :
+      cell.dataset.across || cell.dataset.down;
+
+    if(!clueNum) return;
+
+    // find clue element
+    let clueEl = document.querySelector(`li[data-clue='${clueNum}']`);
+    state.dir = clueEl.dataset.dir;
+    state.clue = parseInt(clueNum);
+    state.length = parseInt(clueEl.dataset.length);
+
+    clearVisual();
+    clueEl.classList.add("current");
+
+    // starting index
+    state.index = cells.indexOf(
+      document.querySelector(`ins[data-clue='${clueNum}']`)
+    );
+
+    // cursor position relative to start
+    if(state.dir==="across"){
+      state.cursor = (cells.indexOf(cell) - state.index);
+    } else {
+      state.cursor = Math.floor((cells.indexOf(cell) - state.index)/GRID_WIDTH);
+    }
+
+    highlight(state.clue,state.dir,state.length);
+    moveCursor();
+  });
+});
+
 function moveCursor(){
   cells.forEach(c=>c.classList.remove("cursor"));
   let pos = state.dir==="across" ?
     state.index+state.cursor :
-    state.index+state.cursor*6;
+    state.index+state.cursor*GRID_WIDTH;
   cells[pos].classList.add("cursor");
+}
+
+/***************
+ ERROR CHECK FUNCTION
+****************/
+
+function checkErrors(){
+  if(!errorToggle.checked) return;
+
+  cells.forEach(cell=>{
+    if(!cell.dataset.answer) return;
+
+    let t = cell.textContent.trim().toUpperCase();
+
+    if(!t){
+      cell.classList.remove("error");
+      return;
+    }
+
+    if(t !== cell.dataset.answer) cell.classList.add("error");
+    else cell.classList.remove("error");
+  });
 }
 
 clues.forEach(c=>c.onclick = editClue);
@@ -325,16 +425,11 @@ document.addEventListener("keydown",e=>{
   if(e.key.length===1 && e.key.match(/[a-z]/i)){
     let pos = state.dir==="across" ?
       state.index+state.cursor :
-      state.index+state.cursor*6;
+      state.index+state.cursor*GRID_WIDTH;
 
     cells[pos].textContent = e.key.toUpperCase();
 
-    // validate
-    if(cells[pos].dataset.answer &&
-       cells[pos].textContent !== cells[pos].dataset.answer)
-      cells[pos].classList.add("error");
-    else
-      cells[pos].classList.remove("error");
+    checkErrors();
 
     // auto advance
     if(state.cursor<state.length-1){
@@ -346,11 +441,12 @@ document.addEventListener("keydown",e=>{
   if(e.key==="Backspace"){
     let pos = state.dir==="across" ?
       state.index+state.cursor :
-      state.index+state.cursor*6;
+      state.index+state.cursor*GRID_WIDTH;
 
     cells[pos].textContent = "";
     if(state.cursor>0) state.cursor--;
     moveCursor();
+    checkErrors();
   }
 });
 </script>
