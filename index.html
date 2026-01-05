@@ -72,20 +72,37 @@ const settingsPanel=document.getElementById('settings-panel');
 settingsBtn.onclick=()=>{settingsPanel.style.display=settingsPanel.style.display==='block'?'none':'block';};
 
 // ===== CROSSWORD DATA =====
-// 6x6 Pokémon grid inside black border
-const POKEMON_ACROSS=["BULBASAUR","IVYSAUR","VENUSAUR","CHARMANDER","CHARMELEON","CHARIZARD"];
-const POKEMON_DOWN=["SQUIRTLE","WARTORTLE","BLASTOISE","PIKACHU","RAICHU","JIGGLYPUFF"];
-
-// Build grid with border: 8x8 (6x6 + 2 border)
+// 6x6 Pokémon grid inside black border (8x8)
 const ROWS=8, COLS=8;
-const GRID=[];
-for(let r=0;r<ROWS;r++){
-    GRID[r]=[];
-    for(let c=0;c<COLS;c++){
-        if(r===0||r===ROWS-1||c===0||c===COLS-1){GRID[r][c]=null;} // black border
-        else{GRID[r][c]='';} // white cell
-    }
-}
+const GRID=[
+  [null,null,null,null,null,null,null,null],
+  [null,'B','U','L','B','A','S',null],
+  [null,'I','V','Y','S','A','U',null],
+  [null,'S','Q','U','I','R','T',null],
+  [null,'C','H','A','R','M','A',null],
+  [null,'P','I','K','A','C','H',null],
+  [null,'J','I','G','G','L','Y',null],
+  [null,null,null,null,null,null,null,null]
+];
+
+// Clues for each Pokémon (numbered left to right, top to bottom)
+const ACROSS_CLUES={
+1:"Bulbasaur",
+2:"Ivysaur",
+3:"Squirtle",
+4:"Charmander",
+5:"Pikachu",
+6:"Jigglypuff"
+};
+
+const DOWN_CLUES={
+1:"B->I line (Bulbasaur/Ivysaur)",
+2:"U->V line (letters intersecting)",
+3:"L->Y line",
+4:"B->S line",
+5:"A->A line",
+6:"S->U line"
+};
 
 // ===== ENGINE =====
 const gridEl=document.getElementById('grid'), acrossEl=document.getElementById('across'), downEl=document.getElementById('down');
@@ -96,16 +113,17 @@ for(let r=0;r<ROWS;r++){
   cells[r]=[];
   for(let c=0;c<COLS;c++){
     const cell=document.createElement('div');
-    if(!GRID[r][c]){cell.className='cell black';gridEl.appendChild(cell);cells[r][c]=cell;continue;}
+    if(GRID[r][c]===null){cell.className='cell black';gridEl.appendChild(cell);cells[r][c]=cell;continue;}
     cell.className='cell white';
     const input=document.createElement('input');input.maxLength=1;cell.appendChild(input);
-    // Determine if clue starts here (simplified numbering)
-    const startAcross = (c===1);
-    const startDown = (r===1);
-    if(startAcross || startDown){
+    // Clue numbers (manual for simplicity)
+    if((r===1&&c===1)||(r===2&&c===1)||(r===3&&c===1)||(r===4&&c===1)||(r===5&&c===1)||(r===6&&c===1)){
         const n=document.createElement('div'); n.className='number'; n.textContent=clueNumber; cell.appendChild(n);
-        if(startAcross){across.push({number:clueNumber,cells:[[r,c],[r,c+1],[r,c+2],[r,c+3],[r,c+4],[r,c+5]]}); numberMap[clueNumber]=POKEMON_ACROSS[clueNumber-1];}
-        if(startDown){down.push({number:clueNumber,cells:[[r,c],[r+1,c],[r+2,c],[r+3,c],[r+4,c],[r+5,c]]}); numberMap[clueNumber]=POKEMON_DOWN[clueNumber-1];}
+        // Across clues (for first letter of each across Pokémon)
+        across.push({number:clueNumber,cells:[[r,c],[r,c+1],[r,c+2],[r,c+3],[r,c+4],[r,c+5]]});
+        // Down clues (for first letter of each down Pokémon)
+        down.push({number:clueNumber,cells:[[r,c],[r+1,c],[r+2,c],[r+3,c],[r+4,c],[r+5,c]]});
+        numberMap[clueNumber]=ACROSS_CLUES[clueNumber]||DOWN_CLUES[clueNumber];
         clueNumber++;
     }
     cell.onclick=()=>activateCell(r,c);gridEl.appendChild(cell);cells[r][c]=cell;
