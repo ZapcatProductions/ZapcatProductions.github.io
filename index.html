@@ -2,306 +2,223 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Gen-1 Pokémon 12x12 Mini Crossword — Fixed</title>
-<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Pokémon Mini Crossword</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <style>
-body{margin:0;font-family:system-ui,Arial,sans-serif;background:#0b1220;color:#eaf2ff;display:flex;justify-content:center;align-items:flex-start;min-height:100vh;padding:28px}
-#titleScreen{position:fixed;inset:0;background:rgba(11,18,32,.95);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;z-index:50;text-align:center}
-button{background:#3a8dff;color:#fff;border:0;padding:10px 18px;border-radius:8px;cursor:pointer;font-size:16px}
-#gameWrapper{display:none;gap:20px;align-items:flex-start;width:100%;max-width:1100px}
-main#grid{display:grid;grid-template-columns:repeat(12,40px);grid-auto-rows:40px;gap:2px}
-ins,del{border-radius:6px;display:flex;align-items:center;justify-content:center;font-weight:700;text-transform:uppercase}
-del{background:#000}
-ins{background:#fff;color:#071322;border:1px solid #9aa3b2;position:relative}
-ins[data-clue]:before{content:attr(data-clue);position:absolute;top:2px;left:4px;font-size:10px;color:#333}
-.highlight{background:#d8f1ff!important}
-.cursor{box-shadow:inset 0 0 0 3px #3399ff}
-.error{background:#ffb3b3!important}
-#panelWrapper{width:300px}
-ul{list-style:none;padding:0;margin:0}
-li.heading{font-weight:700;margin:8px 0}
-li[data-clue]{padding:8px;border-radius:6px;cursor:pointer}
-li.current{background:rgba(58,141,255,.08);color:#3a8dff}
-#timer{margin-bottom:12px}
-label{display:flex;align-items:center;gap:8px;font-size:14px}
+body{
+  background:#0b1220;
+  color:white;
+  font-family:system-ui,Segoe UI,sans-serif;
+}
+#game-container{
+  display:flex;
+  gap:40px;
+  align-items:flex-start;
+  justify-content:center;
+  margin-top:40px;
+}
+.grid{
+  display:grid;
+  grid-template-columns:repeat(12,35px);
+  gap:3px;
+}
+.cell{
+  width:35px;
+  height:35px;
+  background:#09101f;
+  border-radius:4px;
+  position:relative;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+.cell input{
+  width:100%;
+  height:100%;
+  text-align:center;
+  font-size:18px;
+  border:none;
+  background:#fff;
+  text-transform:uppercase;
+}
+.black{
+  background:#000;
+}
+.number{
+  position:absolute;
+  top:2px;
+  left:4px;
+  font-size:10px;
+}
+.correct{
+  background:#cde8ff !important;
+}
+.incorrect{
+  background:#ffb6b6 !important;
+}
+#overlay{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.85);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  flex-direction:column;
+  gap:14px;
+}
+button{
+  padding:10px 18px;
+  border-radius:6px;
+  border:none;
+  font-size:16px;
+  cursor:pointer;
+}
 </style>
 </head>
 <body>
 
-<!-- START OVERLAY -->
-<div id="titleScreen" role="dialog" aria-modal="true">
-  <h1>Gen-1 Pokémon Crossword</h1>
-  <p>12×12 — fixed layout</p>
-  <button id="startBtn">Start Game</button>
+<div id="overlay">
+  <h1>Pokémon Mini Crossword</h1>
+  <button onclick="startGame()">Start Game</button>
 </div>
 
-<!-- GAME -->
-<div id="gameWrapper" aria-hidden="true">
+<div style="margin-left:40px;font-size:18px;">Time: <span id="timer">0:00</span></div>
+
+<div id="game-container">
+
+  <div class="grid" id="grid"></div>
+
   <div>
-    <div id="timer">Time: 0:00</div>
-    <main id="grid" aria-label="crossword grid">
+    <h2>Across</h2>
+    1. ALAKAZAM<br>
+    2. EKANS<br>
+    3. MEW<br>
+    4. SNEASEL<br><br>
 
-      <!-- ROW 1: ALAKAZAM across (cols1-8) ; down starts in cols10-12 -->
-      <ins data-clues="across-1" data-answer="A" data-clue="1"></ins>
-      <ins data-clues="across-1" data-answer="L"></ins>
-      <ins data-clues="across-1" data-answer="A"></ins>
-      <ins data-clues="across-1" data-answer="K"></ins>
-      <ins data-clues="across-1" data-answer="A"></ins>
-      <ins data-clues="across-1" data-answer="Z"></ins>
-      <ins data-clues="across-1" data-answer="A"></ins>
-      <ins data-clues="across-1" data-answer="M"></ins>
-      <del></del>
-      <ins data-clues="down-1" data-answer="A" data-clue="1"></ins>
-      <ins data-clues="down-2" data-answer="A" data-clue="2"></ins>
-      <ins data-clues="down-3" data-answer="M" data-clue="3"></ins>
-
-      <!-- ROW 2 -->
-      <del></del><del></del><del></del><del></del><del></del><del></del><del></del><del></del>
-      <del></del>
-      <ins data-clues="down-1" data-answer="B"></ins>
-      <ins data-clues="down-2" data-answer="R"></ins>
-      <ins data-clues="down-3" data-answer="A"></ins>
-
-      <!-- ROW 3: EKANS across (cols3-7) -->
-      <del></del><del></del>
-      <ins data-clues="across-2,down-2" data-answer="E" data-clue="2"></ins>
-      <ins data-clues="across-2" data-answer="K"></ins>
-      <ins data-clues="across-2" data-answer="A"></ins>
-      <ins data-clues="across-2" data-answer="N"></ins>
-      <ins data-clues="across-2" data-answer="S"></ins>
-      <del></del><del></del>
-      <ins data-clues="down-1" data-answer="R"></ins>
-      <ins data-clues="down-2" data-answer="B"></ins>
-      <ins data-clues="down-3" data-answer="N"></ins>
-
-      <!-- ROW 4 -->
-      <del></del><del></del><del></del><del></del><del></del><del></del><del></del><del></del>
-      <del></del
-      >
-      <ins data-clues="down-1" data-answer="A"></ins>
-      <ins data-clues="down-2" data-answer="O"></ins>
-      <ins data-clues="down-3" data-answer="A"></ins>
-
-      <!-- ROW 5: MEW across (cols3-5) -->
-      <del></del><del></del>
-      <ins data-clues="across-3" data-answer="M" data-clue="3"></ins>
-      <ins data-clues="across-3" data-answer="E"></ins>
-      <ins data-clues="across-3" data-answer="W"></ins>
-      <del></del><del></del><del></del><del></del>
-      <ins data-clues="down-1" data-answer="N"></ins>
-      <ins data-clues="down-2" data-answer="K"></ins>
-      <ins data-clues="down-3" data-answer="A"></ins>
-
-      <!-- ROW 6 -->
-      <del></del><del></del><del></del><del></del><del></del><del></del><del></del><del></del>
-      <del></del><del></del>
-      <ins data-clues="down-1" data-answer="Z"></ins>
-      <del></del>
-
-      <!-- ROW 7: SNEASEL across cols1-7 -->
-      <ins data-clues="across-4" data-answer="S" data-clue="4"></ins>
-      <ins data-clues="across-4" data-answer="N"></ins>
-      <ins data-clues="across-4" data-answer="E"></ins>
-      <ins data-clues="across-4" data-answer="A"></ins>
-      <ins data-clues="across-4" data-answer="S"></ins>
-      <ins data-clues="across-4" data-answer="E"></ins>
-      <ins data-clues="across-4" data-answer="L"></ins>
-      <del></del>
-      <ins data-clues="down-4" data-answer="O" data-clue="4"></ins>
-      <del></del><del></del><del></del>
-
-      <!-- ROW 8 -->
-      <del></del><del></del><del></del><del></del><del></del><del></del><del></del><del></del><ins data-clues="down-4" data-answer="N"></ins><del></del><del></del><del></del>
-
-      <!-- ROW 9 -->
-      <del></del><del></del><del></del><del></del><del></del><del></del><del></del><del></del><ins data-clues="down-4" data-answer="I"></ins><del></del><del></del><del></del>
-
-      <!-- ROW 10 -->
-      <del></del><del></del><del></del><del></del><del></del><del></del><del></del><del></del><ins data-clues="down-4" data-answer="X"></ins><del></del><del></del><del></del>
-
-      <!-- ROW 11 -->
-      <del></del><del></del><del></del><del></del><del></del><del></del><del></del><del></del><del></del><del></del><del></del><del></del>
-
-      <!-- ROW 12 -->
-      <del></del><del></del><del></del><del></del><del></del><del></del><del></del><del></del><del></del><del></del><del></del><del></del>
-
-    </main>
-  </div>
-
-  <div id="panelWrapper">
-    <div id="timer">Time: 0:00</div>
-    <label><input type="checkbox" id="errorToggle" checked> Error check</label>
-
-    <div class="panels" style="margin-top:12px">
-      <ul id="across">
-        <li class="heading">Across</li>
-        <li data-dir="across" data-clue="1" data-length="8">1. ALAKAZAM</li>
-        <li data-dir="across" data-clue="2" data-length="5">2. EKANS</li>
-        <li data-dir="across" data-clue="3" data-length="3">3. MEW</li>
-        <li data-dir="across" data-clue="4" data-length="7">4. SNEASEL</li>
-      </ul>
-
-      <ul id="down" style="margin-top:12px">
-        <li class="heading">Down</li>
-        <li data-dir="down" data-clue="1" data-length="4">1. ABRA</li>
-        <li data-dir="down" data-clue="2" data-length="5">2. ARBOK</li>
-        <li data-dir="down" data-clue="3" data-length="4">3. MANA</li>
-        <li data-dir="down" data-clue="4" data-length="4">4. ONIX</li>
-      </ul>
-    </div>
+    <h2>Down</h2>
+    1. ABRA<br>
+    2. ARBOK<br>
+    3. MEW<br>
+    4. ONIX
   </div>
 
 </div>
 
 <script>
-/* START + TIMER */
-const startBtn=document.getElementById('startBtn');
-const titleScreen=document.getElementById('titleScreen');
-const gameWrapper=document.getElementById('gameWrapper');
-const panelTimer=document.querySelector('#panelWrapper #timer');
-let seconds=0,timerInterval;
+const grid = document.getElementById("grid");
 
-startBtn.addEventListener('click', ()=>{
-  titleScreen.style.display='none';
-  gameWrapper.style.display='flex';
-  gameWrapper.setAttribute('aria-hidden','false');
-  seconds=0;
-  panelTimer.textContent='Time: 0:00';
-  timerInterval=setInterval(()=>{
-    seconds++;
-    const m=Math.floor(seconds/60), s=seconds%60;
-    panelTimer.textContent = 'Time: '+m+':'+(s<10?'0':'')+s;
+const SIZE = 12;
+
+// Empty grid default
+let solution = Array.from({length:SIZE},()=>Array(SIZE).fill(null));
+let isBlack = Array.from({length:SIZE},()=>Array(SIZE).fill(false));
+
+/*
+LAYOUT (12x12)
+
+Across
+1 ALAKAZAM  row1 col1
+2 EKANS     row3 col2
+3 MEW       row5 col3
+4 SNEASEL   row7 col3
+
+Down
+1 ABRA      col1 row1
+2 ARBOK     col2 row2
+3 MEW       col5 row3
+4 ONIX      col5 row7
+
+NOTE:
+SNEASEL and ONIX share ONLY the N
+*/
+
+function placeWord(word,r,c,dir){
+  for(let i=0;i<word.length;i++){
+    let rr=r+(dir==="down"?i:0);
+    let cc=c+(dir==="across"?i:0);
+    solution[rr][cc]=word[i];
+    isBlack[rr][cc]=false;
+  }
+}
+
+// mark all black first
+for(let r=0;r<SIZE;r++)for(let c=0;c<SIZE;c++)isBlack[r][c]=true;
+
+// ACROSS
+placeWord("ALAKAZAM",0,0,"across");
+placeWord("EKANS",2,1,"across");
+placeWord("MEW",4,2,"across");
+placeWord("SNEASEL",6,2,"across");
+
+// DOWN
+placeWord("ABRA",0,0,"down");
+placeWord("ARBOK",1,1,"down");
+placeWord("MEW",2,4,"down");
+placeWord("ONIX",6,4,"down"); // <- crosses SNEASEL at N
+
+// numbering
+let clueNumber=1;
+let numbers = Array.from({length:SIZE},()=>Array(SIZE).fill(null));
+
+function shouldNumber(r,c){
+  if(isBlack[r][c])return false;
+  let startsAcross = (c===0 || isBlack[r][c-1]) && (c+1<SIZE && !isBlack[r][c+1]);
+  let startsDown = (r===0 || isBlack[r-1][c]) && (r+1<SIZE && !isBlack[r+1][c]);
+  return startsAcross || startsDown;
+}
+
+// build UI
+for(let r=0;r<SIZE;r++){
+  for(let c=0;c<SIZE;c++){
+    const cell=document.createElement("div");
+    cell.className="cell";
+    if(isBlack[r][c]){
+      cell.classList.add("black");
+    }else{
+      const inp=document.createElement("input");
+      inp.maxLength=1;
+      inp.dataset.r=r;
+      inp.dataset.c=c;
+      inp.addEventListener("input",checkCorrect);
+      cell.appendChild(inp);
+
+      if(shouldNumber(r,c)){
+        numbers[r][c]=clueNumber++;
+        const n=document.createElement("div");
+        n.className="number";
+        n.innerText=numbers[r][c];
+        cell.appendChild(n);
+      }
+    }
+    grid.appendChild(cell);
+  }
+}
+
+function checkCorrect(){
+  const inputs=document.querySelectorAll("input");
+  inputs.forEach(inp=>{
+    let r=+inp.dataset.r;
+    let c=+inp.dataset.c;
+    let val=inp.value.toUpperCase();
+    if(!val){inp.className="";return;}
+    if(val===solution[r][c]) inp.className="correct";
+    else inp.className="incorrect";
+  });
+}
+
+// timer + overlay
+let secs=0,interval;
+
+function startGame(){
+  document.getElementById("overlay").style.display="none";
+  interval=setInterval(()=>{
+    secs++;
+    const m=Math.floor(secs/60);
+    const s=String(secs%60).padStart(2,"0");
+    document.getElementById("timer").innerText=`${m}:${s}`;
   },1000);
-});
-
-/* CORE LOGIC */
-const cells = Array.from(document.querySelectorAll('main ins'));
-const clues = Array.from(document.querySelectorAll('li[data-clue]'));
-const errorToggle = document.getElementById('errorToggle');
-let state = { clue:null, dir:null, cursor:0 };
-
-function clearVisual(){
-  cells.forEach(c=>c.classList.remove('highlight','cursor'));
-  clues.forEach(l=>l.classList.remove('current'));
 }
-
-function highlight(clueNum, dir){
-  clearVisual();
-  cells.forEach(c=>{
-    if(!c.dataset.clues) return;
-    // accept both "across-2,down-3" or single entries
-    const parts = c.dataset.clues.split(',').map(s=>s.trim());
-    for(const p of parts){
-      const [d,n] = p.split('-');
-      if(d===dir && +n===+clueNum){ c.classList.add('highlight'); break; }
-    }
-  });
-  state.cursor = 0;
-  moveCursor();
-}
-
-function moveCursor(){
-  cells.forEach(c=>c.classList.remove('cursor'));
-  const highlighted = cells.filter(c=>c.classList.contains('highlight'));
-  if(highlighted.length===0) return;
-  highlighted[Math.min(state.cursor, highlighted.length-1)].classList.add('cursor');
-}
-
-function checkErrors(){
-  if(!errorToggle.checked) return;
-  cells.forEach(c=>{
-    if(!c.dataset.answer){ c.classList.remove('error'); return; }
-    const txt = (c.textContent || '').trim().toUpperCase();
-    if(!txt){ c.classList.remove('error'); return; }
-    c.classList.toggle('error', txt !== c.dataset.answer);
-  });
-}
-
-/* clue clicks */
-clues.forEach(li=>{
-  li.addEventListener('click', function(){
-    state.clue = +this.dataset.clue;
-    state.dir = this.dataset.dir;
-    state.cursor = 0;
-    highlight(state.clue, state.dir);
-    clues.forEach(l=>l.classList.remove('current'));
-    this.classList.add('current');
-  });
-});
-
-/* cell clicks: choose first clue on that cell, or toggle to the other if current */
-cells.forEach(cell=>{
-  // build data-clues for cells that only have one dataset 'data-clues' missing: create from data-clues attr in HTML
-  // (our HTML uses data-clues only when necessary); here assume dataset.clues is present
-  cell.addEventListener('click', ()=>{
-    if(!cell.dataset.clues) return;
-    const parts = cell.dataset.clues.split(',').map(s=>s.trim());
-    let pick = parts[0];
-    if(state.clue !== null){
-      const currentTag = `${state.dir}-${state.clue}`;
-      const idx = parts.indexOf(currentTag);
-      if(idx !== -1) pick = parts[(idx+1) % parts.length];
-    }
-    const [d,n] = pick.split('-').map(s=>s.trim());
-    state.dir = d; state.clue = +n; state.cursor = 0;
-    highlight(state.clue, state.dir);
-    clues.forEach(l=>l.classList.remove('current'));
-    const li = document.querySelector(`li[data-clue="${n}"][data-dir="${d}"]`);
-    li && li.classList.add('current');
-  });
-});
-
-/* keyboard input */
-document.addEventListener('keydown', e=>{
-  if(state.clue === null) return;
-  const highlighted = cells.filter(c=>c.classList.contains('highlight'));
-  if(highlighted.length === 0) return;
-
-  if(e.key === 'ArrowRight' && state.dir === 'across'){
-    if(state.cursor < highlighted.length-1) state.cursor++;
-    moveCursor(); e.preventDefault(); return;
-  }
-  if(e.key === 'ArrowLeft' && state.dir === 'across'){
-    if(state.cursor > 0) state.cursor--;
-    moveCursor(); e.preventDefault(); return;
-  }
-  if(e.key === 'ArrowDown' && state.dir === 'down'){
-    if(state.cursor < highlighted.length-1) state.cursor++;
-    moveCursor(); e.preventDefault(); return;
-  }
-  if(e.key === 'ArrowUp' && state.dir === 'down'){
-    if(state.cursor > 0) state.cursor--;
-    moveCursor(); e.preventDefault(); return;
-  }
-
-  if(e.key.length === 1 && /[a-z]/i.test(e.key)){
-    const t = highlighted[state.cursor];
-    if(t){
-      t.textContent = e.key.toUpperCase();
-      if(errorToggle.checked && t.dataset.answer) t.classList.toggle('error', t.textContent !== t.dataset.answer);
-      else t.classList.remove('error');
-    }
-    if(state.cursor < highlighted.length-1) state.cursor++;
-    moveCursor();
-    e.preventDefault();
-    return;
-  }
-
-  if(e.key === 'Backspace'){
-    const t = highlighted[state.cursor];
-    if(t){ t.textContent = ''; t.classList.remove('error'); }
-    if(state.cursor > 0) state.cursor--;
-    moveCursor();
-    e.preventDefault();
-    return;
-  }
-});
-
-/* error toggle */
-errorToggle.addEventListener('change', ()=>{
-  if(!errorToggle.checked) cells.forEach(c=>c.classList.remove('error'));
-  else checkErrors();
-});
 </script>
+
 </body>
 </html>
