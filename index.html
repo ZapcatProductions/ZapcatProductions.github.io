@@ -2,13 +2,13 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Falling Blocks Survival</title>
+<title>Falling Blocks Adventure</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <style>
 body { margin:0; font-family:sans-serif; background:#111; color:#fff; overflow:hidden; }
 #gameCanvas { background:#222; display:block; margin:0 auto; border:2px solid #fff; }
-#menu, #gameOver { 
-  position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); 
+#menu, #levelScreen, #gameOver {
+  position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
   text-align:center; background:#333; padding:20px; border:2px solid #fff;
 }
 button { padding:10px 20px; margin:5px; cursor:pointer; font-size:16px; }
@@ -18,13 +18,18 @@ button { padding:10px 20px; margin:5px; cursor:pointer; font-size:16px; }
 <body>
 
 <div id="menu">
-  <h1>Falling Blocks Survival</h1>
+  <h1>Falling Blocks Adventure</h1>
   <p id="controlsGuide">
     Controls:<br>
     Arrow Left ← : Move Left<br>
     Arrow Right → : Move Right
   </p>
   <button id="startBtn">Start Game</button>
+</div>
+
+<div id="levelScreen" style="display:none;">
+  <h2 id="levelText"></h2>
+  <button id="nextLevelBtn">Next Level</button>
 </div>
 
 <canvas id="gameCanvas" width="400" height="600"></canvas>
@@ -45,6 +50,7 @@ let collectibles = [];
 let score = 0;
 let highScore = localStorage.getItem('highScore') || 0;
 let level = 1;
+let maxLevel = 3;
 let gameRunning = false;
 let keys = {};
 let obstacleTimer = 0;
@@ -59,26 +65,53 @@ const menu = document.getElementById('menu');
 const gameOverDiv = document.getElementById('gameOver');
 const restartBtn = document.getElementById('restartBtn');
 const scoreText = document.getElementById('scoreText');
+const levelScreen = document.getElementById('levelScreen');
+const levelText = document.getElementById('levelText');
+const nextLevelBtn = document.getElementById('nextLevelBtn');
 
 startBtn.onclick = () => startGame();
 restartBtn.onclick = () => startGame();
+nextLevelBtn.onclick = () => startNextLevel();
 
 function startGame() {
   menu.style.display = 'none';
   gameOverDiv.style.display = 'none';
+  levelScreen.style.display = 'none';
   player.x=180; player.y=550; score=0; level=1; obstacles=[]; collectibles=[];
   obstacleTimer=0; collectibleTimer=0; levelTime=0;
   gameRunning=true;
   requestAnimationFrame(gameLoop);
 }
 
-function endGame() {
+function startNextLevel() {
+  levelScreen.style.display='none';
+  obstacles=[];
+  collectibles=[];
+  player.x=180; player.y=550;
+  obstacleTimer=0; collectibleTimer=0; levelTime=0;
+  gameRunning=true;
+  requestAnimationFrame(gameLoop);
+}
+
+function endLevel() {
+  gameRunning=false;
+  if(level >= maxLevel) {
+    endGame(true);
+  } else {
+    levelScreen.style.display='block';
+    levelText.innerHTML = `Level ${level} Cleared!`;
+  }
+}
+
+function endGame(victory=false) {
   gameRunning=false;
   if(score>highScore) {
     highScore = score;
     localStorage.setItem('highScore', highScore);
   }
-  scoreText.innerHTML = `Score: ${score}<br>High Score: ${highScore}`;
+  scoreText.innerHTML = victory ? 
+    `You beat all levels!<br>Score: ${score}<br>High Score: ${highScore}` :
+    `Game Over!<br>Score: ${score}<br>High Score: ${highScore}`;
   gameOverDiv.style.display='block';
 }
 
@@ -122,13 +155,18 @@ function update() {
     const col = collectibles[i];
     if(player.x < col.x+col.w && player.x+player.w>col.x &&
        player.y < col.y+col.h && player.y+player.h>col.y) {
-      score += 50; // bonus points
+      score += 50;
       collectibles.splice(i,1);
     }
   }
 
   score += 1;
-  if(levelTime % 1000 === 0) level++; // increase difficulty every ~1000 frames
+
+  // Level clear condition: survive certain time
+  if(levelTime >= 1500) { // ~1500 frames (~25 seconds)
+    level++;
+    endLevel();
+  }
 }
 
 function draw() {
@@ -149,7 +187,7 @@ function draw() {
   // score
   ctx.fillStyle = '#fff';
   ctx.font = '20px sans-serif';
-  ctx.fillText(`Score: ${score}  Level: ${level}`, 10,30);
+  ctx.fillText(`Score: ${score}  Level: ${level>maxLevel?maxLevel:level}`, 10,30);
   ctx.fillText(`High Score: ${highScore}`, 10,60);
 }
 
@@ -160,6 +198,5 @@ function gameLoop() {
   requestAnimationFrame(gameLoop);
 }
 </script>
-
 </body>
 </html>
