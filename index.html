@@ -29,7 +29,7 @@ button { padding:10px 20px; margin:5px; cursor:pointer; font-size:16px; }
 
 <div id="levelScreen" style="display:none;">
   <h2 id="levelText"></h2>
-  <button id="nextLevelBtn">Next Level</button>
+  <button id="nextLevelBtn">Continue</button>
 </div>
 
 <canvas id="gameCanvas" width="400" height="600"></canvas>
@@ -50,12 +50,13 @@ let collectibles = [];
 let score = 0;
 let highScore = localStorage.getItem('highScore') || 0;
 let level = 1;
-let maxLevel = 3;
+let maxLevel = 50;
 let gameRunning = false;
 let keys = {};
 let obstacleTimer = 0;
 let collectibleTimer = 0;
-let levelTime = 0;
+let levelTimer = 0;
+let levelDuration = 2000; // in frames (~33 fps * 60 = ~60 sec?)
 
 document.addEventListener('keydown', e => keys[e.key] = true);
 document.addEventListener('keyup', e => keys[e.key] = false);
@@ -78,17 +79,18 @@ function startGame() {
   gameOverDiv.style.display = 'none';
   levelScreen.style.display = 'none';
   player.x=180; player.y=550; score=0; level=1; obstacles=[]; collectibles=[];
-  obstacleTimer=0; collectibleTimer=0; levelTime=0;
+  obstacleTimer=0; collectibleTimer=0; levelTimer=0;
+  levelDuration = 600 + level*100; // Level 1 ~10s, increases per level
   gameRunning=true;
   requestAnimationFrame(gameLoop);
 }
 
 function startNextLevel() {
   levelScreen.style.display='none';
-  obstacles=[];
-  collectibles=[];
+  obstacles=[]; collectibles=[];
   player.x=180; player.y=550;
-  obstacleTimer=0; collectibleTimer=0; levelTime=0;
+  obstacleTimer=0; collectibleTimer=0; levelTimer=0;
+  levelDuration = 600 + level*100; // scale duration
   gameRunning=true;
   requestAnimationFrame(gameLoop);
 }
@@ -99,7 +101,7 @@ function endLevel() {
     endGame(true);
   } else {
     levelScreen.style.display='block';
-    levelText.innerHTML = `Level ${level} Cleared!`;
+    levelText.innerHTML = `Level ${level} Cleared!<br>Score: ${score}`;
   }
 }
 
@@ -117,12 +119,12 @@ function endGame(victory=false) {
 
 function spawnObstacle() {
   const width = Math.random()*50+20;
-  obstacles.push({ x:Math.random()*(canvas.width-width), y:-20, w:width, h:20, speed:2+level*0.5 });
+  obstacles.push({ x:Math.random()*(canvas.width-width), y:-20, w:width, h:20, speed:2 + level*0.3 });
 }
 
 function spawnCollectible() {
   const size = 15;
-  collectibles.push({ x:Math.random()*(canvas.width-size), y:-20, w:size, h:size, speed:1.5+level*0.3 });
+  collectibles.push({ x:Math.random()*(canvas.width-size), y:-20, w:size, h:size, speed:1.5+level*0.2 });
 }
 
 function update() {
@@ -131,10 +133,14 @@ function update() {
 
   obstacleTimer++;
   collectibleTimer++;
-  levelTime++;
+  levelTimer++;
 
-  if(obstacleTimer > 30 - level*2) { spawnObstacle(); obstacleTimer=0; }
-  if(collectibleTimer > 150 - level*5) { spawnCollectible(); collectibleTimer=0; }
+  // Difficulty scaling: faster spawn rate as levels increase
+  let obstacleSpawnRate = Math.max(20, 40 - level); // min 20
+  let collectibleSpawnRate = Math.max(100, 150 - level*2);
+
+  if(obstacleTimer > obstacleSpawnRate) { spawnObstacle(); obstacleTimer=0; }
+  if(collectibleTimer > collectibleSpawnRate) { spawnCollectible(); collectibleTimer=0; }
 
   obstacles.forEach(ob => ob.y += ob.speed);
   obstacles = obstacles.filter(ob => ob.y < canvas.height);
@@ -162,8 +168,8 @@ function update() {
 
   score += 1;
 
-  // Level clear condition: survive certain time
-  if(levelTime >= 1500) { // ~1500 frames (~25 seconds)
+  // Level complete if timer reaches duration
+  if(levelTimer >= levelDuration) {
     level++;
     endLevel();
   }
@@ -184,11 +190,15 @@ function draw() {
   ctx.fillStyle = '#ff0';
   collectibles.forEach(col => ctx.fillRect(col.x, col.y, col.w, col.h));
 
-  // score
+  // UI: Score, High Score
   ctx.fillStyle = '#fff';
   ctx.font = '20px sans-serif';
   ctx.fillText(`Score: ${score}  Level: ${level>maxLevel?maxLevel:level}`, 10,30);
   ctx.fillText(`High Score: ${highScore}`, 10,60);
+
+  // Level timer indicator
+  let secondsLeft = Math.max(0, Math.ceil((levelDuration - levelTimer)/60));
+  ctx.fillText(`Survive ${secondsLeft}s for this level`, 10,90);
 }
 
 function gameLoop() {
