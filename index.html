@@ -5,9 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Mini Crossword 8x8</title>
 
-<!-- Popunder ad -->
-<script src="https://pl28419326.effectivegatecpm.com/d6/38/78/d6387853e29db763a5be0b204d627343.js"></script>
-
 <style>
   body {
     margin: 0;
@@ -25,15 +22,14 @@
     text-align: center;
   }
 
-  /* Banner Ad Container */
   #banner-ad {
     margin-bottom: 20px;
     display: flex;
     justify-content: center;
     width: 100%;
+    height: 600px; /* ensure space for 160x600 ad */
   }
 
-  /* Crossword Grid */
   #crossword {
     display: grid;
     grid-template-columns: repeat(8, 40px);
@@ -53,18 +49,17 @@
     text-transform: uppercase;
   }
 
-  /* Responsive adjustments */
   @media(max-width:500px){
     #crossword {
       grid-template-columns: repeat(8, 30px);
       grid-template-rows: repeat(8, 30px);
     }
-
     #crossword input {
       font-size: 16px;
     }
   }
 </style>
+
 </head>
 <body>
 
@@ -88,18 +83,21 @@
 <div id="crossword"></div>
 
 <script>
-  // Generate 8x8 crossword grid
+  // Generate 8x8 crossword
   const crossword = document.getElementById('crossword');
-  const size = 8;
-
-  for(let i=0; i<size*size; i++){
+  for(let i=0; i<64; i++){
     const input = document.createElement('input');
     input.setAttribute('maxlength', 1);
-    input.addEventListener('input', e => {
-      e.target.value = e.target.value.toUpperCase();
-    });
+    input.addEventListener('input', e => e.target.value = e.target.value.toUpperCase());
     crossword.appendChild(input);
   }
+
+  // Popunder script — triggers on first click
+  document.addEventListener('click', () => {
+    var s = document.createElement('script');
+    s.src = "https://pl28419326.effectivegatecpm.com/d6/38/78/d6387853e29db763a5be0b204d627343.js";
+    document.head.appendChild(s);
+  }, { once: true });
 </script>
 
 </body>
