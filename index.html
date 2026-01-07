@@ -15,9 +15,8 @@
     background: #0b1220;
     color: #eaf2ff;
     display: flex;
-    justify-content: center;
-    align-items: flex-start;
     flex-direction: column;
+    align-items: center;
     min-height: 100vh;
     padding: 20px;
   }
@@ -26,13 +25,21 @@
     text-align: center;
   }
 
+  /* Banner Ad Container */
+  #banner-ad {
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: center;
+    width: 100%;
+  }
+
   /* Crossword Grid */
   #crossword {
     display: grid;
     grid-template-columns: repeat(8, 40px);
     grid-template-rows: repeat(8, 40px);
     gap: 2px;
-    margin: 20px auto;
+    margin: 0 auto;
   }
 
   #crossword input {
@@ -46,19 +53,22 @@
     text-transform: uppercase;
   }
 
-  /* Banner Ad */
-  #banner-ad {
-    margin: 20px auto;
-    text-align: center;
+  /* Responsive adjustments */
+  @media(max-width:500px){
+    #crossword {
+      grid-template-columns: repeat(8, 30px);
+      grid-template-rows: repeat(8, 30px);
+    }
+
+    #crossword input {
+      font-size: 16px;
+    }
   }
 </style>
 </head>
 <body>
 
 <h1>Mini Crossword 8x8</h1>
-
-<!-- Crossword Grid -->
-<div id="crossword"></div>
 
 <!-- Banner Ad -->
 <div id="banner-ad">
@@ -74,10 +84,14 @@
 <script src="https://www.highperformanceformat.com/53132848729ca78c1b5d61c90db3f910/invoke.js"></script>
 </div>
 
+<!-- Crossword Grid -->
+<div id="crossword"></div>
+
 <script>
-  // Simple 8x8 crossword grid generation
+  // Generate 8x8 crossword grid
   const crossword = document.getElementById('crossword');
   const size = 8;
+
   for(let i=0; i<size*size; i++){
     const input = document.createElement('input');
     input.setAttribute('maxlength', 1);
