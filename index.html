@@ -12,7 +12,7 @@
 #header #title{font-size:16px;}
 #header-right{display:flex;align-items:center;gap:12px;}
 #timer{font-variant-numeric:tabular-nums;}
-#start-btn,#settings-btn{cursor:pointer;user-select:none;}
+#settings-btn{cursor:pointer;user-select:none;}
 /* MAIN */
 #main{display:flex;height:calc(100vh-48px);padding:20px;}
 #grid-wrap{flex:1;display:flex;justify-content:center;align-items:center;}
@@ -46,7 +46,6 @@
   <div id="title">Mini Crossword – Cute Animals</div>
   <div id="header-right">
     <div id="timer">00:00</div>
-    <div id="start-btn">▶ Start</div>
     <div id="settings-btn">⚙</div>
   </div>
 </div>
@@ -74,7 +73,7 @@
 
 <script>
 // =========================
-// CONFIGURABLE PUZZLE DATA
+// PUZZLE DATA
 // =========================
 let puzzleData = {
   grid:[
@@ -192,25 +191,59 @@ function clearHighlights(){
 }
 
 // =========================
-// INPUT HANDLING
+// INPUT HANDLING WITH ERROR CHECK & AUTO-ADVANCE/BACKSPACE
 // =========================
-document.addEventListener('input',e=>{
-  const target=e.target; if(target.tagName!=='INPUT') return;
-  const val=target.value.toUpperCase(); target.value=val;
-  const r=Number(target.dataset.row); const c=Number(target.dataset.col);
-  const correct=puzzleData.grid[r][c];
+document.addEventListener('input', e => {
+  const target = e.target;
+  if (target.tagName !== 'INPUT') return;
+  const val = target.value.toUpperCase();
+  target.value = val;
+  const r = Number(target.dataset.row);
+  const c = Number(target.dataset.col);
+  const correct = puzzleData.grid[r][c];
+
+  // ERROR CHECK
   if(document.getElementById('show-mistakes')?.checked){
-    if(val!==correct) target.style.background='#991b1b';
-    else target.style.background='transparent';
+    if(val === "") target.style.background = 'transparent';
+    else if(val !== correct) target.style.background = '#991b1b';
+    else target.style.background = 'transparent';
   }
-  if(document.getElementById('auto-advance')?.checked){
-    // Move to next non-block cell in row first, else down
-    let nextC=c+1;
+
+  // AUTO-ADVANCE FORWARD
+  if(document.getElementById('auto-advance')?.checked && val !== ""){
+    let nextC = c + 1;
     while(nextC<cols && cells[r][nextC]?.classList.contains('block')) nextC++;
-    if(nextC<cols && cells[r][nextC] && cells[r][nextC].querySelector('input')){cells[r][nextC].querySelector('input').focus(); return;}
-    let nextR=r+1;
+    if(nextC<cols && cells[r][nextC] && cells[r][nextC].querySelector('input')){
+      cells[r][nextC].querySelector('input').focus();
+      return;
+    }
+    let nextR = r + 1;
     while(nextR<rows && cells[nextR][c]?.classList.contains('block')) nextR++;
-    if(nextR<rows && cells[nextR][c] && cells[nextR][c].querySelector('input')) cells[nextR][c].querySelector('input').focus();
+    if(nextR<rows && cells[nextR][c] && cells[nextR][c].querySelector('input'))
+      cells[nextR][c].querySelector('input').focus();
+  }
+});
+
+// BACKSPACE NAVIGATION
+document.addEventListener('keydown', e => {
+  const target = e.target;
+  if(target.tagName !== 'INPUT') return;
+  const r = Number(target.dataset.row);
+  const c = Number(target.dataset.col);
+
+  if(e.key === 'Backspace'){
+    if(target.value === ""){
+      let prevC = c - 1;
+      while(prevC >= 0 && cells[r][prevC]?.classList.contains('block')) prevC--;
+      if(prevC >= 0 && cells[r][prevC] && cells[r][prevC].querySelector('input')){
+        e.preventDefault();
+        const prevInput = cells[r][prevC].querySelector('input');
+        prevInput.focus();
+        prevInput.value = "";
+        if(document.getElementById('show-mistakes')?.checked)
+          prevInput.style.background = 'transparent';
+      }
+    }
   }
 });
 
@@ -223,7 +256,6 @@ startBtn.onclick=()=>{
   activateCell(0,0);
   startTimer();
 }
-
 </script>
 </body>
 </html>
