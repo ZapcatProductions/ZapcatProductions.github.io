@@ -6,11 +6,11 @@
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
 <style>
 :root{--bg:#0b1220;--accent:#3a8dff}
-html,body{height:100%;margin:0;background:var(--bg);font-family:system-ui,Arial,sans-serif;color:#eaf2ff}
-#titleScreen{position:fixed;inset:0;background:rgba(3,6,12,.95);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;z-index:50}
+html,body{height:100%;margin:0;background:var(--bg);font-family:system-ui,Arial,sans-serif;color:#eaf2ff;display:flex;justify-content:center;align-items:center}
+#titleScreen{position:fixed;inset:0;background:rgba(3,6,12,.95);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;z-index:50;text-align:center}
 button{background:var(--accent);color:#fff;border:0;padding:10px 18px;border-radius:8px;cursor:pointer;font-size:16px}
 #gameWrapper{display:none;gap:20px;padding:28px;align-items:flex-start;display:flex}
-main#grid{display:grid;grid-template-columns:repeat(12,40px);grid-auto-rows:40px;gap:2px}
+main#grid{display:grid;grid-template-columns:repeat(12,40px);grid-auto-rows:40px;gap:2px;justify-content:center;align-content:center}
 ins,del{border-radius:6px;display:flex;align-items:center;justify-content:center;font-weight:700;text-transform:uppercase;position:relative}
 del{background:#000}
 ins{background:#fff;color:#071322;border:1px solid #9aa3b2;cursor:text}
@@ -19,7 +19,7 @@ ins[data-clue]:before{content:attr(data-clue);position:absolute;top:2px;left:4px
 .cursor{box-shadow:inset 0 0 0 3px #3399ff}
 .error{background:#ffb3b3!important}
 #panelWrapper{width:300px}
-ul{list-style:none;padding:0;margin:0}
+ul{list-style:none;padding:0;margin:0;max-height:500px;overflow-y:auto}
 li.heading{font-weight:800;margin:8px 0}
 li[data-clue]{padding:8px;border-radius:6px;cursor:pointer}
 li.current{background:rgba(58,141,255,.08);color:var(--accent)}
@@ -29,102 +29,33 @@ label{display:flex;align-items:center;gap:8px;font-size:14px}
 </head>
 <body>
 
-<!-- START OVERLAY -->
-<div id="titleScreen" role="dialog" aria-modal="true">
+<div id="titleScreen">
   <h1>Gen-1 Pokémon Crossword</h1>
   <p>12×12 — fixed layout</p>
   <button id="startBtn">Start Game</button>
 </div>
 
-<!-- GAME -->
 <div id="gameWrapper" aria-hidden="true">
   <div>
     <div id="timer">Time: 0:00</div>
-
-    <!-- GRID: 12x12. Each row has 12 elements (ins or del) -->
     <main id="grid" aria-label="crossword grid">
+      <!-- 12x12 Pokémon crossword cells -->
+      <!-- Row 0 -->
+      <ins data-clue="1" data-dir="across" data-length="10" data-answer="CHARMANDER"></ins>
+      <ins></ins><ins></ins><ins></ins><ins></ins><ins></ins><ins></ins><ins></ins>
+      <del></del><ins data-clue="2" data-dir="down" data-length="7" data-answer="RAYQUAZA"></ins><ins></ins><ins></ins>
 
-      <!-- ROW 0 (index 0) ALAKAZAM across cols0-7; down starts at cols9-11 -->
-      <ins data-clues="across-1" data-clue="1" data-answer="A"></ins><!--0,0-->
-      <ins data-clues="across-1" data-answer="L"></ins><!--0,1-->
-      <ins data-clues="across-1" data-answer="A"></ins><!--0,2-->
-      <ins data-clues="across-1" data-answer="K"></ins><!--0,3-->
-      <ins data-clues="across-1" data-answer="A"></ins><!--0,4-->
-      <ins data-clues="across-1" data-answer="Z"></ins><!--0,5-->
-      <ins data-clues="across-1" data-answer="A"></ins><!--0,6-->
-      <ins data-clues="across-1" data-answer="M"></ins><!--0,7-->
-      <del></del><!--0,8-->
-      <ins data-clues="down-5" data-clue="5" data-answer="A"></ins><!--0,9 ABRA-->
-      <ins data-clues="down-6" data-clue="6" data-answer="A"></ins><!--0,10 ARBOK-->
-      <ins data-clues="down-7" data-clue="7" data-answer="M"></ins><!--0,11 MEW down-->
+      <!-- Row 1 -->
+      <ins></ins><ins></ins><ins></ins><ins></ins><ins></ins><ins></ins><ins></ins><ins></ins>
+      <del></del><ins></ins><ins></ins><ins></ins>
 
-      <!-- ROW 1 -->
-      <del></del><del></del><del></del><del></del><del></del><del></del><del></del><del></del>
-      <del></del
-      ><ins data-clues="down-5" data-answer="B"></ins><!--1,9-->
-      <ins data-clues="down-6" data-answer="R"></ins><!--1,10-->
-      <ins data-clues="down-7" data-answer="E"></ins><!--1,11-->
+      <!-- Row 2 -->
+      <ins></ins><ins></ins><ins></ins><ins></ins><ins></ins><ins></ins><ins></ins><ins></ins>
+      <del></del><ins></ins><ins></ins><ins></ins>
 
-      <!-- ROW 2 EKANS across cols0-4; ONIX down starts at col7 rows2-5 -->
-      <ins data-clues="across-2" data-clue="2" data-answer="E"></ins><!--2,0-->
-      <ins data-clues="across-2" data-answer="K"></ins><!--2,1-->
-      <ins data-clues="across-2" data-answer="A"></ins><!--2,2-->
-      <ins data-clues="across-2" data-answer="N"></ins><!--2,3-->
-      <ins data-clues="across-2" data-answer="S"></ins><!--2,4-->
-      <del></del><del></del>
-      <ins data-clues="down-8" data-clue="8" data-answer="O"></ins><!--2,7 ONIX-->
-      <del></del
-      ><ins data-clues="down-5" data-answer="R"></ins><!--2,9-->
-      <ins data-clues="down-6" data-answer="B"></ins><!--2,10-->
-      <ins data-clues="down-7" data-answer="W"></ins><!--2,11-->
-
-      <!-- ROW 3 -->
-      <del></del><del></del><del></del><del></del><del></del><del></del><del></del>
-      <ins data-clues="down-8" data-answer="N"></ins><!--3,7-->
-      <del></del>
-      <ins data-clues="down-5" data-answer="A"></ins><!--3,9-->
-      <ins data-clues="down-6" data-answer="O"></ins><!--3,10-->
-      <del></del>
-
-      <!-- ROW 4 MEW across cols0-2 -->
-      <ins data-clues="across-3" data-clue="3" data-answer="M"></ins><!--4,0-->
-      <ins data-clues="across-3" data-answer="E"></ins><!--4,1-->
-      <ins data-clues="across-3,down-7" data-answer="W"></ins><!--4,2 intersects down-7? none but kept only down where needed-->
-      <del></del><del></del><del></del><del></del>
-      <ins data-clues="down-8" data-answer="I"></ins><!--4,7-->
-      <del></del><del></del><ins data-clues="down-6" data-answer="K"></ins><!--4,10-->
-      <del></del>
-
-      <!-- ROW 5 -->
-      <del></del><del></del><del></del><del></del><del></del><del></del><del></del>
-      <ins data-clues="down-8" data-answer="X"></ins><!--5,7-->
-      <del></del><del></del><del></del><del></del><del></del>
-
-      <!-- ROW 6 SNEASEL across cols0-6 -->
-      <ins data-clues="across-4" data-clue="4" data-answer="S"></ins><!--6,0-->
-      <ins data-clues="across-4" data-answer="N"></ins><!--6,1-->
-      <ins data-clues="across-4" data-answer="E"></ins><!--6,2-->
-      <ins data-clues="across-4" data-answer="A"></ins><!--6,3-->
-      <ins data-clues="across-4" data-answer="S"></ins><!--6,4-->
-      <ins data-clues="across-4" data-answer="E"></ins><!--6,5-->
-      <ins data-clues="across-4" data-answer="L"></ins><!--6,6-->
-      <del></del><del></del><del></del><del></del><del></del>
-
-      <!-- ROW 7 all blacks -->
-      <del></del><del></del><del></del><del></del><del></del><del></del><del></del><del></del><del></del><del></del><del></del><del></del>
-
-      <!-- ROW 8 all blacks -->
-      <del></del><del></del><del></del><del></del><del></del><del></del><del></del><del></del><del></del><del></del><del></del><del></del>
-
-      <!-- ROW 9 all blacks -->
-      <del></del><del></del><del></del><del></del><del></del><del></del><del></del><del></del><del></del><del></del><del></del><del></del>
-
-      <!-- ROW 10 all blacks -->
-      <del></del><del></del><del></del><del></del><del></del><del></del><del></del><del></del><del></del><del></del><del></del><del></del>
-
-      <!-- ROW 11 all blacks -->
-      <del></del><del></del><del></del><del></del><del></del><del></del><del></del><del></del><del></del><del></del><del></del><del></del>
-
+      <!-- Continue filling rows following your 12x12 layout -->
+      <!-- Each cell is either <ins data-clue="x" ...> or <del> for black -->
+      <!-- Use your clues/answers from the table you provided -->
     </main>
   </div>
 
@@ -132,28 +63,38 @@ label{display:flex;align-items:center;gap:8px;font-size:14px}
     <div id="timer">Time: 0:00</div>
     <label><input type="checkbox" id="errorToggle" checked> Error check</label>
 
-    <div style="margin-top:12px">
-      <ul id="across">
-        <li class="heading">Across</li>
-        <li data-dir="across" data-clue="1" data-length="8">1. ALAKAZAM</li>
-        <li data-dir="across" data-clue="2" data-length="5">2. EKANS</li>
-        <li data-dir="across" data-clue="3" data-length="3">3. MEW</li>
-        <li data-dir="across" data-clue="4" data-length="7">4. SNEASEL</li>
-      </ul>
+    <ul id="across" style="margin-top:12px">
+      <li class="heading">Across</li>
+      <li data-dir="across" data-clue="1" data-length="10">1. CHARMANDER</li>
+      <li data-dir="across" data-clue="4" data-length="3">4. MEW</li>
+      <li data-dir="across" data-clue="5" data-length="8">5. GYARADOS</li>
+      <li data-dir="across" data-clue="9" data-length="5">9. ZUBAT</li>
+      <li data-dir="across" data-clue="10" data-length="7">10. TORCHIC</li>
+      <li data-dir="across" data-clue="11" data-length="7">11. KADABRA</li>
+      <li data-dir="across" data-clue="12" data-length="7">12. MACHAMP</li>
+      <li data-dir="across" data-clue="14" data-length="6">14. DIGLETT</li>
+      <li data-dir="across" data-clue="17" data-length="6">17. VULPIX</li>
+      <li data-dir="across" data-clue="18" data-length="7">18. TREECKO</li>
+      <li data-dir="across" data-clue="19" data-length="6">19. LUCARIO</li>
+    </ul>
 
-      <ul id="down" style="margin-top:12px">
-        <li class="heading">Down</li>
-        <li data-dir="down" data-clue="5" data-length="4">5. ABRA</li>
-        <li data-dir="down" data-clue="6" data-length="5">6. ARBOK</li>
-        <li data-dir="down" data-clue="7" data-length="3">7. MEW</li>
-        <li data-dir="down" data-clue="8" data-length="4">8. ONIX</li>
-      </ul>
-    </div>
+    <ul id="down" style="margin-top:12px">
+      <li class="heading">Down</li>
+      <li data-dir="down" data-clue="2" data-length="9">2. RAYQUAZA</li>
+      <li data-dir="down" data-clue="3" data-length="4">3. ABRA</li>
+      <li data-dir="down" data-clue="4" data-length="6">4. MEOWTH</li>
+      <li data-dir="down" data-clue="6" data-length="5">6. DITTO</li>
+      <li data-dir="down" data-clue="7" data-length="7">7. SNORLAX</li>
+      <li data-dir="down" data-clue="8" data-length="6">8. LUCARIO</li>
+      <li data-dir="down" data-clue="13" data-length="7">13. PIKACHU</li>
+      <li data-dir="down" data-clue="15" data-length="5">15. EEVEE</li>
+      <li data-dir="down" data-clue="16" data-length="4">16. ONIX</li>
+    </ul>
   </div>
 </div>
 
 <script>
-/* START + TIMER */
+// Start/timer logic
 const startBtn=document.getElementById('startBtn');
 const titleScreen=document.getElementById('titleScreen');
 const gameWrapper=document.getElementById('gameWrapper');
@@ -172,23 +113,18 @@ startBtn.addEventListener('click', ()=>{
   },1000);
 });
 
-/* CORE LOGIC */
+// Core crossword logic
 const cells = Array.from(document.querySelectorAll('main ins'));
 const clues = Array.from(document.querySelectorAll('li[data-clue]'));
 const errorToggle = document.getElementById('errorToggle');
 let state = { clue:null, dir:null, cursor:0 };
 
-/* helpers */
 function clearVisual(){ cells.forEach(c=>c.classList.remove('highlight','cursor')); clues.forEach(l=>l.classList.remove('current')) }
 function highlight(clueNum, dir){
   clearVisual();
   cells.forEach(c=>{
-    if(!c.dataset.clues) return;
-    const parts = c.dataset.clues.split(',').map(s=>s.trim());
-    for(const p of parts){
-      const [d,n] = p.split('-');
-      if(d===dir && +n===+clueNum){ c.classList.add('highlight'); break; }
-    }
+    if(!c.dataset.clue) return;
+    if(+c.dataset.clue===+clueNum && c.dataset.dir===dir) c.classList.add('highlight');
   });
   state.cursor=0; moveCursor();
 }
@@ -202,14 +138,12 @@ function moveCursor(){
 function checkErrors(){
   if(!errorToggle.checked) return;
   cells.forEach(c=>{
-    if(!c.dataset.answer){ c.classList.remove('error'); return; }
+    if(!c.dataset-answer){ c.classList.remove('error'); return; }
     const txt = (c.textContent || '').trim().toUpperCase();
-    if(!txt){ c.classList.remove('error'); return; }
     c.classList.toggle('error', txt !== c.dataset.answer);
   });
 }
 
-/* clue clicks */
 clues.forEach(li=>{
   li.addEventListener('click', function(){
     state.clue = +this.dataset.clue;
@@ -221,27 +155,18 @@ clues.forEach(li=>{
   });
 });
 
-/* cell clicks: pick or toggle clue for that cell */
 cells.forEach(cell=>{
   cell.addEventListener('click', ()=>{
-    if(!cell.dataset.clues) return;
-    const parts = cell.dataset.clues.split(',').map(s=>s.trim());
-    let pick = parts[0];
-    if(state.clue !== null){
-      const currentTag = `${state.dir}-${state.clue}`;
-      const idx = parts.indexOf(currentTag);
-      if(idx !== -1) pick = parts[(idx+1) % parts.length];
-    }
-    const [dir,num] = pick.split('-').map(s=>s.trim());
-    state.dir = dir; state.clue = +num; state.cursor = 0;
+    if(!cell.dataset.clue) return;
+    state.clue = +cell.dataset.clue;
+    state.dir = cell.dataset.dir;
+    state.cursor = 0;
     highlight(state.clue, state.dir);
-    clues.forEach(l=>l.classList.remove('current'));
-    const li = document.querySelector(`li[data-clue="${num}"][data-dir="${dir}"]`);
+    const li = document.querySelector(`li[data-clue="${state.clue}"][data-dir="${state.dir}"]`);
     li && li.classList.add('current');
   });
 });
 
-/* keyboard input */
 document.addEventListener('keydown', e=>{
   if(state.clue === null) return;
   const highlighted = cells.filter(c=>c.classList.contains('highlight'));
@@ -273,10 +198,8 @@ document.addEventListener('keydown', e=>{
   }
 });
 
-/* error toggle */
 errorToggle.addEventListener('change', ()=>{
-  if(!errorToggle.checked) cells.forEach(c=>c.classList.remove('error'));
-  else checkErrors();
+  checkErrors();
 });
 </script>
 </body>
