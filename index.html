@@ -2,12 +2,12 @@
 <html lang="en">
 <head>
 <meta charset="utf-8"/>
-<title>Gen-1 Pokémon 12x12 — Fixed</title>
+<title>Gen-1 Pokémon Crossword 12x12</title>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
 <style>
 :root{--bg:#0b1220;--accent:#3a8dff}
 html,body{height:100%;margin:0;background:var(--bg);font-family:system-ui,Arial,sans-serif;color:#eaf2ff;display:flex;justify-content:center;align-items:center}
-#titleScreen{position:fixed;inset:0;background:rgba(3,6,12,.95);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;z-index:50;text-align:center}
+#titleScreen{position:fixed;inset:0;background:rgba(3,6,12,.95);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;text-align:center;z-index:50}
 button{background:var(--accent);color:#fff;border:0;padding:10px 18px;border-radius:8px;cursor:pointer;font-size:16px}
 #gameWrapper{display:none;gap:20px;padding:28px;align-items:flex-start;display:flex}
 main#grid{display:grid;grid-template-columns:repeat(12,40px);grid-auto-rows:40px;gap:2px;justify-content:center;align-content:center}
@@ -39,23 +39,87 @@ label{display:flex;align-items:center;gap:8px;font-size:14px}
   <div>
     <div id="timer">Time: 0:00</div>
     <main id="grid" aria-label="crossword grid">
-      <!-- 12x12 Pokémon crossword cells -->
-      <!-- Row 0 -->
-      <ins data-clue="1" data-dir="across" data-length="10" data-answer="CHARMANDER"></ins>
-      <ins></ins><ins></ins><ins></ins><ins></ins><ins></ins><ins></ins><ins></ins>
-      <del></del><ins data-clue="2" data-dir="down" data-length="7" data-answer="RAYQUAZA"></ins><ins></ins><ins></ins>
+      <!-- ROW 0 -->
+      <ins data-clue="1" data-dir="across" data-answer="C"></ins>
+      <ins data-clue="1" data-dir="across" data-answer="H"></ins>
+      <ins data-clue="1" data-dir="across" data-answer="A"></ins>
+      <ins data-clue="1" data-dir="across" data-answer="R"></ins>
+      <ins data-clue="1" data-dir="across" data-answer="M"></ins>
+      <ins data-clue="1" data-dir="across" data-answer="A"></ins>
+      <ins data-clue="1" data-dir="across" data-answer="N"></ins>
+      <ins data-clue="1" data-dir="across" data-answer="D"></ins>
+      <ins></ins>
+      <ins data-clue="2" data-dir="down" data-answer="R"></ins>
+      <ins data-clue="3" data-dir="down" data-answer="A"></ins>
+      <ins data-clue="4" data-dir="down" data-answer="M"></ins>
 
-      <!-- Row 1 -->
+      <!-- ROW 1 -->
       <ins></ins><ins></ins><ins></ins><ins></ins><ins></ins><ins></ins><ins></ins><ins></ins>
-      <del></del><ins></ins><ins></ins><ins></ins>
+      <ins></ins>
+      <ins data-clue="2" data-dir="down" data-answer="A"></ins>
+      <ins data-clue="3" data-dir="down" data-answer="B"></ins>
+      <ins data-clue="4" data-dir="down" data-answer="E"></ins>
 
-      <!-- Row 2 -->
-      <ins></ins><ins></ins><ins></ins><ins></ins><ins></ins><ins></ins><ins></ins><ins></ins>
-      <del></del><ins></ins><ins></ins><ins></ins>
+      <!-- ROW 2 -->
+      <ins data-clue="5" data-dir="across" data-answer="G"></ins>
+      <ins data-clue="5" data-dir="across" data-answer="Y"></ins>
+      <ins data-clue="5" data-dir="across" data-answer="A"></ins>
+      <ins data-clue="5" data-dir="across" data-answer="R"></ins>
+      <ins data-clue="5" data-dir="across" data-answer="A"></ins>
+      <ins data-clue="5" data-dir="across" data-answer="D"></ins>
+      <ins data-clue="5" data-dir="across" data-answer="O"></ins>
+      <ins data-clue="6" data-dir="down" data-answer="O"></ins>
+      <ins></ins>
+      <ins data-clue="2" data-dir="down" data-answer="Y"></ins>
+      <ins data-clue="3" data-dir="down" data-answer="K"></ins>
+      <ins></ins>
 
-      <!-- Continue filling rows following your 12x12 layout -->
-      <!-- Each cell is either <ins data-clue="x" ...> or <del> for black -->
-      <!-- Use your clues/answers from the table you provided -->
+      <!-- ROW 3 -->
+      <ins></ins><ins></ins><ins></ins><ins></ins><ins></ins><ins></ins>
+      <ins></ins>
+      <ins data-clue="6" data-dir="down" data-answer="N"></ins>
+      <ins></ins><ins></ins><ins></ins><ins></ins>
+
+      <!-- ROW 4 -->
+      <ins data-clue="4" data-dir="across" data-answer="M"></ins>
+      <ins data-clue="4" data-dir="across" data-answer="E"></ins>
+      <ins data-clue="4" data-dir="across" data-answer="W"></ins>
+      <ins></ins><ins></ins><ins></ins><ins></ins>
+      <ins data-clue="6" data-dir="down" data-answer="I"></ins>
+      <ins></ins><ins></ins>
+      <ins data-clue="3" data-dir="down" data-answer="K"></ins>
+      <ins></ins>
+
+      <!-- ROW 5 -->
+      <ins></ins><ins></ins><ins></ins><ins></ins><ins></ins><ins></ins>
+      <ins></ins>
+      <ins data-clue="6" data-dir="down" data-answer="X"></ins>
+      <ins></ins><ins></ins><ins></ins><ins></ins>
+
+      <!-- ROW 6 -->
+      <ins data-clue="7" data-dir="across" data-answer="S"></ins>
+      <ins data-clue="7" data-dir="across" data-answer="N"></ins>
+      <ins data-clue="7" data-dir="across" data-answer="E"></ins>
+      <ins data-clue="7" data-dir="across" data-answer="A"></ins>
+      <ins data-clue="7" data-dir="across" data-answer="S"></ins>
+      <ins data-clue="7" data-dir="across" data-answer="E"></ins>
+      <ins data-clue="7" data-dir="across" data-answer="L"></ins>
+      <ins></ins><ins></ins><ins></ins><ins></ins><ins></ins>
+
+      <!-- ROW 7 -->
+      <del></del><del></del><del></del><del></del><del></del><del></del><del></del><del></del><del></del><del></del><del></del><del></del>
+
+      <!-- ROW 8 -->
+      <del></del><del></del><del></del><del></del><del></del><del></del><del></del><del></del><del></del><del></del><del></del><del></del>
+
+      <!-- ROW 9 -->
+      <del></del><del></del><del></del><del></del><del></del><del></del><del></del><del></del><del></del><del></del><del></del><del></del>
+
+      <!-- ROW 10 -->
+      <del></del><del></del><del></del><del></del><del></del><del></del><del></del><del></del><del></del><del></del><del></del><del></del>
+
+      <!-- ROW 11 -->
+      <del></del><del></del><del></del><del></del><del></del><del></del><del></del><del></del><del></del><del></del><del></del><del></del>
     </main>
   </div>
 
@@ -68,33 +132,21 @@ label{display:flex;align-items:center;gap:8px;font-size:14px}
       <li data-dir="across" data-clue="1" data-length="10">1. CHARMANDER</li>
       <li data-dir="across" data-clue="4" data-length="3">4. MEW</li>
       <li data-dir="across" data-clue="5" data-length="8">5. GYARADOS</li>
-      <li data-dir="across" data-clue="9" data-length="5">9. ZUBAT</li>
-      <li data-dir="across" data-clue="10" data-length="7">10. TORCHIC</li>
-      <li data-dir="across" data-clue="11" data-length="7">11. KADABRA</li>
-      <li data-dir="across" data-clue="12" data-length="7">12. MACHAMP</li>
-      <li data-dir="across" data-clue="14" data-length="6">14. DIGLETT</li>
-      <li data-dir="across" data-clue="17" data-length="6">17. VULPIX</li>
-      <li data-dir="across" data-clue="18" data-length="7">18. TREECKO</li>
-      <li data-dir="across" data-clue="19" data-length="6">19. LUCARIO</li>
+      <li data-dir="across" data-clue="7" data-length="7">7. SNEASEL</li>
     </ul>
 
     <ul id="down" style="margin-top:12px">
       <li class="heading">Down</li>
-      <li data-dir="down" data-clue="2" data-length="9">2. RAYQUAZA</li>
+      <li data-dir="down" data-clue="2" data-length="7">2. RAYQUAZA</li>
       <li data-dir="down" data-clue="3" data-length="4">3. ABRA</li>
       <li data-dir="down" data-clue="4" data-length="6">4. MEOWTH</li>
-      <li data-dir="down" data-clue="6" data-length="5">6. DITTO</li>
-      <li data-dir="down" data-clue="7" data-length="7">7. SNORLAX</li>
-      <li data-dir="down" data-clue="8" data-length="6">8. LUCARIO</li>
-      <li data-dir="down" data-clue="13" data-length="7">13. PIKACHU</li>
-      <li data-dir="down" data-clue="15" data-length="5">15. EEVEE</li>
-      <li data-dir="down" data-clue="16" data-length="4">16. ONIX</li>
+      <li data-dir="down" data-clue="6" data-length="6">6. ONIX</li>
     </ul>
   </div>
 </div>
 
 <script>
-// Start/timer logic
+// TIMER
 const startBtn=document.getElementById('startBtn');
 const titleScreen=document.getElementById('titleScreen');
 const gameWrapper=document.getElementById('gameWrapper');
@@ -113,7 +165,7 @@ startBtn.addEventListener('click', ()=>{
   },1000);
 });
 
-// Core crossword logic
+// CORE LOGIC
 const cells = Array.from(document.querySelectorAll('main ins'));
 const clues = Array.from(document.querySelectorAll('li[data-clue]'));
 const errorToggle = document.getElementById('errorToggle');
@@ -123,7 +175,6 @@ function clearVisual(){ cells.forEach(c=>c.classList.remove('highlight','cursor'
 function highlight(clueNum, dir){
   clearVisual();
   cells.forEach(c=>{
-    if(!c.dataset.clue) return;
     if(+c.dataset.clue===+clueNum && c.dataset.dir===dir) c.classList.add('highlight');
   });
   state.cursor=0; moveCursor();
@@ -132,13 +183,12 @@ function moveCursor(){
   cells.forEach(c=>c.classList.remove('cursor'));
   const highlighted = cells.filter(c=>c.classList.contains('highlight'));
   if(highlighted.length===0) return;
-  const target = highlighted[Math.min(state.cursor, highlighted.length-1)];
-  target && target.classList.add('cursor');
+  highlighted[Math.min(state.cursor, highlighted.length-1)].classList.add('cursor');
 }
 function checkErrors(){
   if(!errorToggle.checked) return;
   cells.forEach(c=>{
-    if(!c.dataset-answer){ c.classList.remove('error'); return; }
+    if(!c.dataset.answer){ c.classList.remove('error'); return; }
     const txt = (c.textContent || '').trim().toUpperCase();
     c.classList.toggle('error', txt !== c.dataset.answer);
   });
@@ -172,35 +222,27 @@ document.addEventListener('keydown', e=>{
   const highlighted = cells.filter(c=>c.classList.contains('highlight'));
   if(highlighted.length === 0) return;
 
-  if(e.key === 'ArrowRight' && state.dir === 'across'){ if(state.cursor < highlighted.length-1) state.cursor++; moveCursor(); e.preventDefault(); return; }
-  if(e.key === 'ArrowLeft'  && state.dir === 'across'){ if(state.cursor > 0) state.cursor--; moveCursor(); e.preventDefault(); return; }
-  if(e.key === 'ArrowDown'  && state.dir === 'down'  ){ if(state.cursor < highlighted.length-1) state.cursor++; moveCursor(); e.preventDefault(); return; }
-  if(e.key === 'ArrowUp'    && state.dir === 'down'  ){ if(state.cursor > 0) state.cursor--; moveCursor(); e.preventDefault(); return; }
+  if(e.key === 'ArrowRight' && state.dir==='across'){ if(state.cursor<highlighted.length-1) state.cursor++; moveCursor(); e.preventDefault(); return; }
+  if(e.key === 'ArrowLeft'  && state.dir==='across'){ if(state.cursor>0) state.cursor--; moveCursor(); e.preventDefault(); return; }
+  if(e.key === 'ArrowDown'  && state.dir==='down'){ if(state.cursor<highlighted.length-1) state.cursor++; moveCursor(); e.preventDefault(); return; }
+  if(e.key === 'ArrowUp'    && state.dir==='down'){ if(state.cursor>0) state.cursor--; moveCursor(); e.preventDefault(); return; }
 
-  if(e.key.length === 1 && /[a-z]/i.test(e.key)){
+  if(e.key.length===1 && /[a-z]/i.test(e.key)){
     const t = highlighted[state.cursor];
-    if(t){
-      t.textContent = e.key.toUpperCase();
-      if(errorToggle.checked && t.dataset.answer) t.classList.toggle('error', t.textContent !== t.dataset.answer);
-      else t.classList.remove('error');
-    }
-    if(state.cursor < highlighted.length-1) state.cursor++;
-    moveCursor();
-    e.preventDefault(); return;
+    if(t){ t.textContent=e.key.toUpperCase(); if(errorToggle.checked && t.dataset.answer) t.classList.toggle('error', t.textContent!==t.dataset.answer); else t.classList.remove('error'); }
+    if(state.cursor<highlighted.length-1) state.cursor++;
+    moveCursor(); e.preventDefault(); return;
   }
 
-  if(e.key === 'Backspace'){
+  if(e.key==='Backspace'){
     const t = highlighted[state.cursor];
-    if(t){ t.textContent = ''; t.classList.remove('error'); }
-    if(state.cursor > 0) state.cursor--;
-    moveCursor();
-    e.preventDefault(); return;
+    if(t){ t.textContent=''; t.classList.remove('error'); }
+    if(state.cursor>0) state.cursor--;
+    moveCursor(); e.preventDefault(); return;
   }
 });
 
-errorToggle.addEventListener('change', ()=>{
-  checkErrors();
-});
+errorToggle.addEventListener('change', checkErrors);
 </script>
 </body>
 </html>
