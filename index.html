@@ -2,275 +2,163 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Crosshare – Pokémon Mini</title>
+<title>Falling Blocks Survival</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <style>
-body {
-  margin: 0;
-  font-family: system-ui, sans-serif;
-  background: #0b1220;
-  color: #eaf2ff;
+body { margin:0; font-family:sans-serif; background:#111; color:#fff; overflow:hidden; }
+#gameCanvas { background:#222; display:block; margin:0 auto; border:2px solid #fff; }
+#menu, #gameOver { 
+  position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); 
+  text-align:center; background:#333; padding:20px; border:2px solid #fff;
 }
-
-/* HEADER */
-#header {
-  height: 48px;
-  background: #1e3a8a;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 14px;
-  font-weight: 600;
-}
-
-/* LAYOUT */
-#main {
-  display: grid;
-  grid-template-columns: auto 380px;
-  height: calc(100vh - 48px);
-}
-
-/* GRID */
-#grid {
-  display: grid;
-  gap: 2px;
-  background: black;
-  padding: 24px;
-  justify-content: start;
-  align-content: start;
-}
-
-.cell {
-  width: 46px;
-  height: 46px;
-  background: #1f2937;
-  position: relative;
-}
-
-.cell.block {
-  background: black;
-}
-
-.cell input {
-  width: 100%;
-  height: 100%;
-  background: transparent;
-  border: none;
-  color: #eaf2ff;
-  font-size: 20px;
-  text-align: center;
-  text-transform: uppercase;
-}
-
-.cell input:focus { outline: none; }
-
-.cell.highlight { background: #2563eb; }
-.cell.active { background: #60a5fa; }
-
-.number {
-  position: absolute;
-  top: 2px;
-  left: 4px;
-  font-size: 10px;
-  opacity: 0.8;
-}
-
-/* CLUES */
-#clues {
-  background: #0f172a;
-  border-left: 1px solid #1e3a8a;
-  padding: 14px;
-  overflow-y: auto;
-}
-
-.section {
-  font-weight: bold;
-  color: #60a5fa;
-  margin-top: 12px;
-}
-
-.clue {
-  padding: 4px;
-  cursor: pointer;
-}
-
-.clue.active {
-  background: #1e40af;
-}
+button { padding:10px 20px; margin:5px; cursor:pointer; font-size:16px; }
+#controlsGuide { font-size:14px; color:#0f0; margin-top:10px; }
 </style>
 </head>
-
 <body>
 
-<div id="header">
-  <div>CROSSHARE</div>
-  <div>00:00</div>
+<div id="menu">
+  <h1>Falling Blocks Survival</h1>
+  <p id="controlsGuide">
+    Controls:<br>
+    Arrow Left ← : Move Left<br>
+    Arrow Right → : Move Right
+  </p>
+  <button id="startBtn">Start Game</button>
 </div>
 
-<div id="main">
-  <div id="grid"></div>
+<canvas id="gameCanvas" width="400" height="600"></canvas>
 
-  <div id="clues">
-    <div class="section">ACROSS</div>
-    <div id="across"></div>
-    <div class="section">DOWN</div>
-    <div id="down"></div>
-  </div>
+<div id="gameOver" style="display:none;">
+  <h2 id="overText">Game Over!</h2>
+  <p id="scoreText"></p>
+  <button id="restartBtn">Restart</button>
 </div>
 
 <script>
-/* ================= GRID (16x16) ================= */
-const GRID = [
-['B','U','L','B','A','S','A','U','R',null,null,null,null,null,null,null],
-[null,null,null,null,null,null,null,'I','V','Y','S','A','U','R',null,null],
-[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],
-['V','E','N','U','S','A','U','R',null,null,null,null,null,null,null],
-[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],
-['C','H','A','R','M','A','N','D','E','R',null,null,null,null,null,null],
-[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],
-['C','H','A','R','M','E','L','E','O','N',null,null,null,null,null,null],
-[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],
-['C','H','A','R','I','Z','A','R','D',null,null,null,null,null,null,null],
-[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],
-['S','Q','U','I','R','T','L','E',null,null,null,null,null,null,null,null],
-[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],
-['W','A','R','T','O','R','T','L','E',null,null,null,null,null,null,null],
-[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],
-[null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null]
-];
+const canvas = document.getElementById('gameCanvas');
+const ctx = canvas.getContext('2d');
 
-/* ================= CLUES ================= */
-const ACROSS_CLUES = {
-1:"Starter Pokémon that begins the Grass line",
-3:"Bulbasaur’s middle evolution",
-4:"Final Grass starter evolution",
-5:"Fire starter Pokémon",
-6:"Charmander’s middle evolution",
-7:"Final Fire starter evolution",
-8:"Water starter Pokémon",
-9:"Squirtle’s middle evolution"
-};
+let player = { x:180, y:550, w:40, h:40, speed:6 };
+let obstacles = [];
+let collectibles = [];
+let score = 0;
+let highScore = localStorage.getItem('highScore') || 0;
+let level = 1;
+let gameRunning = false;
+let keys = {};
+let obstacleTimer = 0;
+let collectibleTimer = 0;
+let levelTime = 0;
 
-const DOWN_CLUES = {
-10:"Final Water starter evolution",
-11:"Electric mascot Pokémon",
-12:"Evolved form of Pikachu",
-13:"Pokémon famous for many evolutions",
-14:"Team Rocket’s talking Pokémon",
-15:"Confused duck Pokémon",
-16:"Legendary Psychic Pokémon"
-};
+document.addEventListener('keydown', e => keys[e.key] = true);
+document.addEventListener('keyup', e => keys[e.key] = false);
 
-/* ================= ENGINE ================= */
-const gridEl = document.getElementById('grid');
-const acrossEl = document.getElementById('across');
-const downEl = document.getElementById('down');
+const startBtn = document.getElementById('startBtn');
+const menu = document.getElementById('menu');
+const gameOverDiv = document.getElementById('gameOver');
+const restartBtn = document.getElementById('restartBtn');
+const scoreText = document.getElementById('scoreText');
 
-const rows = GRID.length;
-const cols = GRID[0].length;
-gridEl.style.gridTemplateColumns = `repeat(${cols},46px)`;
+startBtn.onclick = () => startGame();
+restartBtn.onclick = () => startGame();
 
-const cells = [];
-let number = 1;
-const across = [];
-const down = [];
+function startGame() {
+  menu.style.display = 'none';
+  gameOverDiv.style.display = 'none';
+  player.x=180; player.y=550; score=0; level=1; obstacles=[]; collectibles=[];
+  obstacleTimer=0; collectibleTimer=0; levelTime=0;
+  gameRunning=true;
+  requestAnimationFrame(gameLoop);
+}
 
-const isLetter = (r,c)=>GRID[r]?.[c];
-
-for(let r=0;r<rows;r++){
-  cells[r]=[];
-  for(let c=0;c<cols;c++){
-    const cell=document.createElement('div');
-    cell.className='cell';
-
-    if(!isLetter(r,c)){
-      cell.classList.add('block');
-      gridEl.appendChild(cell);
-      cells[r][c]=cell;
-      continue;
-    }
-
-    const input=document.createElement('input');
-    input.maxLength=1;
-    cell.appendChild(input);
-
-    const startAcross=!isLetter(r,c-1)&&isLetter(r,c+1);
-    const startDown=!isLetter(r-1,c)&&isLetter(r+1,c);
-
-    if(startAcross||startDown){
-      const n=document.createElement('div');
-      n.className='number';
-      n.textContent=number;
-      cell.appendChild(n);
-
-      if(startAcross){
-        let cc=c, arr=[];
-        while(isLetter(r,cc)){ arr.push([r,cc]); cc++; }
-        across.push({number, cells:arr});
-      }
-      if(startDown){
-        let rr=r, arr=[];
-        while(isLetter(rr,c)){ arr.push([rr,c]); rr++; }
-        down.push({number, cells:arr});
-      }
-      number++;
-    }
-
-    cell.onclick=()=>toggleFromCell(r,c);
-    gridEl.appendChild(cell);
-    cells[r][c]=cell;
+function endGame() {
+  gameRunning=false;
+  if(score>highScore) {
+    highScore = score;
+    localStorage.setItem('highScore', highScore);
   }
+  scoreText.innerHTML = `Score: ${score}<br>High Score: ${highScore}`;
+  gameOverDiv.style.display='block';
 }
 
-function render(list, el, clues){
-  list.forEach(e=>{
-    const d=document.createElement('div');
-    d.className='clue';
-    d.textContent=`${e.number}. ${clues[e.number]||''}`;
-    d.onclick=()=>activate(e);
-    el.appendChild(d);
-    e.el=d;
-  });
+function spawnObstacle() {
+  const width = Math.random()*50+20;
+  obstacles.push({ x:Math.random()*(canvas.width-width), y:-20, w:width, h:20, speed:2+level*0.5 });
 }
 
-render(across,acrossEl,ACROSS_CLUES);
-render(down,downEl,DOWN_CLUES);
-
-let active=null;
-
-function activate(entry){
-  document.querySelectorAll('.cell').forEach(c=>c.classList.remove('highlight','active'));
-  document.querySelectorAll('.clue').forEach(c=>c.classList.remove('active'));
-
-  entry.cells.forEach(([r,c],i)=>{
-    cells[r][c].classList.add('highlight');
-    if(i===0) cells[r][c].classList.add('active');
-  });
-
-  entry.el.classList.add('active');
-  const [r,c]=entry.cells[0];
-  cells[r][c].querySelector('input').focus();
-  active=entry;
+function spawnCollectible() {
+  const size = 15;
+  collectibles.push({ x:Math.random()*(canvas.width-size), y:-20, w:size, h:size, speed:1.5+level*0.3 });
 }
 
-function toggleFromCell(r,c){
-  const hits=[];
-  across.forEach(a=>a.cells.some(p=>p[0]==r&&p[1]==c)&&hits.push(a));
-  down.forEach(d=>d.cells.some(p=>p[0]==r&&p[1]==c)&&hits.push(d));
-  if(hits.length) activate(hits[0]);
-}
+function update() {
+  if(keys['ArrowLeft'] && player.x>0) player.x -= player.speed;
+  if(keys['ArrowRight'] && player.x+player.w<canvas.width) player.x += player.speed;
 
-document.addEventListener('input',e=>{
-  if(!active) return;
-  const idx=active.cells.findIndex(([r,c])=>cells[r][c].contains(e.target));
-  if(idx>-1&&idx<active.cells.length-1){
-    const [nr,nc]=active.cells[idx+1];
-    cells[nr][nc].querySelector('input').focus();
+  obstacleTimer++;
+  collectibleTimer++;
+  levelTime++;
+
+  if(obstacleTimer > 30 - level*2) { spawnObstacle(); obstacleTimer=0; }
+  if(collectibleTimer > 150 - level*5) { spawnCollectible(); collectibleTimer=0; }
+
+  obstacles.forEach(ob => ob.y += ob.speed);
+  obstacles = obstacles.filter(ob => ob.y < canvas.height);
+
+  collectibles.forEach(col => col.y += col.speed);
+  collectibles = collectibles.filter(col => col.y < canvas.height);
+
+  // Collision with obstacles
+  for(let ob of obstacles) {
+    if(player.x < ob.x+ob.w && player.x+player.w>ob.x &&
+       player.y < ob.y+ob.h && player.y+player.h>ob.y) {
+      endGame();
+    }
   }
-});
 
-activate(across[0]);
+  // Collision with collectibles
+  for(let i=collectibles.length-1; i>=0; i--) {
+    const col = collectibles[i];
+    if(player.x < col.x+col.w && player.x+player.w>col.x &&
+       player.y < col.y+col.h && player.y+player.h>col.y) {
+      score += 50; // bonus points
+      collectibles.splice(i,1);
+    }
+  }
+
+  score += 1;
+  if(levelTime % 1000 === 0) level++; // increase difficulty every ~1000 frames
+}
+
+function draw() {
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+
+  // player
+  ctx.fillStyle = '#0f0';
+  ctx.fillRect(player.x, player.y, player.w, player.h);
+
+  // obstacles
+  ctx.fillStyle = '#f00';
+  obstacles.forEach(ob => ctx.fillRect(ob.x, ob.y, ob.w, ob.h));
+
+  // collectibles
+  ctx.fillStyle = '#ff0';
+  collectibles.forEach(col => ctx.fillRect(col.x, col.y, col.w, col.h));
+
+  // score
+  ctx.fillStyle = '#fff';
+  ctx.font = '20px sans-serif';
+  ctx.fillText(`Score: ${score}  Level: ${level}`, 10,30);
+  ctx.fillText(`High Score: ${highScore}`, 10,60);
+}
+
+function gameLoop() {
+  if(!gameRunning) return;
+  update();
+  draw();
+  requestAnimationFrame(gameLoop);
+}
 </script>
 
 </body>
