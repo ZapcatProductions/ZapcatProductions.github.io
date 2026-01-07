@@ -5,8 +5,8 @@
 <title>Falling Blocks Adventure</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <style>
-body { margin:0; font-family:sans-serif; background:#111; color:#fff; overflow:hidden; }
-#gameCanvas { background:#222; display:block; margin:0 auto; border:2px solid #fff; }
+body { margin:0; font-family:sans-serif; background:#111; color:#fff; overflow:hidden; text-align:center; }
+#gameCanvas { background:#222; display:block; margin:40px auto 0 auto; border:2px solid #fff; }
 #menu, #levelScreen, #gameOver {
   position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
   text-align:center; background:#333; padding:20px; border:2px solid #fff;
@@ -51,12 +51,17 @@ let score = 0;
 let highScore = localStorage.getItem('highScore') || 0;
 let level = 1;
 let maxLevel = 50;
+let lives = 3;
 let gameRunning = false;
 let keys = {};
 let obstacleTimer = 0;
 let collectibleTimer = 0;
 let levelTimer = 0;
-let levelDuration = 2000; // in frames (~33 fps * 60 = ~60 sec?)
+let levelDuration = 600 + level*100; // frames (~60fps)
+const maxLives = 3;
+
+// Color palette per level (cycles)
+const levelColors = ['#f00','#00f','#800080','#ffa500','#0ff','#ff0','#0f0'];
 
 document.addEventListener('keydown', e => keys[e.key] = true);
 document.addEventListener('keyup', e => keys[e.key] = false);
@@ -75,12 +80,13 @@ restartBtn.onclick = () => startGame();
 nextLevelBtn.onclick = () => startNextLevel();
 
 function startGame() {
-  menu.style.display = 'none';
-  gameOverDiv.style.display = 'none';
-  levelScreen.style.display = 'none';
-  player.x=180; player.y=550; score=0; level=1; obstacles=[]; collectibles=[];
+  menu.style.display='none';
+  gameOverDiv.style.display='none';
+  levelScreen.style.display='none';
+  player.x=180; player.y=550;
+  score=0; level=1; obstacles=[]; collectibles=[]; lives=maxLives;
   obstacleTimer=0; collectibleTimer=0; levelTimer=0;
-  levelDuration = 600 + level*100; // Level 1 ~10s, increases per level
+  levelDuration = 600 + level*100;
   gameRunning=true;
   requestAnimationFrame(gameLoop);
 }
@@ -90,28 +96,28 @@ function startNextLevel() {
   obstacles=[]; collectibles=[];
   player.x=180; player.y=550;
   obstacleTimer=0; collectibleTimer=0; levelTimer=0;
-  levelDuration = 600 + level*100; // scale duration
+  levelDuration = 600 + level*100;
   gameRunning=true;
   requestAnimationFrame(gameLoop);
 }
 
 function endLevel() {
   gameRunning=false;
-  if(level >= maxLevel) {
+  if(level>=maxLevel) {
     endGame(true);
   } else {
     levelScreen.style.display='block';
-    levelText.innerHTML = `Level ${level} Cleared!<br>Score: ${score}`;
+    levelText.innerHTML = `Level ${level} Cleared!<br>Score: ${score}<br>Lives: ${lives}`;
   }
 }
 
 function endGame(victory=false) {
   gameRunning=false;
-  if(score>highScore) {
-    highScore = score;
-    localStorage.setItem('highScore', highScore);
+  if(score>highScore){
+    highScore=score;
+    localStorage.setItem('highScore',highScore);
   }
-  scoreText.innerHTML = victory ? 
+  scoreText.innerHTML = victory ?
     `You beat all levels!<br>Score: ${score}<br>High Score: ${highScore}` :
     `Game Over!<br>Score: ${score}<br>High Score: ${highScore}`;
   gameOverDiv.style.display='block';
@@ -119,28 +125,28 @@ function endGame(victory=false) {
 
 function spawnObstacle() {
   const width = Math.random()*50+20;
-  obstacles.push({ x:Math.random()*(canvas.width-width), y:-20, w:width, h:20, speed:2 + level*0.3 });
+  const color = levelColors[(level-1)%levelColors.length];
+  obstacles.push({ x:Math.random()*(canvas.width-width), y:-20, w:width, h:20, speed:2+level*0.3, color:color });
 }
 
 function spawnCollectible() {
-  const size = 15;
+  const size=15;
   collectibles.push({ x:Math.random()*(canvas.width-size), y:-20, w:size, h:size, speed:1.5+level*0.2 });
 }
 
 function update() {
-  if(keys['ArrowLeft'] && player.x>0) player.x -= player.speed;
-  if(keys['ArrowRight'] && player.x+player.w<canvas.width) player.x += player.speed;
+  if(keys['ArrowLeft'] && player.x>0) player.x-=player.speed;
+  if(keys['ArrowRight'] && player.x+player.w<canvas.width) player.x+=player.speed;
 
   obstacleTimer++;
   collectibleTimer++;
   levelTimer++;
 
-  // Difficulty scaling: faster spawn rate as levels increase
-  let obstacleSpawnRate = Math.max(20, 40 - level); // min 20
-  let collectibleSpawnRate = Math.max(100, 150 - level*2);
+  let obstacleSpawnRate = Math.max(20, 40-level);
+  let collectibleSpawnRate = Math.max(100,150-level*2);
 
-  if(obstacleTimer > obstacleSpawnRate) { spawnObstacle(); obstacleTimer=0; }
-  if(collectibleTimer > collectibleSpawnRate) { spawnCollectible(); collectibleTimer=0; }
+  if(obstacleTimer>obstacleSpawnRate){ spawnObstacle(); obstacleTimer=0; }
+  if(collectibleTimer>collectibleSpawnRate){ spawnCollectible(); collectibleTimer=0; }
 
   obstacles.forEach(ob => ob.y += ob.speed);
   obstacles = obstacles.filter(ob => ob.y < canvas.height);
@@ -149,27 +155,30 @@ function update() {
   collectibles = collectibles.filter(col => col.y < canvas.height);
 
   // Collision with obstacles
-  for(let ob of obstacles) {
+  for(let i=obstacles.length-1;i>=0;i--){
+    const ob = obstacles[i];
     if(player.x < ob.x+ob.w && player.x+player.w>ob.x &&
-       player.y < ob.y+ob.h && player.y+player.h>ob.y) {
-      endGame();
+       player.y < ob.y+ob.h && player.y+player.h>ob.y){
+      obstacles.splice(i,1);
+      lives--;
+      if(lives<=0){ endGame(); return; }
     }
   }
 
   // Collision with collectibles
-  for(let i=collectibles.length-1; i>=0; i--) {
+  for(let i=collectibles.length-1;i>=0;i--){
     const col = collectibles[i];
     if(player.x < col.x+col.w && player.x+player.w>col.x &&
-       player.y < col.y+col.h && player.y+player.h>col.y) {
+       player.y < col.y+col.h && player.y+player.h>col.y){
       score += 50;
       collectibles.splice(i,1);
     }
   }
 
-  score += 1;
+  score+=1;
 
-  // Level complete if timer reaches duration
-  if(levelTimer >= levelDuration) {
+  // Level complete
+  if(levelTimer>=levelDuration){
     level++;
     endLevel();
   }
@@ -183,25 +192,30 @@ function draw() {
   ctx.fillRect(player.x, player.y, player.w, player.h);
 
   // obstacles
-  ctx.fillStyle = '#f00';
-  obstacles.forEach(ob => ctx.fillRect(ob.x, ob.y, ob.w, ob.h));
+  obstacles.forEach(ob => { ctx.fillStyle=ob.color; ctx.fillRect(ob.x,ob.y,ob.w,ob.h); });
 
   // collectibles
-  ctx.fillStyle = '#ff0';
-  collectibles.forEach(col => ctx.fillRect(col.x, col.y, col.w, col.h));
+  ctx.fillStyle='#ff0';
+  collectibles.forEach(col => ctx.fillRect(col.x,col.y,col.w,col.h));
 
-  // UI: Score, High Score
-  ctx.fillStyle = '#fff';
-  ctx.font = '20px sans-serif';
-  ctx.fillText(`Score: ${score}  Level: ${level>maxLevel?maxLevel:level}`, 10,30);
-  ctx.fillText(`High Score: ${highScore}`, 10,60);
+  // UI
+  ctx.fillStyle='#fff';
+  ctx.font='20px sans-serif';
+  ctx.fillText(`Score: ${score}  Level: ${level>maxLevel?maxLevel:level}`,10,30);
+  ctx.fillText(`High Score: ${highScore}`,10,60);
 
-  // Level timer indicator
-  let secondsLeft = Math.max(0, Math.ceil((levelDuration - levelTimer)/60));
-  ctx.fillText(`Survive ${secondsLeft}s for this level`, 10,90);
+  // Lives as hearts
+  for(let i=0;i<lives;i++){
+    ctx.fillStyle='#f00';
+    ctx.fillText('♥',canvas.width-25-(i*20),30);
+  }
+
+  // Level timer
+  let secondsLeft = Math.max(0,Math.ceil((levelDuration-levelTimer)/60));
+  ctx.fillText(`Survive ${secondsLeft}s for this level`,10,90);
 }
 
-function gameLoop() {
+function gameLoop(){
   if(!gameRunning) return;
   update();
   draw();
