@@ -1,75 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Mini Pokémon Crossword</title>
+<style>
+@import url('https://fonts.googleapis.com/css?family=Annie+Use+Your+Telescope|Libre+Baskerville');
+
+body {
+  font-family: 'Libre Baskerville';
+  display: grid;
+  grid-template-rows: 1fr 5fr 5fr 1fr;
+  grid-template-columns: 1fr 1fr;
+  grid-gap: 15px;
+  align-items: center;
+  justify-items: center;
+  margin: 0;
+  padding: 10px;
+}
+
+h1 {
+  grid-row: 1;
+  grid-column: 1/3;
+  padding: 0;
+  margin: 0;
+}
+
+main {
+  grid-row: 2;
+  grid-column: 1/3;
+  display: grid;
+  grid-template-rows: repeat(6, 8vmin);
+  grid-template-columns: repeat(6, 8vmin);
+  grid-gap: 2px;
+}
+
+ins, del {
+  border-radius: 2px;
+}
+
+del {
+  background-color: black;
+}
+
+ins {
+  font-family: 'Annie Use Your Telescope', cursive;
+  position: relative;
+  display: grid;
+  align-items: center;
+  justify-items: center;
+  background-color: white;
+  border: 1px solid #444;
+  text-decoration: none;
+  font-size: calc(24px + 0.5vmin);
+  padding: 0;
+  margin: 0;
+  text-transform: uppercase;
+  cursor: text;
+}
+
+ins[data-clue]:before {
+  font-family: 'Libre Baskerville';
+  position: absolute;
+  top: 1px;
+  left: 2px;
+  font-size: 10px;
+  content: attr(data-clue);
+}
+
+ins.highlight, li.current {
+  background-color: #ffd;
+}
+
+ins.editting {
+  background-color: #ffb;
+}
+
+ins.cursor {
+  box-shadow: inset 0 0 0 4px #BBB;
+  animation-name: pulse;
+  animation-duration: 0.5s;
+  animation-iteration-count: infinite;
+  animation-timing-function: ease-in-out;
+  animation-direction: alternate;
+}
+
+@keyframes pulse {
+  from { box-shadow: inset 0 0 0 4px #BBB; }
+  to   { box-shadow: inset 0 0 0 6px #BBB; }
+}
+
+ul { list-style:none; padding:0 15px; }
+li.heading { font-weight:bold; padding: 10px 0; cursor:default; }
+li[data-clue] { padding:2px 5px; cursor:pointer; }
+</style>
+</head>
+<body>
+<h1>Pokémon Mini Crossword</h1>
+
+<main>
+  <!-- 6x6 grid example -->
+  <ins data-clue="1"></ins>
+  <ins></ins>
+  <ins data-clue="2"></ins>
+  <ins></ins>
+  <ins data-clue="3"></ins>
+  <ins></ins>
+
+  <ins></ins>
+  <ins data-clue="4"></ins>
+  <ins></ins>
+  <ins data-clue="5"></ins>
+  <ins></ins>
+  <ins></ins>
+
+  <ins data-clue="6"></ins>
+  <ins></ins>
+  <ins data-clue="7"></ins>
+  <ins></ins>
+  <ins></ins>
+  <ins></ins>
+
+  <ins></ins>
+  <ins data-clue="8"></ins>
+  <ins></ins>
+  <ins data-clue="9"></ins>
+  <ins></ins>
+  <ins></ins>
+
+  <ins data-clue="10"></ins>
+  <ins></ins>
+  <ins></ins>
+  <ins></ins>
+  <ins></ins>
+  <ins></ins>
+
+  <ins></ins>
+  <ins data-clue="11"></ins>
+  <ins></ins>
+  <ins></ins>
+  <ins data-clue="12"></ins>
+  <ins></ins>
+</main>
+
+<ul>
+  <li class="heading">Across</li>
+  <li data-clue="1" data-dir="across" data-length="3">1. Pikachu type (3)</li>
+  <li data-clue="4" data-dir="across" data-length="2">4. Evolution of Charmander (2)</li>
+  <li data-clue="6" data-dir="across" data-length="3">6. Legendary bird (3)</li>
+  <li data-clue="8" data-dir="across" data-length="2">8. Water starter (2)</li>
+  <li data-clue="10" data-dir="across" data-length="2">10. Eevee evolution (2)</li>
+  <li data-clue="11" data-dir="across" data-length="3">11. Fire starter (3)</li>
+</ul>
+
+<ul>
+  <li class="heading">Down</li>
+  <li data-clue="1" data-dir="down" data-length="2">1. Electric move (2)</li>
+  <li data-clue="2" data-dir="down" data-length="3">2. Grass starter (3)</li>
+  <li data-clue="3" data-dir="down" data-length="2">3. Water Pokémon (2)</li>
+  <li data-clue="5" data-dir="down" data-length="3">5. Legendary Pokémon (3)</li>
+  <li data-clue="7" data-dir="down" data-length="2">7. Dragon Pokémon (2)</li>
+  <li data-clue="9" data-dir="down" data-length="3">9. Fire type (3)</li>
+  <li data-clue="12" data-dir="down" data-length="3">12. Psychic Pokémon (3)</li>
+</ul>
+
 <script>
-const btnCreate = document.getElementById('btnCreate');
-const btnPlay = document.getElementById('btnPlay');
-const crosswordEl = document.getElementById('crossword');
+let index = Array.from(document.querySelector('main').children);
+let clues = Array.from(document.querySelectorAll('li[data-clue]'));
 
-let crosswordData = []; // [{word, clue, positions:[r,c,...]}]
-let grid = [];
-let gridRows = 15, gridCols = 15;
+let state = { index:null, clue:null, cursor:0, answers:{}, dir:null, length:null };
 
-function createGrid() {
-  crosswordEl.innerHTML = '';
-  grid = Array.from({length:gridRows},()=>Array(gridCols).fill(''));
-  crosswordData.forEach(entry=>{
-    let r = Math.floor(Math.random()*(gridRows-entry.word.length));
-    let c = Math.floor(Math.random()*(gridCols-entry.word.length));
-    entry.positions = [];
-    for(let i=0;i<entry.word.length;i++){
-      grid[r][c+i] = entry.word[i].toUpperCase();
-      entry.positions.push([r,c+i]);
-    }
-  });
-
-  for(let r=0;r<gridRows;r++){
-    const rowDiv = document.createElement('div');
-    rowDiv.classList.add('crossrow');
-    for(let c=0;c<gridCols;c++){
-      const sq = document.createElement('div');
-      sq.className = 'square';
-      if(grid[r][c]){
-        const input = document.createElement('input');
-        input.type='text';
-        input.maxLength=1;
-        input.className='char';
-        input.dataset.row=r;
-        input.dataset.col=c;
-        input.addEventListener('input', e=>{
-          e.target.value=e.target.value.toUpperCase();
-          moveNext(e.target);
-        });
-        sq.appendChild(input);
-      } else {
-        sq.classList.add('hide');
-      }
-      rowDiv.appendChild(sq);
-    }
-    crosswordEl.appendChild(rowDiv);
+function toggleClue() {
+  let c = this.getAttribute("data-clue");
+  let d = this.getAttribute("data-dir");
+  let l = parseInt(this.getAttribute("data-length"));
+  let s = index.indexOf(document.querySelector('ins[data-clue="'+c+'"]'));
+  for (let x=0;x<l;x++) {
+    if (d==="across") index[s+x].classList.toggle("highlight");
+    else index[s+x*6].classList.toggle("highlight");        
   }
 }
 
-function moveNext(input){
-  const r = Number(input.dataset.row);
-  const c = Number(input.dataset.col);
-  // simple right movement
-  for(let nc=c+1;nc<gridCols;nc++){
-    const next = crosswordEl.querySelector(`input[data-row="${r}"][data-col="${nc}"]`);
-    if(next){next.focus();break;}
+function editClue() {
+  Array.from(document.querySelectorAll('.cursor,.editting,.current')).map(el => el.classList.remove("cursor","editting","current"));
+  let c = parseInt(this.getAttribute("data-clue"));
+  let l = parseInt(this.getAttribute("data-length"));
+  let d = this.getAttribute("data-dir");
+  let s = index.indexOf(document.querySelector('ins[data-clue="'+c+'"]'));
+  for (let x=0;x<l;x++) {
+    if (d==="across") index[s+x].classList.add("editting");
+    else index[s+x*6].classList.add("editting");        
   }
+  state.index=s; state.clue=c; state.dir=d; state.length=l;
+  if (!state.answers[c+'-'+d]) { state.answers[c+'-'+d]=''; state.cursor=0; }
+  else state.cursor=state.answers[c+'-'+d].length;
+  if (d==="across") index[s+state.cursor].classList.add("cursor");
+  else index[s+state.cursor*6].classList.add("cursor");
+  document.querySelector('li[data-clue="'+c+'"][data-dir="'+d+'"]').classList.add("current");
 }
 
-btnCreate.onclick = ()=>{
-  const lines = document.querySelectorAll('.line');
-  crosswordData = [];
-  lines.forEach(line=>{
-    const word = line.querySelector('.word').value.trim();
-    const clue = line.querySelector('.clue').value.trim();
-    if(word) crosswordData.push({word, clue});
-  });
-  createGrid();
-};
+clues.forEach(clue=>{
+  ['mouseover','mouseout'].map(e=> clue.addEventListener(e,toggleClue));
+  clue.addEventListener('click', editClue);
+});
 
-btnPlay.onclick = ()=>{
-  const firstInput = crosswordEl.querySelector('input.char');
-  if(firstInput) firstInput.focus();
-};
+document.addEventListener('keydown', e=>{
+  if (!state.clue) return;
+  e.preventDefault();
+  switch(e.key){
+    case "Tab": {
+      let cli = document.querySelector('li[data-clue="'+state.clue+'"][data-dir="'+state.dir+'"]');
+      let c = clues.indexOf(cli);
+      let nc = e.shiftKey? c-1:c+1;
+      if (nc<0) nc=clues.length-1;
+      if (nc>=clues.length) nc=0;
+      editClue.bind(clues[nc])();
+      return;
+    }
+    case "Backspace":
+      state.answers[state.clue+'-'+state.dir] = state.answers[state.clue+'-'+state.dir].slice(0,-1);
+      break;
+    default:
+      if (e.key.length>1) return;
+      if (state.answers[state.clue+'-'+state.dir].length<state.length)
+        state.answers[state.clue+'-'+state.dir]+=e.key.toUpperCase();
+      break;
+  }
+  // update cursor
+  if (state.dir==="across") index[state.index+state.cursor].classList.remove("cursor");
+  else index[state.index+state.cursor*6].classList.remove("cursor");
+  state.cursor = state.answers[state.clue+'-'+state.dir].length;
+  if (state.cursor<0) state.cursor=0; if (state.cursor>state.length-1) state.cursor=state.length-1;
+  if (state.dir==="across") index[state.index+state.cursor].classList.add("cursor");
+  else index[state.index+state.cursor*6].classList.add("cursor");
+
+  // fill letters
+  for (let x=0;x<state.length;x++) {
+    if (state.dir==="across") index[state.index+x].textContent = state.answers[state.clue+'-'+state.dir][x]||'';
+    else index[state.index+x*6].textContent = state.answers[state.clue+'-'+state.dir][x]||'';
+  }
+});
+
+// click a numbered cell to jump to that clue
+Array.from(document.querySelectorAll('ins[data-clue]')).forEach(el=>{
+  el.addEventListener('click', function(){
+    let c = parseInt(this.getAttribute('data-clue'));
+    let lis = Array.from(document.querySelectorAll('li[data-clue="'+c+'"]'));
+    if (lis.length===1) editClue.bind(lis[0])();
+    else editClue.bind(lis[state.dir==='across'?1:0])();
+  });
+});
 </script>
+</body>
+</html>
